@@ -28,15 +28,22 @@ body[data-mode="view"] .edit-only{display:none !important}
 #editBanner{display:none;background:color-mix(in srgb,#ffb020 16%,var(--panel));border-bottom:1px solid color-mix(in srgb,#ffb020 45%,transparent);padding:9px 22px;font-size:12.5px;font-weight:700;color:#ffd166}
 body[data-mode="edit"] #editBanner{display:block}
 
+/* ---------- LIVE ---------- */
+.live{display:flex;align-items:center;gap:6px;font:800 9px var(--font);letter-spacing:1.4px;color:#3ddc84;flex:0 0 auto}
+.live i{width:7px;height:7px;border-radius:50%;background:#3ddc84;box-shadow:0 0 10px #3ddc84;animation:pulse 1.7s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
+body[data-mode="edit"] .live{display:none}
+
 /* ---------- SPLASH ---------- */
 #splash{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .55s ease,visibility .55s;cursor:pointer}
 #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-.sp-logo{font-size:62px;animation:spPop .7s cubic-bezier(.2,1.5,.4,1) both}
-.sp-name{font-family:var(--font-head);font-size:32px;font-weight:800;color:var(--accent);animation:spUp .55s .18s ease both;letter-spacing:1px}
-.sp-sub{color:var(--muted);font-size:13px;animation:spUp .55s .34s ease both}
-.sp-bar{width:170px;height:3px;border-radius:3px;background:var(--border);overflow:hidden;animation:spUp .5s .4s ease both}
+#splashCv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.sp-logo{font-size:62px;animation:spPop .7s cubic-bezier(.2,1.5,.4,1) both;position:relative;z-index:2}
+.sp-name{font-family:var(--font-head);font-size:32px;font-weight:800;color:var(--accent);animation:spUp .55s .18s ease both;letter-spacing:1px;position:relative;z-index:2}
+.sp-sub{color:var(--muted);font-size:13px;animation:spUp .55s .34s ease both;position:relative;z-index:2}
+.sp-bar{width:170px;height:3px;border-radius:3px;background:var(--border);overflow:hidden;animation:spUp .5s .4s ease both;position:relative;z-index:2}
 .sp-bar i{display:block;height:100%;width:0;background:var(--accent);animation:spBar 1s .45s ease forwards}
-.sp-skip{margin-top:6px;font-size:11px;color:var(--muted);opacity:.6;animation:spUp .5s .6s ease both}
+.sp-skip{margin-top:6px;font-size:11px;color:var(--muted);opacity:.6;animation:spUp .5s .6s ease both;position:relative;z-index:2}
 @keyframes spPop{from{transform:scale(.15);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes spUp{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
 @keyframes spBar{to{width:100%}}
@@ -48,23 +55,25 @@ body[data-mode="edit"] #editBanner{display:block}
 .logo-ico{font-size:19px;transition:.2s}
 .logo:hover .logo-ico{transform:rotate(-12deg) scale(1.15)}
 .tabwrap{position:relative;display:flex;flex:1;min-width:0}
-#tabbar{display:flex;gap:1px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+#tabbar{display:flex;gap:1px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0;position:relative}
 #tabbar::-webkit-scrollbar{display:none}
 .tabwrap.can-scroll::after{content:'';position:absolute;right:0;top:4px;bottom:4px;width:44px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--bg));border-radius:10px}
-.tab{display:flex;align-items:center;gap:7px;padding:17px 10px;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap;transition:color .18s,border-color .18s;flex:0 0 auto}
+.tab{display:flex;align-items:center;gap:7px;padding:17px 10px;background:none;border:0;color:var(--muted);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap;transition:color .18s;flex:0 0 auto}
 .tab .m-ico{opacity:.65;transition:.18s}
 .tab:hover{color:var(--text)}
 .tab:hover .m-ico{opacity:1;transform:translateY(-1px)}
-.tab.active{color:var(--text);border-bottom-color:var(--accent)}
-.tab.active .m-ico{opacity:1}
+.tab.active{color:var(--text)}
+.tab-ind{position:absolute;bottom:0;left:0;height:2px;width:0;background:var(--accent);border-radius:2px;box-shadow:0 0 10px var(--accent);transition:left .3s cubic-bezier(.35,1.5,.4,1),width .3s cubic-bezier(.35,1.5,.4,1),opacity .2s;pointer-events:none;opacity:0}
 .tab-sep{width:1px;height:22px;background:var(--border);margin:0 7px;flex:0 0 auto;align-self:center}
 .m-ico{display:inline-flex;flex:0 0 auto}
 .m-ico svg,.m-ico img{width:18px;height:18px;display:block}
 .m-ico.txt{font-size:16px;line-height:1}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:6px;flex:0 0 auto}
-.tb-gear{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.tb-gear,.tb-sound{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.15s}
 .tb-gear:hover{color:var(--text);border-color:var(--accent);transform:rotate(45deg)}
 .tb-gear.active{color:var(--accent);border-color:var(--accent)}
+.tb-sound:hover{color:var(--text);border-color:var(--accent)}
+.tb-sound.active{color:#3ddc84;border-color:#3ddc84}
 .dd{position:relative}
 .dd-btn{border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:9px 13px;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.15s}
 .dd-btn:hover{color:var(--text);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
@@ -82,8 +91,6 @@ body[data-mode="edit"] #editBanner{display:block}
 /* ---------- LAYOUT ---------- */
 main{max-width:1240px;margin:0 auto;padding:0 22px}
 #content{padding:20px 0 46px}
-#content.anim{animation:pageIn .38s ease}
-@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #footer{padding:0 22px 30px;text-align:center;color:var(--muted);font-size:12px}
 #footer a{color:var(--muted);text-decoration:none;font-size:11px;opacity:.6}
 #footer a:hover{opacity:1;color:var(--accent)}
@@ -118,6 +125,7 @@ main{max-width:1240px;margin:0 auto;padding:0 22px}
 .p-name{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .p-title{font-size:12px;color:var(--muted);margin-top:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .p-title b{color:var(--c);font-weight:700}
+.p-title .pts{font-variant-numeric:tabular-nums}
 .tag{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);white-space:nowrap}
 .ava{width:46px;height:46px;border-radius:9px;image-rendering:pixelated;background:var(--panel2);border:1px solid var(--border);object-fit:cover;flex:0 0 auto}
 .col-region{width:84px;flex:0 0 auto;display:flex;justify-content:center}
@@ -250,6 +258,7 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 </head>
 <body data-mode="view" data-compact="true">
 <div id="splash">
+  <canvas id="splashCv"></canvas>
   <div class="sp-logo">🧡</div>
   <div class="sp-name">HTL</div>
   <div class="sp-sub">HTL-рейтинг «наших» игроков</div>
@@ -259,8 +268,10 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 <div id="editBanner">✏️ Режим редактирования — изменения видны только тебе. Готово? Нажми «📥 Скачать data.json» в редакторе и замени файл в репозитории GitHub.</div>
 <header id="topbar"><div class="tb-in">
   <div class="logo" data-act="goto" data-id="top"><span class="logo-ico" id="logoIco">🧡</span><span id="logoText">HTL</span></div>
-  <div class="tabwrap" id="tabwrap"><div id="tabbar"></div></div>
+  <span class="live" id="liveDot" title="Данные обновляются в реальном времени"><i></i>LIVE</span>
+  <div class="tabwrap" id="tabwrap"><div id="tabbar"><span class="tab-ind" id="tabInd"></span></div></div>
   <div class="tb-right">
+    <button class="tb-sound" id="soundBtn" title="Звуки интерфейса (только у тебя)">🔇</button>
     <div class="dd" id="pagesDD">
       <button class="dd-btn" id="ddBtn" data-act="toggleDD">📄<span>Страницы</span><span class="dd-caret">▾</span></button>
       <div class="dd-menu" id="ddMenu"></div>
@@ -310,7 +321,7 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 'use strict';
 const EDIT_MODE=new URLSearchParams(location.search).has('edit');
 document.body.dataset.mode=EDIT_MODE?'edit':'view';
-const KEY='htl_state_v4',DRAFT_KEY='htl_draft_v1';
+const KEY='htl_state_v4',DRAFT_KEY='htl_draft_v1',SOUND_KEY='htl_sound';
 const TIERS=['HT1','LT1','HT2','LT2','HT3','LT3','HT4','LT4','HT5','LT5'];
 const REGIONS=['EU','NA','ASIA','SA','OCE','AF'];
 const REGION_COLORS={EU:'#3ddc84',NA:'#ff4655',ASIA:'#4aa3ff',SA:'#ff8a5c',OCE:'#b07cff',AF:'#ffd166'};
@@ -321,7 +332,7 @@ const BLOCK_TYPES=[['h2','🔶 Заголовок'],['h3','▫️ Подзаго
 const DEFAULT_AVA='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#181c26"/><rect x="16" y="14" width="32" height="34" fill="#8b5a3c"/><rect x="16" y="14" width="32" height="10" fill="#3b2a1e"/><rect x="22" y="28" width="6" height="6" fill="#fff"/><rect x="36" y="28" width="6" height="6" fill="#fff"/><rect x="26" y="40" width="12" height="4" fill="#5b3a26"/></svg>');
 window.DEFAULT_AVA=DEFAULT_AVA;
 
-/* ================= ИКОНКИ: ОФИЦИАЛЬНЫЕ С MCTIERS + ФОЛБЭК ================= */
+/* ================= ИКОНКИ ================= */
 const OFFICIAL={
   overall:'https://mctiers.net/tier_icons/overall.svg',
   vanilla:'https://mctiers.net/tier_icons/vanilla.svg',
@@ -368,6 +379,28 @@ window.iconFail=function(img){
   const fb=ICON_FB[img.dataset.fb]||ICON_FB.overall;
   img.src='data:image/svg+xml;utf8,'+encodeURIComponent(fb);
 };
+
+/* ================= ЗВУКИ ================= */
+let SOUND_ON=localStorage.getItem(SOUND_KEY)==='1';
+let AC=null;
+function ensureAC(){
+  if(AC)return;
+  try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
+}
+function tick(freq=760,dur=.05,vol=.05){
+  if(!SOUND_ON||!AC||AC.state!=='running')return;
+  try{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='square';o.frequency.setValueAtTime(freq,AC.currentTime);
+    o.frequency.exponentialRampToValueAtTime(freq*.6,AC.currentTime+dur);
+    g.gain.setValueAtTime(vol,AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+dur);
+    o.connect(g);g.connect(AC.destination);
+    o.start();o.stop(AC.currentTime+dur+.01);
+  }catch(e){}
+}
+document.addEventListener('pointerdown',()=>{ensureAC();if(AC&&AC.state==='suspended')AC.resume();},{once:false});
+function updateSoundBtn(){const b=$('#soundBtn');b.textContent=SOUND_ON?'🔊':'🔇';b.classList.toggle('active',SOUND_ON);}
 
 /* ================= ДАННЫЕ ================= */
 const DEFAULTS={
@@ -453,7 +486,7 @@ function normalize(o){
   return d;
 }
 let S=clone(DEFAULTS);
-const UI={page:'top',edTab:'theme',search:'',region:'',country:'',sort:'points',drag:null,collapsed:new Set(),pageEdit:null};
+const UI={page:'top',edTab:'theme',search:'',region:'',country:'',sort:'points',drag:null,collapsed:new Set(),pageEdit:null,animatePts:true};
 let PF=null;
 function save(){try{localStorage.setItem(EDIT_MODE?DRAFT_KEY:KEY,JSON.stringify(S));}catch(e){toast('⚠️ Не удалось сохранить (хранилище переполнено — уменьши картинки)',true);}}
 
@@ -466,7 +499,7 @@ async function boot(){
   if(!loaded){try{const l=JSON.parse(localStorage.getItem(KEY)||'null');if(l){S=normalize(l);loaded=true;}}catch(e){}}
   if(!loaded)S=clone(DEFAULTS);
   seedPages();renderAll();applyHash();
-  showSplash();
+  showSplash();updateSoundBtn();
   if(!EDIT_MODE)startPolling();
 }
 function showSplash(){
@@ -474,10 +507,32 @@ function showSplash(){
   $('.sp-logo').textContent=S.settings.logoEmoji;
   $('.sp-name').textContent=S.settings.siteName;
   $('.sp-sub').textContent=S.settings.subtitle;
-  const done=()=>{s.classList.add('hide');sessionStorage.setItem('htl_splash','1');};
+  let fxOn=true;
+  startSplashFX(()=>fxOn);
+  const done=()=>{if(s.classList.contains('hide'))return;fxOn=false;s.classList.add('hide');sessionStorage.setItem('htl_splash','1');};
   s.onclick=done;
-  if(sessionStorage.getItem('htl_splash')){s.style.display='none';return;}
-  setTimeout(done,1900);
+  if(sessionStorage.getItem('htl_splash')){fxOn=false;s.style.display='none';return;}
+  setTimeout(done,2000);
+}
+function startSplashFX(alive){
+  const cv=$('#splashCv');if(!cv)return;
+  const x=cv.getContext('2d');
+  const cols=Object.values(S.settings.tierColors).concat([S.settings.accent]);
+  const P=[];
+  for(let i=0;i<48;i++)P.push({x:Math.random(),y:Math.random()-1,s:2+Math.random()*5,v:.0016+Math.random()*.004,c:cols[i%cols.length],a:.25+Math.random()*.55});
+  function frame(){
+    if(!alive()){cv.width=cv.height=0;return;}
+    const w=cv.width=cv.clientWidth,h=cv.height=cv.clientHeight;
+    x.clearRect(0,0,w,h);
+    P.forEach(p=>{
+      p.y+=p.v;if(p.y>1.05){p.y=-.05;p.x=Math.random();}
+      x.globalAlpha=p.a;x.fillStyle=p.c;
+      x.fillRect(Math.round(p.x*w),Math.round(p.y*h),p.s,p.s);
+    });
+    x.globalAlpha=1;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 function startPolling(){
   setInterval(async()=>{
@@ -494,7 +549,7 @@ function mkBlock(type){const b={id:uid(),type};if(type==='h2')b.text='Загол
 function mkPage(title,icon,subtitle,blocks){return{id:uid(),title,icon,subtitle,updated:Date.now(),blocks};}
 function tplRules(){return mkPage('Правила тир-листа','📜','Как устроен рейтинг и как попасть в сетки',[{id:uid(),type:'h2',text:'🏆 Общие положения'},{id:uid(),type:'p',text:'Этот сайт — внутренний tier list нашего комьюнити. Игроки оцениваются по режимам (китам), а сумма очков определяет место в **Overall** и **звание**.'},{id:uid(),type:'list',ordered:false,items:['Оценку ставит только действующий тестер соответствующего кита.','Оценка — это текущий уровень игрока.','Рейтинг публичный: любой игрок может посмотреть свою карточку и скачать её.','Все спорные ситуации решает руководство сайта / старшие тестеры.']},{id:uid(),type:'h2',text:'⚔️ Как получить оценку'},{id:uid(),type:'list',ordered:true,items:['Договорись с тестером нужного кита.','Согласуй кит, регион и формат (обычно 1х1).','Проведи бой по регламенту.','Тестер выносит вердикт и вносит тир в таблицу.','После внесения тир появится у тебя в карточке и в Overall.']},{id:uid(),type:'note',tone:'warn',text:'Не проси завысить оценку и не дави на тестеров. Попытка повлиять на результат = отказ в оценке.'},{id:uid(),type:'h2',text:'🧮 Шкала очков'},{id:uid(),type:'tiers'},{id:uid(),type:'h2',text:'👑 Звания'},{id:uid(),type:'titles'}]);}
 function tplCalib(){return mkPage('Регламент калибровок и 1х1','🎯','Процедура оценки при вызове / выходе на тестера',[{id:uid(),type:'h2',text:'📌 Что такое калибровка'},{id:uid(),type:'p',text:'Калибровка — первичная оценка нового игрока в ките. Проводится в формате **1х1** с тестером этого кита до вынесения вердикта.'},{id:uid(),type:'h2',text:'🗡️ Формат боя'},{id:uid(),type:'list',ordered:false,items:['Кит выбирается из списка режимов сайта.','Арена — стандартная для кита.','Длительность: до явного преимущества или по решению тестера (обычно 1–4 раунда).','Запись боя (clip) желательна — она решает апелляции.']},{id:uid(),type:'h2',text:'👤 Кто вызывает'},{id:uid(),type:'list',ordered:true,items:['Игрок сам инициирует калибровку: пишет тестеру кита и договаривается о времени.','Тестер вправе отказать без объяснения причин.','Если тестер долго недоступен — калибровку проводит старший тестер кита.']},{id:uid(),type:'note',tone:'info',text:'Игрок без оценки в ките отображается как **Unranked** и не учитывается в Overall по этому режиму.'},{id:uid(),type:'h2',text:'📊 Как тестер ставит тир'},{id:uid(),type:'p',text:'Тестер оценивает: контроль дистанции, тайминги, урон, принятие решений, стабильность. Итог — один тир из шкалы HT1–LT5.'},{id:uid(),type:'tiers'}]);}
-function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['28.11 — все вкладки китов теперь влезают в верхний ряд; страницы можно переключать: dropdown / вкладки / скрыть.','28.11 — splash-анимация при входе, каскадное появление игроков.','27.11 — официальные иконки китов с mctiers, сайт на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
+function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['28.11 — LIVE-индикатор, скользящий индикатор вкладок, анимация очков, пиксель-частицы на заставке, звуки интерфейса.','27.11 — официальные иконки китов с mctiers, сайт на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
 function seedPages(){if(S._seeded)return;S._seeded=true;if(!S.pages.length){[tplRules(),tplCalib(),tplChangelog()].forEach(p=>{S.pages.push(p);S.nav.push({kind:'page',ref:p.id});});}save();}
 
 /* ================= ТЕМА ================= */
@@ -511,7 +566,7 @@ function applyTheme(){
 function tierWidth(){const n=S.modes.length;return Math.min(n*50+6*(n-1),520)+'px';}
 function setTierVar(){document.documentElement.style.setProperty('--tw',tierWidth());}
 
-/* ================= ВКЛАДКИ + СТРАНИЦЫ В МЕНЮ ================= */
+/* ================= ВКЛАДКИ + ИНДИКАТОР ================= */
 function navMeta(n){
   if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top'};
   if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall'};
@@ -524,6 +579,18 @@ function updateScrollFade(){
   if(!t||!w)return;
   w.classList.toggle('can-scroll',t.scrollWidth>t.clientWidth+4);
 }
+function updateIndicator(center){
+  const bar=$('#tabbar'),ind=$('#tabInd');
+  const act=bar.querySelector('.tab.active');
+  if(!act){ind.style.opacity=0;return;}
+  ind.style.opacity=1;
+  ind.style.left=act.offsetLeft+'px';
+  ind.style.width=act.offsetWidth+'px';
+  if(center){
+    const x=act.offsetLeft-bar.clientWidth/2+act.offsetWidth/2;
+    bar.scrollTo({left:Math.max(0,Math.min(x,bar.scrollWidth)),behavior:'smooth'});
+  }
+}
 function renderTabs(){
   const pnav=S.settings.pagesInNav||'dropdown';
   let html=S.nav.map(n=>{
@@ -534,13 +601,13 @@ function renderTabs(){
   if(pnav==='tabs'&&pages.length){
     html+=`<span class="tab-sep"></span>`+pages.map(p=>`<button class="tab ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
   }
-  $('#tabbar').innerHTML=html;
+  $('#tabbar').innerHTML=html+'<span class="tab-ind" id="tabInd"></span>';
   const showDD=pnav==='dropdown'&&pages.length>0;
   $('#pagesDD').style.display=showDD?'':'none';
   $('#ddMenu').innerHTML=pages.map(p=>`<button class="dd-item ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
   $('#ddBtn').classList.toggle('active',showDD&&pages.some(p=>p.id===UI.page));
   $('#editorBtn').classList.toggle('active',UI.page==='editor');
-  requestAnimationFrame(updateScrollFade);
+  requestAnimationFrame(()=>{updateScrollFade();updateIndicator(false);});
 }
 function updateChrome(){
   const st=S.settings;
@@ -552,7 +619,30 @@ $('#tabbar').addEventListener('wheel',e=>{
   const t=$('#tabbar');
   if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&t.scrollWidth>t.clientWidth){e.preventDefault();t.scrollLeft+=e.deltaY;}
 },{passive:false});
-window.addEventListener('resize',updateScrollFade);
+$('#tabbar').addEventListener('mouseover',e=>{const t=e.target.closest('.tab');if(t&&t!==$('#tabbar')._lh){$('#tabbar')._lh=t;tick(720,.04,.04);}});
+$('#tabbar').addEventListener('mouseleave',()=>{$('#tabbar')._lh=null;});
+window.addEventListener('resize',()=>{updateScrollFade();updateIndicator(false);});
+
+/* ================= COUNT-UP ================= */
+function animatePoints(){
+  const els=[...document.querySelectorAll('.pts')];
+  els.forEach((el,i)=>{
+    const target=+el.dataset.v||0;
+    if(!target){el.textContent=0;return;}
+    const dur=650,delay=Math.min(i*40,400);
+    el.textContent='0';
+    setTimeout(()=>{
+      const s=performance.now();
+      function step(n){
+        const p=Math.min(1,(n-s)/dur);
+        const e=1-Math.pow(1-p,3);
+        el.textContent=Math.round(target*e);
+        if(p<1)requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    },delay);
+  });
+}
 
 /* ================= БЕЙДЖИ / СТРОКИ ================= */
 function tb(modeId,tier,big){
@@ -566,7 +656,8 @@ function tb(modeId,tier,big){
 function rowHTML(p,rank,showAll,idx){
   const pts=points(p),t=titleFor(pts),st=S.settings;
   const tags=st.showTags&&p.tags.length?p.tags.map(tg=>`<span class="tag" style="--c:${tagColor(tg)}">${esc(tg)}</span>`).join(''):'';
-  const titleLine=st.showTitles?`<div class="p-title" style="--c:${t.color}">${t.emoji} <b>${esc(t.name)}</b>${st.showPoints?`<span>(${pts} очков)</span>`:''}</div>`:(st.showPoints?`<div class="p-title"><span>${pts} очков</span></div>`:'');
+  const ptsSpan=`<span class="pts" data-v="${pts}">${pts}</span>`;
+  const titleLine=st.showTitles?`<div class="p-title" style="--c:${t.color}">${t.emoji} <b>${esc(t.name)}</b>${st.showPoints?`<span>(${ptsSpan} очков)</span>`:''}</div>`:(st.showPoints?`<div class="p-title"><span>(${ptsSpan} очков)</span></div>`:'');
   const badges=showAll?S.modes.map(m=>tb(m.id,p.tiers[m.id])).join(''):tb(UI.page,p.tiers[UI.page],true);
   const rc=REGION_COLORS[p.region]||'#8f97ab';
   const region=st.showRegions?`<span class="rgn" style="background:${hexA(rc,.2)};border:1px solid ${hexA(rc,.5)};color:${rc}">${esc(p.region||'—')}</span>`:'';
@@ -612,6 +703,8 @@ function renderPage(){
   else if(page(UI.page))c.innerHTML=renderPageView(page(UI.page));
   else{UI.page='top';c.innerHTML=renderTop();}
   updateChrome();
+  if(UI.animatePts&&(UI.page==='top'||UI.page==='overall'))animatePoints();
+  UI.animatePts=false;
 }
 function renderTop(){
   let offset=1;
@@ -877,8 +970,8 @@ document.addEventListener('change',e=>{
 function act(a,el){
   const id=el.dataset.id,dir=+el.dataset.dir||0,idx=+el.dataset.idx,g=el.dataset.grid;
   switch(a){
-    case 'goto':UI.page=id;UI.search='';$('#pagesDD').classList.remove('open');renderTabs();renderPage();setHash('#/'+id);window.scrollTo({top:0});break;
-    case 'toggleDD':$('#pagesDD').classList.toggle('open');break;
+    case 'goto':UI.page=id;UI.search='';UI.animatePts=true;$('#pagesDD').classList.remove('open');renderTabs();renderPage();setHash('#/'+id);requestAnimationFrame(()=>updateIndicator(true));window.scrollTo({top:0});break;
+    case 'toggleDD':$('#pagesDD').classList.toggle('open');tick(640,.04,.04);break;
     case 'edTab':UI.edTab=id;renderPage();break;
     case 'gridsOpen':UI.page='editor';UI.edTab='grids';renderTabs();renderPage();setHash('#/editor');break;
     case 'closeModal':closeModal(id);break;
@@ -937,6 +1030,13 @@ document.addEventListener('click',e=>{
   if(r){openPlayer(r.dataset.player);return;}
   if(e.target.classList&&e.target.classList.contains('modal'))closeModal(e.target.id);
 });
+$('#soundBtn').addEventListener('click',()=>{
+  SOUND_ON=!SOUND_ON;
+  localStorage.setItem(SOUND_KEY,SOUND_ON?'1':'0');
+  ensureAC();
+  updateSoundBtn();
+  if(SOUND_ON)tick(900,.06,.06);
+});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){document.querySelectorAll('.modal.open').forEach(m=>closeModal(m.id));$('#pagesDD').classList.remove('open');}
   if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&$('#searchInput')){e.preventDefault();$('#searchInput').focus();}
@@ -953,7 +1053,7 @@ function applyHash(){
   const h=decodeURIComponent(location.hash.replace(/^#\/?/,''));
   if(h.startsWith('player/')){const id=h.slice(7);if(byId(id)){openPlayer(id);return;}}
   if(h){const ok=h==='top'||h==='overall'||h==='editor'||mode(h)||page(h);
-    if(ok){if(UI.page!==h){UI.page=h;renderTabs();renderPage();}closeModal('playerModal');}}
+    if(ok){if(UI.page!==h){UI.page=h;UI.animatePts=true;renderTabs();renderPage();requestAnimationFrame(()=>updateIndicator(true));}closeModal('playerModal');}}
 }
 window.addEventListener('hashchange',applyHash);
 
