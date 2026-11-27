@@ -144,7 +144,8 @@
   ],
   "nav": [
     {
-      "kind": "top"
+      "kind": "top",
+      "hidden": false
     },
     {
       "kind": "overall"
@@ -188,6 +189,14 @@
     {
       "kind": "page",
       "ref": "l6ikwuqb"
+    },
+    {
+      "kind": "page",
+      "ref": "6tf745lf"
+    },
+    {
+      "kind": "page",
+      "ref": "nadpctkt"
     },
     {
       "kind": "page",
@@ -349,23 +358,65 @@
       ]
     },
     {
+      "id": "nadpctkt",
+      "title": "Пояснения",
+      "icon": "📄",
+      "subtitle": "Разне объяснения",
+      "updated": 1795744909767,
+      "blocks": [
+        {
+          "id": "n28328mw",
+          "type": "h2",
+          "text": "Сетка «продвиженцы»"
+        },
+        {
+          "id": "jyakcsq7",
+          "type": "divider"
+        },
+        {
+          "id": "qhvxku9y",
+          "type": "p",
+          "text": "Сама сетка **«продвиженцы»** является **промежуточным этапом** для вступления игрока в верхнюю сетку игроков, где собраны одни из сильнейших игроков сайта. Простыми словами сетка, **«продвиженцы»** — это **показатель** того, **что игрок имеет серьёзные навыки мастерства**, чтобы иметь вес и возможность противостоять сильнейшим игрокам из верхней сетки. В эту сетку попадают игроки начиная с **150 очков**. Считаются новыми игроками, которые могут составить серьёзное соперничество."
+        }
+      ]
+    },
+    {
+      "id": "6tf745lf",
+      "title": "Руководство сайта",
+      "icon": "🔰",
+      "subtitle": "Основатель и владелец сайта",
+      "updated": 1795745360077,
+      "blocks": [
+        {
+          "id": "vlgm6ij1",
+          "type": "h2",
+          "text": "Руководство сайта"
+        },
+        {
+          "id": "cmvj5iz1",
+          "type": "p",
+          "text": "Руководство сайта и постоянный редактор — [gavrilaquinn](https://discord.com/users/987379946508939294)"
+        }
+      ]
+    },
+    {
       "id": "yrvce37f",
       "title": "Журнал обновлений",
       "icon": "📰",
       "subtitle": "Что меняется в тир-листе и на сайте",
-      "updated": 1795743143387,
+      "updated": 1795744267984,
       "blocks": [
         {
           "id": "m1rp03dw",
           "type": "h2",
-          "text": "27.11.2026"
+          "text": "Последние обновления"
         },
         {
           "id": "vb0ldqsd",
           "type": "list",
           "ordered": false,
           "items": [
-            "27.11 — сайт опубликован на GitHub Pages, данные обновляются в реальном времени."
+            "27.11 — сайт опубликован на **GitHub Pages**, данные обновляются в реальном времени."
           ]
         }
       ]
@@ -476,7 +527,7 @@
       "city": "Kharkiv",
       "region": "EU",
       "tags": [],
-      "skin": "",
+      "skin": "data:image/png;base64,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",
       "bg": "",
       "tiers": {
         "sword": "HT4",
@@ -508,7 +559,7 @@
       "city": "Dzerzhinsk",
       "region": "EU",
       "tags": [],
-      "skin": "",
+      "skin": "data:image/png;base64,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",
       "bg": "",
       "tiers": {
         "sword": "LT5",
@@ -576,7 +627,7 @@
     },
     {
       "id": "0q807yo1",
-      "name": "Продвиженцы: Попадают игроки начиная с 150 очков. Считаются новыми сильными игроками",
+      "name": "Продвиженцы",
       "icon": "",
       "auto": false,
       "autoCount": 3,
