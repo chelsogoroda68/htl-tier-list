@@ -97,42 +97,42 @@
       "name": "Combat Warlord",
       "emoji": "👑",
       "color": "#38f2ff",
-      "min": 600
+      "min": 450
     },
     {
       "id": "x6y02o5d",
       "name": "Combat Champion",
       "emoji": "👑",
       "color": "#6c72ff",
-      "min": 800
+      "min": 500
     },
     {
       "id": "89imnlzo",
       "name": "Combat Mythic",
       "emoji": "👑",
       "color": "#ff55cc",
-      "min": 1050
+      "min": 580
     },
     {
       "id": "d52cjn26",
       "name": "Combat Immortal",
       "emoji": "👑",
       "color": "#ff2e55",
-      "min": 1350
+      "min": 670
     },
     {
       "id": "2au28wl5",
       "name": "Combat Sovereign",
       "emoji": "👑",
       "color": "#bf40ff",
-      "min": 1700
+      "min": 760
     },
     {
       "id": "fj4fjzi8",
       "name": "Combat Deity",
       "emoji": "👑",
       "color": "#ebf8ff",
-      "min": 2100
+      "min": 850
     }
   ],
   "modes": [
