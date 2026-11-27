@@ -230,16 +230,16 @@
     },
     {
       "kind": "page",
+      "ref": "6tf745lf"
+    },
+    {
+      "kind": "page",
       "ref": "l6ikwuqb",
       "hidden": false
     },
     {
       "kind": "page",
       "ref": "zobiik1v"
-    },
-    {
-      "kind": "page",
-      "ref": "6tf745lf"
     },
     {
       "kind": "page",
@@ -677,7 +677,7 @@
     {
       "id": "vyc0bv86",
       "name": "Верхняя сетка",
-      "icon": "𝐇𝐈𝐆𝐇",
+      "icon": "",
       "auto": false,
       "autoCount": 3,
       "players": [
@@ -689,7 +689,7 @@
     {
       "id": "0q807yo1",
       "name": "Продвиженцы",
-      "icon": "𝐔𝐏",
+      "icon": "",
       "auto": false,
       "autoCount": 3,
       "players": [
@@ -699,7 +699,7 @@
     {
       "id": "1uu3cuj8",
       "name": "Нижняя сетка",
-      "icon": "𝐋𝐎𝐖",
+      "icon": "",
       "auto": false,
       "autoCount": 5,
       "players": [
