@@ -537,7 +537,7 @@
         "uhc": "HT3",
         "pot": "HT3",
         "smp": "HT4",
-        "axe": "HT4",
+        "axe": "HT3",
         "mace": "LT2",
         "cart": "LT2",
         "spear": "LT1"
@@ -666,8 +666,8 @@
       "autoCount": 3,
       "players": [
         "p1",
-        "p2",
-        "p3"
+        "p3",
+        "p2"
       ]
     },
     {
