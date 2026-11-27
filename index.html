@@ -28,7 +28,7 @@ body[data-mode="view"] .edit-only{display:none !important}
 body[data-mode="edit"] #editBanner{display:block}
 
 /* ---------- TOPBAR + TABS ---------- */
-#topbar{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+#topbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 .tb-in{width:min(1240px,100%);margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:10px}
 .logo{font-family:var(--font-head);font-weight:800;font-size:18px;color:var(--accent);display:flex;gap:9px;align-items:center;cursor:pointer;white-space:nowrap;padding:16px 10px 16px 0}
 .logo-ico{font-size:19px}
@@ -39,12 +39,25 @@ body[data-mode="edit"] #editBanner{display:block}
 .tab:hover{color:var(--text)}
 .tab.active{color:var(--text);border-bottom-color:var(--accent)}
 .tab.active .m-ico{opacity:1}
-.m-ico{display:inline-flex}
+.m-ico{display:inline-flex;flex:0 0 auto}
 .m-ico svg,.m-ico img{width:18px;height:18px;display:block}
 .m-ico.txt{font-size:16px;line-height:1}
-.tb-gear{margin-left:auto;flex:0 0 auto;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.tb-gear{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
 .tb-gear:hover{color:var(--text);border-color:var(--accent)}
 .tb-gear.active{color:var(--accent);border-color:var(--accent)}
+/* dropdown pages */
+.dd{position:relative}
+.dd-btn{border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:9px 13px;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.dd-btn:hover{color:var(--text);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.dd-btn.active{color:var(--text);border-color:var(--accent)}
+.dd-caret{font-size:10px;color:var(--muted)}
+.dd-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:230px;box-shadow:0 16px 40px rgba(0,0,0,.55);z-index:60}
+.dd.open .dd-menu{display:flex;flex-direction:column;gap:2px}
+.dd-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:0;background:none;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer;text-align:left;width:100%}
+.dd-item:hover{background:var(--panel2);color:var(--text)}
+.dd-item.active{color:var(--text);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.dd-item .m-ico{opacity:.8}
 
 /* ---------- LAYOUT ---------- */
 main{max-width:1240px;margin:0 auto;padding:0 22px}
@@ -115,7 +128,7 @@ input[type="color"]{width:44px;height:35px;padding:2px;border-radius:8px;backgro
 input[type="range"]{accent-color:var(--accent);width:100%}
 .ed-row{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--panel2);flex-wrap:wrap}
 .ed-row .grow{flex:1;min-width:140px}
-.icon-inp{width:150px !important;flex:0 0 auto;font-size:11px !important}
+.icon-inp{width:170px !important;flex:0 0 auto;font-size:11px !important}
 .num-inp{width:92px !important;flex:0 0 auto}
 .drag{cursor:grab;color:var(--muted);font-size:15px;user-select:none}
 .icon-btn{width:31px;height:31px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;transition:.15s;flex:0 0 auto}
@@ -212,7 +225,13 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 <header id="topbar"><div class="tb-in">
   <div class="logo" data-act="goto" data-id="top"><span class="logo-ico" id="logoIco">🧡</span><span id="logoText">HTL</span></div>
   <div id="tabbar"></div>
-  <button class="tb-gear edit-only" id="editorBtn" data-act="goto" data-id="editor" title="Редактор">🛠️</button>
+  <div class="tb-right">
+    <div class="dd" id="pagesDD">
+      <button class="dd-btn" id="ddBtn" data-act="toggleDD">📄<span>Страницы</span><span class="dd-caret">▾</span></button>
+      <div class="dd-menu" id="ddMenu"></div>
+    </div>
+    <button class="tb-gear edit-only" id="editorBtn" data-act="goto" data-id="editor" title="Редактор">🛠️</button>
+  </div>
 </div></header>
 <main><section id="content"></section></main>
 <footer id="footer"></footer>
@@ -267,30 +286,63 @@ const BLOCK_TYPES=[['h2','🔶 Заголовок'],['h3','▫️ Подзаго
 const DEFAULT_AVA='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#181c26"/><rect x="16" y="14" width="32" height="34" fill="#8b5a3c"/><rect x="16" y="14" width="32" height="10" fill="#3b2a1e"/><rect x="22" y="28" width="6" height="6" fill="#fff"/><rect x="36" y="28" width="6" height="6" fill="#fff"/><rect x="26" y="40" width="12" height="4" fill="#5b3a26"/></svg>');
 window.DEFAULT_AVA=DEFAULT_AVA;
 
-/* ================= SVG-ИКОНКИ КИТОВ ================= */
-const ICONS={
-vanilla:`<svg viewBox="0 0 24 24"><path d="M12 3l7 4v6l-7 8-7-8V7z" fill="#b07cff"/><path d="M12 3l7 4-7 4-7-4z" fill="#d9b8ff"/><path d="M5 7v6l7 8V11z" fill="#8a5cff"/></svg>`,
-sword:`<svg viewBox="0 0 24 24"><rect x="14" y="3" width="4" height="3" fill="#e8e8e8"/><rect x="12" y="5" width="4" height="3" fill="#d8d8d8"/><rect x="10" y="7" width="4" height="3" fill="#c8c8c8"/><rect x="8" y="9" width="4" height="3" fill="#d8d8d8"/><rect x="6" y="11" width="4" height="3" fill="#a8a8a8"/><rect x="4" y="13" width="3" height="3" fill="#6b4a2b"/><rect x="3" y="16" width="4" height="3" fill="#5b3a26"/><rect x="6" y="15" width="3" height="3" fill="#5b3a26"/><rect x="5" y="14" width="3" height="3" fill="#8b5a3c"/></svg>`,
-uhc:`<svg viewBox="0 0 24 24"><path d="M12 5c-4 0-7 3-7 7 0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z" fill="#ff4655"/><path d="M12 5c-2 0-3 1-4 2 2 1 6 1 8 0-1-1-2-2-4-2z" fill="#cc2233"/><rect x="11" y="3" width="2" height="3" fill="#6b4a2b"/><path d="M13 4c2-1 4-1 4-1s0 2-2 3z" fill="#3ddc84"/><rect x="8" y="9" width="2" height="2" fill="#ffffff55"/></svg>`,
-pot:`<svg viewBox="0 0 24 24"><rect x="10" y="3" width="4" height="3" fill="#c8c8c8"/><path d="M9 6h6l2 3v8a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9z" fill="#7b5cff"/><path d="M9 6h6l2 3H7z" fill="#9b7cff"/><rect x="10" y="12" width="4" height="5" fill="#c9a9ff"/><rect x="11" y="8" width="2" height="2" fill="#ffffff66"/></svg>`,
-smp:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#0b3b2e"/><circle cx="12" cy="12" r="8" fill="none" stroke="#3ddc84" stroke-width="2"/><path d="M12 6l1.6 4.4L18 12l-4.4 1.6L12 18l-1.6-4.4L6 12l4.4-1.6z" fill="#7ce7a2"/><circle cx="12" cy="12" r="1.6" fill="#e9edf5"/></svg>`,
-axe:`<svg viewBox="0 0 24 24"><rect x="11" y="6" width="2" height="14" fill="#6b4a2b"/><path d="M12 4h6l1 3-2 4h-5z" fill="#d8d8d8"/><path d="M12 4h6l1 3h-7z" fill="#e8e8e8"/><path d="M12 11h5l-2 4h-3z" fill="#a8a8a8"/></svg>`,
-mace:`<svg viewBox="0 0 24 24"><rect x="11" y="11" width="2" height="10" fill="#6b4a2b"/><circle cx="12" cy="8" r="5" fill="#8a8f98"/><circle cx="12" cy="8" r="5" fill="none" stroke="#5b6068" stroke-width="1.5"/><rect x="9" y="2" width="6" height="2" fill="#a7adba"/><rect x="11" y="4" width="2" height="3" fill="#a7adba"/></svg>`,
-cart:`<svg viewBox="0 0 24 24"><path d="M4 8h16l-2 8H6z" fill="#7a5a3a"/><path d="M4 8h16l-1 3H5z" fill="#8b5a3c"/><rect x="8" y="4" width="8" height="4" fill="#4aa3ff"/><circle cx="8" cy="18" r="2" fill="#333"/><circle cx="16" cy="18" r="2" fill="#333"/></svg>`,
-spear:`<svg viewBox="0 0 24 24"><rect x="11" y="10" width="2" height="11" fill="#6b4a2b"/><path d="M6 3v6c0 2 3 3 6 3s6-1 6-3V3l-2 4-1-4v4h-2V3h-2v4H8V7z" fill="#4aa3ff"/><path d="M6 3v6c0 2 3 3 6 3V3l-2 4-1-4z" fill="#7cc0ff"/></svg>`
+/* ================= ИКОНКИ: ОФИЦИАЛЬНЫЕ С MCTIERS + ФОЛБЭК ================= */
+const OFFICIAL={
+  overall:'https://mctiers.net/tier_icons/overall.svg',
+  vanilla:'https://mctiers.net/tier_icons/vanilla.svg',
+  sword:'https://mctiers.net/tier_icons/sword.svg',
+  uhc:'https://mctiers.net/tier_icons/uhc.svg',
+  pot:'https://mctiers.net/tier_icons/pot.svg',
+  smp:'https://mctiers.net/tier_icons/smp.svg',
+  axe:'https://mctiers.net/tier_icons/axe.svg',
+  mace:'https://mctiers.net/tier_icons/mace.svg',
+  spear:'https://mctiers.net/tier_icons/spear.png'
+};
+/* встроенные SVG-запаски на случай, если mctiers запретит хотлинк */
+const ICON_FB={
+  overall:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3l7 4v6l-7 8-7-8V7z" fill="#b07cff"/><path d="M12 3l7 4-7 4-7-4z" fill="#d9b8ff"/></svg>`,
+  vanilla:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3l7 4v6l-7 8-7-8V7z" fill="#b07cff"/><path d="M12 3l7 4-7 4-7-4z" fill="#d9b8ff"/><path d="M5 7v6l7 8V11z" fill="#8a5cff"/></svg>`,
+  sword:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="14" y="3" width="4" height="3" fill="#e8e8e8"/><rect x="12" y="5" width="4" height="3" fill="#d8d8d8"/><rect x="10" y="7" width="4" height="3" fill="#c8c8c8"/><rect x="8" y="9" width="4" height="3" fill="#d8d8d8"/><rect x="6" y="11" width="4" height="3" fill="#a8a8a8"/><rect x="4" y="13" width="3" height="3" fill="#6b4a2b"/><rect x="3" y="16" width="4" height="3" fill="#5b3a26"/><rect x="6" y="15" width="3" height="3" fill="#5b3a26"/><rect x="5" y="14" width="3" height="3" fill="#8b5a3c"/></svg>`,
+  uhc:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 5c-4 0-7 3-7 7 0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z" fill="#ff4655"/><path d="M12 5c-2 0-3 1-4 2 2 1 6 1 8 0-1-1-2-2-4-2z" fill="#cc2233"/><rect x="11" y="3" width="2" height="3" fill="#6b4a2b"/><path d="M13 4c2-1 4-1 4-1s0 2-2 3z" fill="#3ddc84"/><rect x="8" y="9" width="2" height="2" fill="#ffffff55"/></svg>`,
+  pot:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="10" y="3" width="4" height="3" fill="#c8c8c8"/><path d="M9 6h6l2 3v8a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9z" fill="#7b5cff"/><path d="M9 6h6l2 3H7z" fill="#9b7cff"/><rect x="10" y="12" width="4" height="5" fill="#c9a9ff"/><rect x="11" y="8" width="2" height="2" fill="#ffffff66"/></svg>`,
+  smp:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#0b3b2e"/><circle cx="12" cy="12" r="8" fill="none" stroke="#3ddc84" stroke-width="2"/><path d="M12 6l1.6 4.4L18 12l-4.4 1.6L12 18l-1.6-4.4L6 12l4.4-1.6z" fill="#7ce7a2"/><circle cx="12" cy="12" r="1.6" fill="#e9edf5"/></svg>`,
+  axe:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="11" y="6" width="2" height="14" fill="#6b4a2b"/><path d="M12 4h6l1 3-2 4h-5z" fill="#d8d8d8"/><path d="M12 4h6l1 3h-7z" fill="#e8e8e8"/><path d="M12 11h5l-2 4h-3z" fill="#a8a8a8"/></svg>`,
+  mace:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="11" y="11" width="2" height="10" fill="#6b4a2b"/><circle cx="12" cy="8" r="5" fill="#8a8f98"/><circle cx="12" cy="8" r="5" fill="none" stroke="#5b6068" stroke-width="1.5"/><rect x="9" y="2" width="6" height="2" fill="#a7adba"/><rect x="11" y="4" width="2" height="3" fill="#a7adba"/></svg>`,
+  spear:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="11" y="10" width="2" height="11" fill="#6b4a2b"/><path d="M6 3v6c0 2 3 3 6 3s6-1 6-3V3l-2 4-1-4v4h-2V3h-2v4H8V7z" fill="#4aa3ff"/><path d="M6 3v6c0 2 3 3 6 3V3l-2 4-1-4z" fill="#7cc0ff"/></svg>`,
+  cart:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 8h16l-2 8H6z" fill="#7a5a3a"/><path d="M4 8h16l-1 3H5z" fill="#8b5a3c"/><rect x="8" y="4" width="8" height="4" fill="#4aa3ff"/><circle cx="8" cy="18" r="2" fill="#333"/><circle cx="16" cy="18" r="2" fill="#333"/></svg>`
+};
+/* старые самописные SVG — если они уже сохранены в data.json, заменим на официальные */
+const OLD_DEFAULT_ICONS={
+  vanilla:'<svg viewBox="0 0 24 24"><path d="M12 3l7 4v6l-7 8-7-8V7z" fill="#b07cff"/><path d="M12 3l7 4-7 4-7-4z" fill="#d9b8ff"/><path d="M5 7v6l7 8V11z" fill="#8a5cff"/></svg>',
+  sword:'<svg viewBox="0 0 24 24"><rect x="14" y="3" width="4" height="3" fill="#e8e8e8"/><rect x="12" y="5" width="4" height="3" fill="#d8d8d8"/><rect x="10" y="7" width="4" height="3" fill="#c8c8c8"/><rect x="8" y="9" width="4" height="3" fill="#d8d8d8"/><rect x="6" y="11" width="4" height="3" fill="#a8a8a8"/><rect x="4" y="13" width="3" height="3" fill="#6b4a2b"/><rect x="3" y="16" width="4" height="3" fill="#5b3a26"/><rect x="6" y="15" width="3" height="3" fill="#5b3a26"/><rect x="5" y="14" width="3" height="3" fill="#8b5a3c"/></svg>',
+  uhc:'<svg viewBox="0 0 24 24"><path d="M12 5c-4 0-7 3-7 7 0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z" fill="#ff4655"/><path d="M12 5c-2 0-3 1-4 2 2 1 6 1 8 0-1-1-2-2-4-2z" fill="#cc2233"/><rect x="11" y="3" width="2" height="3" fill="#6b4a2b"/><path d="M13 4c2-1 4-1 4-1s0 2-2 3z" fill="#3ddc84"/><rect x="8" y="9" width="2" height="2" fill="#ffffff55"/></svg>',
+  pot:'<svg viewBox="0 0 24 24"><rect x="10" y="3" width="4" height="3" fill="#c8c8c8"/><path d="M9 6h6l2 3v8a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9z" fill="#7b5cff"/><path d="M9 6h6l2 3H7z" fill="#9b7cff"/><rect x="10" y="12" width="4" height="5" fill="#c9a9ff"/><rect x="11" y="8" width="2" height="2" fill="#ffffff66"/></svg>',
+  smp:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#0b3b2e"/><circle cx="12" cy="12" r="8" fill="none" stroke="#3ddc84" stroke-width="2"/><path d="M12 6l1.6 4.4L18 12l-4.4 1.6L12 18l-1.6-4.4L6 12l4.4-1.6z" fill="#7ce7a2"/><circle cx="12" cy="12" r="1.6" fill="#e9edf5"/></svg>',
+  axe:'<svg viewBox="0 0 24 24"><rect x="11" y="6" width="2" height="14" fill="#6b4a2b"/><path d="M12 4h6l1 3-2 4h-5z" fill="#d8d8d8"/><path d="M12 4h6l1 3h-7z" fill="#e8e8e8"/><path d="M12 11h5l-2 4h-3z" fill="#a8a8a8"/></svg>',
+  mace:'<svg viewBox="0 0 24 24"><rect x="11" y="11" width="2" height="10" fill="#6b4a2b"/><circle cx="12" cy="8" r="5" fill="#8a8f98"/><circle cx="12" cy="8" r="5" fill="none" stroke="#5b6068" stroke-width="1.5"/><rect x="9" y="2" width="6" height="2" fill="#a7adba"/><rect x="11" y="4" width="2" height="3" fill="#a7adba"/></svg>',
+  cart:'<svg viewBox="0 0 24 24"><path d="M4 8h16l-2 8H6z" fill="#7a5a3a"/><path d="M4 8h16l-1 3H5z" fill="#8b5a3c"/><rect x="8" y="4" width="8" height="4" fill="#4aa3ff"/><circle cx="8" cy="18" r="2" fill="#333"/><circle cx="16" cy="18" r="2" fill="#333"/></svg>',
+  spear:'<svg viewBox="0 0 24 24"><rect x="11" y="10" width="2" height="11" fill="#6b4a2b"/><path d="M6 3v6c0 2 3 3 6 3s6-1 6-3V3l-2 4-1-4v4h-2V3h-2v4H8V7z" fill="#4aa3ff"/><path d="M6 3v6c0 2 3 3 6 3V3l-2 4-1-4z" fill="#7cc0ff"/></svg>'
 };
 function iconHTML(icon){
-  if(!icon)return `<span class="m-ico txt">🎮</span>`;
-  if(icon.trim().startsWith('<'))return `<span class="m-ico">${icon}</span>`;
-  return `<span class="m-ico txt">${icon}</span>`;
+  const ic=String(icon||'').trim();
+  if(!ic)return `<span class="m-ico txt">🎮</span>`;
+  if(ic.startsWith('<'))return `<span class="m-ico">${ic}</span>`;
+  if(ic.startsWith('http'))return `<span class="m-ico"><img src="${esc(ic)}" alt="" onerror="iconFail(this)"></span>`;
+  return `<span class="m-ico txt">${ic}</span>`;
 }
+window.iconFail=function(img){
+  img.onerror=null;
+  const fb=ICON_FB[img.dataset.fb]||ICON_FB.overall;
+  img.src='data:image/svg+xml;utf8,'+encodeURIComponent(fb);
+};
+window.ICON_FB=ICON_FB;
 
 /* ================= ДАННЫЕ ================= */
 const DEFAULTS={
   settings:{siteName:'HTL',logoEmoji:'🧡',subtitle:'HTL-рейтинг «наших» игроков',footer:'Официальный tier list сайт наших игроков.',overallNote:'ℹ️ Overall — суммарный рейтинг по очкам за тиры во всех режимах. Режимы без оценки (Unranked) не учитываются.',accent:'#f59e0b',bg:'#0a0c11',panel:'#12151d',font:'Inter',headFont:'Unbounded',radius:14,compact:true,showPoints:true,showTags:true,showRegions:true,showTitles:true,customCSS:'',tierColors:{HT1:'#ff4655',LT1:'#ff8a5c',HT2:'#ffb020',LT2:'#ffd166',HT3:'#3ddc84',LT3:'#7ce7a2',HT4:'#4aa3ff',LT4:'#7cc0ff',HT5:'#b07cff',LT5:'#c9a9ff'}},
   points:{HT1:100,LT1:80,HT2:60,LT2:45,HT3:35,LT3:25,HT4:18,LT4:12,HT5:8,LT5:4},
   titles:[{id:'t1',name:'Combat Grandmaster',emoji:'👑',color:'#ffd700',min:400},{id:'t2',name:'Combat Master',emoji:'👑',color:'#ff9f43',min:250},{id:'t3',name:'Combat Ace',emoji:'👑',color:'#ff6b6b',min:150},{id:'t4',name:'Combat Specialist',emoji:'👑',color:'#b07cff',min:80},{id:'t5',name:'Combat Cadet',emoji:'👑',color:'#4aa3ff',min:30},{id:'t6',name:'Combat Novice',emoji:'👑',color:'#3ddc84',min:15},{id:'t7',name:'Rookie',emoji:'👑',color:'#8f97ab',min:0}],
-  modes:[{id:'vanilla',name:'Vanilla',icon:ICONS.vanilla},{id:'sword',name:'Sword',icon:ICONS.sword},{id:'uhc',name:'UHC',icon:ICONS.uhc},{id:'pot',name:'Pot',icon:ICONS.pot},{id:'smp',name:'SMP',icon:ICONS.smp},{id:'axe',name:'Axe',icon:ICONS.axe},{id:'mace',name:'Mace',icon:ICONS.mace},{id:'cart',name:'Cart',icon:ICONS.cart},{id:'spear',name:'Spear Mace',icon:ICONS.spear}],
+  modes:[{id:'vanilla',name:'Vanilla',icon:OFFICIAL.vanilla},{id:'sword',name:'Sword',icon:OFFICIAL.sword},{id:'uhc',name:'UHC',icon:OFFICIAL.uhc},{id:'pot',name:'Pot',icon:OFFICIAL.pot},{id:'smp',name:'SMP',icon:OFFICIAL.smp},{id:'axe',name:'Axe',icon:OFFICIAL.axe},{id:'mace',name:'Mace',icon:OFFICIAL.mace},{id:'cart',name:'Cart',icon:ICON_FB.cart},{id:'spear',name:'Spear Mace',icon:OFFICIAL.spear}],
   nav:[{kind:'top'},{kind:'overall'},{kind:'mode',ref:'vanilla'},{kind:'mode',ref:'sword'},{kind:'mode',ref:'uhc'},{kind:'mode',ref:'pot'},{kind:'mode',ref:'smp'},{kind:'mode',ref:'axe'},{kind:'mode',ref:'mace'},{kind:'mode',ref:'cart'},{kind:'mode',ref:'spear'}],
   pages:[],
   players:[
@@ -344,6 +396,13 @@ function normalizePage(p){
   p.updated=p.updated||Date.now();
   return p;
 }
+function upgradeIcon(m){
+  const ic=String(m.icon||'').trim();
+  if(!ic)return OFFICIAL[m.id]||'🎮';                                  /* пусто → официальная */
+  if(!ic.startsWith('<')&&!ic.startsWith('http'))return OFFICIAL[m.id]||ic; /* эмодзи → официальная */
+  if(ic.startsWith('<')&&OLD_DEFAULT_ICONS[m.id]===ic)return OFFICIAL[m.id]||ic; /* мой старый SVG → официальная */
+  return m.icon;                                                        /* своя кастомная → не трогаем */
+}
 function normalize(o){
   const d=clone(DEFAULTS);
   if(!o||typeof o!=='object')return d;
@@ -352,8 +411,7 @@ function normalize(o){
   d.points=Object.assign(clone(DEFAULTS.points),o.points||{});
   ['titles','modes','nav','pages','players'].forEach(k=>{if(Array.isArray(o[k]))d[k]=o[k];});
   if(Array.isArray(o.grids))d.grids=o.grids.map(g=>({id:g.id||uid(),name:g.name||'Сетка',icon:g.icon||'🏆',auto:!!g.auto,autoCount:Math.max(1,+g.autoCount||3),players:Array.isArray(g.players)?g.players:[]}));
-  // авто-апгрейд эмодзи-иконок на SVG
-  d.modes.forEach(m=>{if(!String(m.icon||'').trim().startsWith('<')&&ICONS[m.id])m.icon=ICONS[m.id];});
+  d.modes.forEach(m=>{m.icon=upgradeIcon(m);});
   d.pages=d.pages.map(normalizePage);
   d.players.forEach(p=>{p.tiers=p.tiers||{};p.tags=p.tags||[];p.bio=p.bio||'';});
   d.nav=d.nav.filter(n=>n&&(n.kind==='top'||n.kind==='overall'||(n.kind==='mode'&&d.modes.some(m=>m.id===n.ref))||(n.kind==='page'&&d.pages.some(p=>p.id===n.ref))));
@@ -393,7 +451,7 @@ function mkBlock(type){const b={id:uid(),type};if(type==='h2')b.text='Загол
 function mkPage(title,icon,subtitle,blocks){return{id:uid(),title,icon,subtitle,updated:Date.now(),blocks};}
 function tplRules(){return mkPage('Правила тир-листа','📜','Как устроен рейтинг и как попасть в сетки',[{id:uid(),type:'h2',text:'🏆 Общие положения'},{id:uid(),type:'p',text:'Этот сайт — внутренний tier list нашего комьюнити. Игроки оцениваются по режимам (китам), а сумма очков определяет место в **Overall** и **звание**.'},{id:uid(),type:'list',ordered:false,items:['Оценку ставит только действующий тестер соответствующего кита.','Оценка — это текущий уровень игрока.','Рейтинг публичный: любой игрок может посмотреть свою карточку и скачать её.','Все спорные ситуации решает руководство сайта / старшие тестеры.']},{id:uid(),type:'h2',text:'⚔️ Как получить оценку'},{id:uid(),type:'list',ordered:true,items:['Договорись с тестером нужного кита.','Согласуй кит, регион и формат (обычно 1х1).','Проведи бой по регламенту.','Тестер выносит вердикт и вносит тир в таблицу.','После внесения тир появится у тебя в карточке и в Overall.']},{id:uid(),type:'note',tone:'warn',text:'Не проси завысить оценку и не дави на тестеров. Попытка повлиять на результат = отказ в оценке.'},{id:uid(),type:'h2',text:'🧮 Шкала очков'},{id:uid(),type:'tiers'},{id:uid(),type:'h2',text:'👑 Звания'},{id:uid(),type:'titles'}]);}
 function tplCalib(){return mkPage('Регламент калибровок и 1х1','🎯','Процедура оценки при вызове / выходе на тестера',[{id:uid(),type:'h2',text:'📌 Что такое калибровка'},{id:uid(),type:'p',text:'Калибровка — первичная оценка нового игрока в ките. Проводится в формате **1х1** с тестером этого кита до вынесения вердикта.'},{id:uid(),type:'h2',text:'🗡️ Формат боя'},{id:uid(),type:'list',ordered:false,items:['Кит выбирается из списка режимов сайта.','Арена — стандартная для кита.','Длительность: до явного преимущества или по решению тестера (обычно 1–4 раунда).','Запись боя (clip) желательна — она решает апелляции.']},{id:uid(),type:'h2',text:'👤 Кто вызывает'},{id:uid(),type:'list',ordered:true,items:['Игрок сам инициирует калибровку: пишет тестеру кита и договаривается о времени.','Тестер вправе отказать без объяснения причин.','Если тестер долго недоступен — калибровку проводит старший тестер кита.']},{id:uid(),type:'note',tone:'info',text:'Игрок без оценки в ките отображается как **Unranked** и не учитывается в Overall по этому режиму.'},{id:uid(),type:'h2',text:'📊 Как тестер ставит тир'},{id:uid(),type:'p',text:'Тестер оценивает: контроль дистанции, тайминги, урон, принятие решений, стабильность. Итог — один тир из шкалы HT1–LT5.'},{id:uid(),type:'tiers'}]);}
-function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['27.11 — сайт опубликован на GitHub Pages, данные обновляются в реальном времени.','27.11 — реальные SVG-иконки китов и табличный вид рейтинга в стиле mcpvp.','26.11 — добавлены страницы правил и регламентов.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
+function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['27.11 — официальные иконки китов с mctiers, страницы вынесены в отдельное меню.','27.11 — сайт опубликован на GitHub Pages, данные обновляются в реальном времени.','26.11 — добавлены страницы правил и регламентов.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
 function seedPages(){if(S._seeded)return;S._seeded=true;if(!S.pages.length){[tplRules(),tplCalib(),tplChangelog()].forEach(p=>{S.pages.push(p);S.nav.push({kind:'page',ref:p.id});});}save();}
 
 /* ================= ТЕМА ================= */
@@ -407,17 +465,24 @@ function applyTheme(){
   $('#userCSS').textContent=st.customCSS||'';
 }
 
-/* ================= ВКЛАДКИ ================= */
+/* ================= ВКЛАДКИ + ДРОПДАУН СТРАНИЦ ================= */
 function navMeta(n){
   if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top'};
-  if(n.kind==='overall')return{icon:n.icon||'🏆',label:n.label||'Overall',page:'overall'};
+  if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall'};
   if(n.kind==='mode'){const m=mode(n.ref);return m?{icon:m.icon,label:m.name,page:m.id}:null;}
   if(n.kind==='page'){const p=page(n.ref);return p?{icon:p.icon,label:p.title,page:p.id}:null;}
   return null;
 }
 function renderTabs(){
-  $('#tabbar').innerHTML=S.nav.map(n=>{const m=navMeta(n);if(!m||n.hidden)return '';
+  $('#tabbar').innerHTML=S.nav.map(n=>{
+    if(n.kind==='page')return '';   /* страницы — в отдельном меню */
+    const m=navMeta(n);if(!m||n.hidden)return '';
+    const fb=m.page==='overall'?'overall':(m.page||'');
     return `<button class="tab ${UI.page===m.page?'active':''}" data-act="goto" data-id="${m.page}">${iconHTML(m.icon)}<span>${esc(m.label)}</span></button>`;}).join('');
+  const pages=S.nav.filter(n=>n.kind==='page'&&!n.hidden).map(n=>page(n.ref)).filter(Boolean);
+  $('#pagesDD').style.display=pages.length?'':'none';
+  $('#ddMenu').innerHTML=pages.map(p=>`<button class="dd-item ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
+  $('#ddBtn').classList.toggle('active',pages.some(p=>p.id===UI.page));
   $('#editorBtn').classList.toggle('active',UI.page==='editor');
 }
 function updateChrome(){
@@ -431,9 +496,10 @@ function updateChrome(){
 function tb(modeId,tier,big){
   const m=mode(modeId);
   const ic=iconHTML(m?m.icon:'🎮');
-  if(!tier)return `<span class="tb empty${big?' big':''}">${ic}<span class="tb-lbl" style="color:var(--muted)">–</span></span>`;
+  const ic2=ic.replace('class="m-ico"','class="m-ico" data-fb="'+(m?m.id:'')+'"').replace('<img ','<img data-fb="'+(m?m.id:'')+'" ');
+  if(!tier)return `<span class="tb empty${big?' big':''}">${ic2}<span class="tb-lbl" style="color:var(--muted)">–</span></span>`;
   const c=S.settings.tierColors[tier]||'#8f97ab';
-  return `<span class="tb${big?' big':''}" style="--c:${c}">${ic}<span class="tb-lbl">${tier}</span></span>`;
+  return `<span class="tb${big?' big':''}" style="--c:${c}">${ic2}<span class="tb-lbl">${tier}</span></span>`;
 }
 function tierWidth(){const n=S.modes.length;return Math.min(n*50+6*(n-1),520)+'px';}
 function rowHTML(p,rank,showAll){
@@ -458,7 +524,7 @@ const thead=showAll=>`<div class="thead" style="--tw:${showAll?tierWidth():'64px
 
 /* ================= СТРАНИЦЫ ================= */
 function fmt(t){let h=esc(t);h=h.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');h=h.replace(/`([^`]+)`/g,'<code>$1</code>');h=h.replace(/\*([^*]+)\*/g,'<i>$1</i>');h=h.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');return h.replace(/\n/g,'<br>');}
-function tiersTableHTML(){return `<table class="pt-table"><tr><th>Тир</th><th>Иконка</th><th>Очки</th></tr>${TIERS.map(t=>`<tr><td><b style="color:${S.settings.tierColors[t]}">${t}</b></td><td>—</td><td><b>${S.points[t]}</b></td></tr>`).join('')}</table>`;}
+function tiersTableHTML(){return `<table class="pt-table"><tr><th>Тир</th><th>Очки</th></tr>${TIERS.map(t=>`<tr><td><b style="color:${S.settings.tierColors[t]}">${t}</b></td><td><b>${S.points[t]}</b></td></tr>`).join('')}</table>`;}
 function titlesTableHTML(){return `<table class="pt-table"><tr><th>Звание</th><th>Минимум очков</th></tr>${[...S.titles].sort((a,b)=>b.min-a.min).map(t=>`<tr><td><span style="color:${t.color};font-weight:700">${t.emoji} ${esc(t.name)}</span></td><td><b>${t.min}+</b></td></tr>`).join('')}</table>`;}
 function blockHTML(b){switch(b.type){
   case 'h2':return `<h2>${fmt(b.text)}</h2>`;case 'h3':return `<h3>${fmt(b.text)}</h3>`;case 'p':return `<p>${fmt(b.text)}</p>`;
@@ -469,7 +535,7 @@ function blockHTML(b){switch(b.type){
   case 'html':return b.code||'';default:return '';}}
 const pageBlocksHTML=p=>(p.blocks||[]).map(blockHTML).join('');
 function renderPageView(p){
-  return `<div class="page-head"><span class="ph-ico">${p.icon}</span>
+  return `<div class="page-head"><span class="ph-ico">${iconHTML(p.icon)}</span>
     <div><h1>${esc(p.title)}</h1><div class="ph-sub">${esc(p.subtitle||'')}${p.updated?' • обновлено '+fmtDate(p.updated):''}</div></div>
     ${EDIT_MODE?`<button class="btn btn-sm edit-only" style="margin-left:auto" data-act="editPage" data-id="${p.id}">✏️ Редактировать</button>`:''}
   </div><div class="ed-card prose">${pageBlocksHTML(p)||'<div class="empty">Страница пуста — добавь блоки в редакторе.</div>'}</div>`;
@@ -533,7 +599,7 @@ const inp=(bind,val,extra='')=>`<input class="inp" data-bind="${bind}" value="${
 const sel=(bind,val,opts)=>`<select class="inp" data-bind="${bind}">${opts.map(o=>`<option value="${esc(o[0])}"${String(o[0])===String(val)?' selected':''}>${esc(o[1])}</option>`).join('')}</select>`;
 const sw=(bind,val,label)=>`<label class="sw-row"><input type="checkbox" class="sw" data-bind="${bind}"${val?' checked':''}><span>${label}</span></label>`;
 const col=(bind,val)=>`<input type="color" data-bind="${bind}" value="${val}">`;
-const iconField=(bind,val)=>`<div class="ed-row" style="background:none;border:0;padding:0;margin:0;gap:6px"><input class="inp icon-inp" data-bind="${bind}" data-prev="${bind}" value="${esc(val)}" placeholder="эмодзи или <svg...>"><span class="icoprev" data-for="${bind}">${iconHTML(val)}</span></div>`;
+const iconField=(bind,val)=>`<div class="ed-row" style="background:none;border:0;padding:0;margin:0;gap:6px"><input class="inp icon-inp" data-bind="${bind}" data-prev="${bind}" value="${esc(val)}" placeholder="эмодзи / URL / <svg...>"><span class="icoprev" data-for="${bind}">${iconHTML(val)}</span></div>`;
 
 function renderEditor(){
   const tabs=`<div class="ed-tabs">${ED_TABS.map(t=>`<button class="ed-tab${UI.edTab===t[0]?' active':''}" data-act="edTab" data-id="${t[0]}">${t[1]}</button>`).join('')}</div>`;
@@ -576,8 +642,8 @@ function edNav(){
       <button class="icon-btn" data-act="moveNav" data-idx="${i}" data-dir="1">↓</button>
       ${n.kind==='page'?`<button class="icon-btn" data-act="editPage" data-id="${n.ref}" title="К редактору блоков">✏️</button><button class="icon-btn danger" data-act="delPage" data-id="${n.ref}">🗑</button>`:''}
     </div>`;}).join('');
-  return `<div class="ed-card"><h3>🧭 Меню (вкладки сверху)</h3>
-  <div class="ed-hint">Меняй иконки, названия и порядок пунктов — перетаскиванием за ⠿ или стрелками. В поле иконки можно вставить эмодзи или SVG-код (например, <code>&lt;svg viewBox="0 0 24 24"&gt;...&lt;/svg&gt;</code>). Переключатель скрывает пункт из меню.</div>
+  return `<div class="ed-card"><h3>🧭 Меню сайта</h3>
+  <div class="ed-hint">⚔️ Режимы и Overall — вкладки сверху. 📄 Страницы — в выпадающем меню «Страницы» справа. В поле иконки можно вставить эмодзи, ссылку на картинку (<code>https://...svg</code>) или SVG-код. Переключатель скрывает пункт.</div>
   ${rows}<div class="modal-actions"><button class="btn btn-accent" data-act="addPage">➕ Добавить свою страницу</button></div></div>`;
 }
 function edModes(){
@@ -587,7 +653,7 @@ function edModes(){
     <button class="icon-btn" data-act="moveMode" data-id="${m.id}" data-dir="1">↓</button>
     <button class="icon-btn danger" data-act="delMode" data-id="${m.id}">🗑</button></div>`).join('');
   return `<div class="ed-card"><h3>⚔️ Режимы (киты)</h3>
-  <div class="ed-hint">Иконки китов: эмодзи или SVG-код предмета. Порядок задаёт порядок бейджей в строках и в форме игрока. Overall считается автоматически по всем режимам.</div>
+  <div class="ed-hint">Иконки уже официальные с mctiers. Если захочешь свои — вставь URL картинки или SVG. Порядок задаёт порядок бейджей в строках и в форме игрока.</div>
   ${rows}<div class="modal-actions"><button class="btn btn-accent" data-act="addMode">➕ Добавить режим</button></div></div>`;
 }
 function edTitles(){
@@ -677,7 +743,7 @@ function edPages(){
       <div class="muted" style="font-size:11px;margin-bottom:6px">Блоков: ${p.blocks.length} • обновлено ${fmtDate(p.updated)}</div>
       <button class="btn btn-sm${open?' btn-accent':''}" data-act="toggleBlocks" data-id="${p.id}">${open?'▲ Свернуть редактор':'✏️ Редактировать блоки'}</button>
       ${inner}</div>`;}).join('');
-  return `<div class="ed-hint">Страницы — отдельные вкладки сайта (правила, регламенты, FAQ...), независимые от тир-листа. Каждая появляется в верхнем меню и имеет свою ссылку.</div>
+  return `<div class="ed-hint">Страницы — отдельные вкладки сайта (правила, регламенты, FAQ...), независимые от тир-листа. Они собраны в меню «📄 Страницы» в правом верхнем углу сайта.</div>
   ${tplbar}${cards||'<div class="empty">Страниц пока нет — создай первую или возьми шаблон 📄</div>'}`;
 }
 function edData(){
@@ -744,7 +810,8 @@ document.addEventListener('change',e=>{
 function act(a,el){
   const id=el.dataset.id,dir=+el.dataset.dir||0,idx=+el.dataset.idx,g=el.dataset.grid;
   switch(a){
-    case 'goto':UI.page=id;UI.search='';renderTabs();renderPage();setHash('#/'+id);window.scrollTo({top:0});break;
+    case 'goto':UI.page=id;UI.search='';$('#pagesDD').classList.remove('open');renderTabs();renderPage();setHash('#/'+id);window.scrollTo({top:0});break;
+    case 'toggleDD':$('#pagesDD').classList.toggle('open');break;
     case 'edTab':UI.edTab=id;renderPage();break;
     case 'gridsOpen':UI.page='editor';UI.edTab='grids';renderTabs();renderPage();setHash('#/editor');break;
     case 'closeModal':closeModal(id);break;
@@ -796,6 +863,7 @@ function act(a,el){
   }
 }
 document.addEventListener('click',e=>{
+  if(!e.target.closest('#pagesDD'))$('#pagesDD')&&$('#pagesDD').classList.remove('open');
   const a=e.target.closest('[data-act]');
   if(a){e.preventDefault();act(a.dataset.act,a);return;}
   const r=e.target.closest('[data-player]');
@@ -803,14 +871,14 @@ document.addEventListener('click',e=>{
   if(e.target.classList&&e.target.classList.contains('modal'))closeModal(e.target.id);
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')document.querySelectorAll('.modal.open').forEach(m=>closeModal(m.id));
+  if(e.key==='Escape'){document.querySelectorAll('.modal.open').forEach(m=>closeModal(m.id));$('#pagesDD').classList.remove('open');}
   if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&$('#searchInput')){e.preventDefault();$('#searchInput').focus();}
 });
 const content=$('#content');
 content.addEventListener('dragstart',e=>{const r=e.target.closest('[data-navrow]');if(r){UI.drag=+r.dataset.navrow;e.dataTransfer.effectAllowed='move';}});
 content.addEventListener('dragover',e=>{if(e.target.closest('[data-navrow]'))e.preventDefault();});
 content.addEventListener('drop',e=>{const r=e.target.closest('[data-navrow]');if(r&&UI.drag!==null){const to=+r.dataset.navrow;const [it]=S.nav.splice(UI.drag,1);S.nav.splice(to,0,it);UI.drag=null;save();renderTabs();renderPage();}});
-content.addEventListener('input',e=>{if(e.target.id==='searchInput'){UI.search=e.target.value;const list=renderRanking(UI.page);const rows=content.querySelector('.row')?content:null;renderPage();setTimeout(()=>{const s=$('#searchInput');if(s){s.focus();s.setSelectionRange(s.value.length,s.value.length);}},0);}});
+content.addEventListener('input',e=>{if(e.target.id==='searchInput'){UI.search=e.target.value;renderPage();setTimeout(()=>{const s=$('#searchInput');if(s){s.focus();s.setSelectionRange(s.value.length,s.value.length);}},0);}});
 
 /* ================= ХЭШ ================= */
 function setHash(h){if(location.hash!==h)location.hash=h;}
