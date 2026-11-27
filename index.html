@@ -428,7 +428,7 @@ function loadSkinview(){
   return new Promise((res,rej)=>{
     if(window.skinview3d)return res();
     const sc=document.createElement('script');
-    sc.src='https://cdn.jsdelivr.net/npm/skinview3d@3.0.0/bundles/skinview3d.bundle.js';
+    sc.src='https://chelsogoroda68.github.io/htl-tier-list/skinview3d.bundle.js';
     sc.onload=()=>res();sc.onerror=rej;
     document.head.appendChild(sc);
   });
