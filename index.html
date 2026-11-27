@@ -16,6 +16,7 @@
   --accent:#f59e0b; --radius:14px;
   --font:'Inter',system-ui,sans-serif; --font-head:'Unbounded',var(--font);
   --gold:#ffd700; --silver:#c7d0e0; --bronze:#cd7f32;
+  --tw:520px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scrollbar-color:var(--border) transparent}
@@ -27,34 +28,50 @@ body[data-mode="view"] .edit-only{display:none !important}
 #editBanner{display:none;background:color-mix(in srgb,#ffb020 16%,var(--panel));border-bottom:1px solid color-mix(in srgb,#ffb020 45%,transparent);padding:9px 22px;font-size:12.5px;font-weight:700;color:#ffd166}
 body[data-mode="edit"] #editBanner{display:block}
 
+/* ---------- SPLASH ---------- */
+#splash{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .55s ease,visibility .55s;cursor:pointer}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.sp-logo{font-size:62px;animation:spPop .7s cubic-bezier(.2,1.5,.4,1) both}
+.sp-name{font-family:var(--font-head);font-size:32px;font-weight:800;color:var(--accent);animation:spUp .55s .18s ease both;letter-spacing:1px}
+.sp-sub{color:var(--muted);font-size:13px;animation:spUp .55s .34s ease both}
+.sp-bar{width:170px;height:3px;border-radius:3px;background:var(--border);overflow:hidden;animation:spUp .5s .4s ease both}
+.sp-bar i{display:block;height:100%;width:0;background:var(--accent);animation:spBar 1s .45s ease forwards}
+.sp-skip{margin-top:6px;font-size:11px;color:var(--muted);opacity:.6;animation:spUp .5s .6s ease both}
+@keyframes spPop{from{transform:scale(.15);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes spUp{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes spBar{to{width:100%}}
+
 /* ---------- TOPBAR + TABS ---------- */
 #topbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 .tb-in{width:min(1240px,100%);margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:10px}
 .logo{font-family:var(--font-head);font-weight:800;font-size:18px;color:var(--accent);display:flex;gap:9px;align-items:center;cursor:pointer;white-space:nowrap;padding:16px 10px 16px 0}
-.logo-ico{font-size:19px}
+.logo-ico{font-size:19px;transition:.2s}
+.logo:hover .logo-ico{transform:rotate(-12deg) scale(1.15)}
 #tabbar{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
 #tabbar::-webkit-scrollbar{display:none}
-.tab{display:flex;align-items:center;gap:8px;padding:17px 15px;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:.15s}
-.tab .m-ico{opacity:.65}
+.tab{display:flex;align-items:center;gap:8px;padding:17px 15px;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:color .18s,border-color .18s}
+.tab .m-ico{opacity:.65;transition:.18s}
 .tab:hover{color:var(--text)}
+.tab:hover .m-ico{opacity:1;transform:translateY(-1px)}
 .tab.active{color:var(--text);border-bottom-color:var(--accent)}
 .tab.active .m-ico{opacity:1}
 .m-ico{display:inline-flex;flex:0 0 auto}
 .m-ico svg,.m-ico img{width:18px;height:18px;display:block}
 .m-ico.txt{font-size:16px;line-height:1}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:6px;flex:0 0 auto}
-.tb-gear{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
-.tb-gear:hover{color:var(--text);border-color:var(--accent)}
+.tb-gear{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.tb-gear:hover{color:var(--text);border-color:var(--accent);transform:rotate(45deg)}
 .tb-gear.active{color:var(--accent);border-color:var(--accent)}
-/* dropdown pages */
 .dd{position:relative}
-.dd-btn{border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:9px 13px;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.dd-btn{border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:9px 13px;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.15s}
 .dd-btn:hover{color:var(--text);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
 .dd-btn.active{color:var(--text);border-color:var(--accent)}
-.dd-caret{font-size:10px;color:var(--muted)}
+.dd-caret{font-size:10px;color:var(--muted);transition:transform .2s}
+.dd.open .dd-caret{transform:rotate(180deg)}
 .dd-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:230px;box-shadow:0 16px 40px rgba(0,0,0,.55);z-index:60}
-.dd.open .dd-menu{display:flex;flex-direction:column;gap:2px}
-.dd-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:0;background:none;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer;text-align:left;width:100%}
+.dd.open .dd-menu{display:flex;flex-direction:column;gap:2px;animation:ddIn .18s ease}
+@keyframes ddIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.dd-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:0;background:none;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer;text-align:left;width:100%;transition:.12s}
 .dd-item:hover{background:var(--panel2);color:var(--text)}
 .dd-item.active{color:var(--text);background:color-mix(in srgb,var(--accent) 12%,transparent)}
 .dd-item .m-ico{opacity:.8}
@@ -62,6 +79,8 @@ body[data-mode="edit"] #editBanner{display:block}
 /* ---------- LAYOUT ---------- */
 main{max-width:1240px;margin:0 auto;padding:0 22px}
 #content{padding:20px 0 46px}
+#content.anim{animation:pageIn .38s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #footer{padding:0 22px 30px;text-align:center;color:var(--muted);font-size:12px}
 #footer a{color:var(--muted);text-decoration:none;font-size:11px;opacity:.6}
 #footer a:hover{opacity:1;color:var(--accent)}
@@ -79,12 +98,13 @@ main{max-width:1240px;margin:0 auto;padding:0 22px}
 .btn-sm{padding:6px 11px;font-size:12px;border-radius:8px}
 
 /* ---------- TABLE ROWS ---------- */
-.thead{display:flex;align-items:center;gap:14px;padding:4px 16px 10px;color:var(--muted);font:800 10px var(--font);letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--border);margin-bottom:10px}
-.th-rank{width:34px;text-align:center}
-.th-info{flex:1}
-.th-region{width:84px;text-align:center}
-.th-tiers{width:var(--tw,460px)}
-.row{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:10px;cursor:pointer;transition:.16s}
+.thead{display:flex;align-items:center;gap:14px;padding:6px 16px 10px;color:var(--muted);font:800 10px var(--font);letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--border);margin-bottom:10px}
+.thead .col-rank,.thead .col-region,.thead .col-tiers,.thead .col-info{display:flex;align-items:center}
+.thead .col-region{justify-content:center}
+.thead .col-tiers{justify-content:flex-start}
+.ava-spacer{width:46px;flex:0 0 auto}
+.row{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:10px;cursor:pointer;transition:transform .16s,border-color .16s,box-shadow .16s;position:relative;animation:rowIn .45s ease backwards}
+@keyframes rowIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .row:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 42%,transparent);box-shadow:0 10px 26px rgba(0,0,0,.38)}
 .col-rank{width:34px;flex:0 0 auto}
 .rankb{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:9px;font:800 15px var(--font-head);color:var(--muted)}
@@ -98,8 +118,8 @@ main{max-width:1240px;margin:0 auto;padding:0 22px}
 .tag{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);white-space:nowrap}
 .ava{width:46px;height:46px;border-radius:9px;image-rendering:pixelated;background:var(--panel2);border:1px solid var(--border);object-fit:cover;flex:0 0 auto}
 .col-region{width:84px;flex:0 0 auto;display:flex;justify-content:center}
-.rgn{min-width:46px;text-align:center;padding:6px 0;border-radius:7px;font:800 12px var(--font);color:#fff}
-.col-tiers{width:var(--tw,460px);flex:0 0 auto;display:flex;gap:6px;flex-wrap:wrap}
+.rgn{min-width:46px;text-align:center;padding:6px 0;border-radius:7px;font:800 12px var(--font)}
+.col-tiers{width:var(--tw);flex:0 0 auto;display:flex;gap:6px;flex-wrap:wrap}
 .tb{width:44px;padding:5px 0 4px;display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:9px;background:#0c0f15;border:1px solid var(--border);flex:0 0 auto}
 .tb .m-ico svg,.tb .m-ico img{width:17px;height:17px}
 .tb-lbl{font:800 9.5px var(--font);color:var(--c);letter-spacing:.3px}
@@ -110,6 +130,13 @@ main{max-width:1240px;margin:0 auto;padding:0 22px}
 .tb.big .tb-lbl{font-size:12.5px}
 body[data-compact="true"] .row{padding:8px 12px;margin-bottom:6px}
 body[data-compact="true"] .ava{width:38px;height:38px}
+body[data-compact="true"] .ava-spacer{width:38px}
+@media (max-width:760px){
+  .th-region,.col-region,.thead .col-region{display:none}
+  .thead,.row{gap:10px}
+  .th-tiers,.col-tiers{width:auto;flex:1}
+  main{padding:0 12px}
+}
 
 /* ---------- EDITOR ---------- */
 .ed-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
@@ -188,12 +215,12 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 /* ---------- MODALS ---------- */
 .modal{position:fixed;inset:0;background:rgba(4,6,10,.72);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
 .modal.open{display:flex}
-.sheet{width:min(600px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px;position:relative;animation:pop .18s ease}
+.sheet{width:min(600px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px;position:relative;animation:pop .22s cubic-bezier(.2,1.2,.4,1)}
 .sheet.wide{width:min(780px,100%)}
-@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pop{from{transform:scale(.94) translateY(8px);opacity:0}to{transform:none;opacity:1}}
 .sheet h3{font-family:var(--font-head);font-size:16px;margin-bottom:16px;padding-right:34px}
-.x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel2);color:var(--muted);cursor:pointer;font-size:14px}
-.x:hover{color:var(--text)}
+.x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--panel2);color:var(--muted);cursor:pointer;font-size:14px;transition:.15s}
+.x:hover{color:var(--text);transform:rotate(90deg)}
 .modal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
 .pc-head{border-radius:14px;background:var(--panel2) center/cover no-repeat;border:1px solid var(--border);overflow:hidden}
 .pc-in{display:flex;gap:16px;padding:18px;background:linear-gradient(180deg,rgba(8,10,15,.38),rgba(8,10,15,.86));align-items:center;flex-wrap:wrap}
@@ -202,6 +229,9 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 .pc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
 .pc-title{font-weight:700;color:var(--c);margin-top:7px;font-size:14px}
 .pc-title .muted{color:var(--muted);font-weight:600}
+.pc-loc{display:flex;align-items:center;gap:10px;margin-top:10px}
+.pc-loc .rgn{padding:7px 13px;font-size:13px;border-radius:8px;min-width:56px}
+.pc-loc-t{font-size:13.5px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
 .pc-bio{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.65;white-space:pre-wrap;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 13px}
 .tiers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:15px}
 .tg-cell{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px;font-weight:700}
@@ -211,16 +241,18 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 .toast{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);padding:11px 15px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:tin .22s ease;max-width:340px}
 .toast.err{border-left-color:#ff4655}
 @keyframes tin{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
-@media (max-width:760px){
-  .th-region,.col-region{display:none}
-  .thead,.row{gap:10px}
-  .th-tiers,.col-tiers{width:auto;flex:1}
-  main{padding:0 12px}
-}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
 </style>
 <style id="userCSS"></style>
 </head>
 <body data-mode="view" data-compact="true">
+<div id="splash">
+  <div class="sp-logo">🧡</div>
+  <div class="sp-name">HTL</div>
+  <div class="sp-sub">HTL-рейтинг «наших» игроков</div>
+  <div class="sp-bar"><i></i></div>
+  <div class="sp-skip">клик — пропустить</div>
+</div>
 <div id="editBanner">✏️ Режим редактирования — изменения видны только тебе. Готово? Нажми «📥 Скачать data.json» в редакторе и замени файл в репозитории GitHub.</div>
 <header id="topbar"><div class="tb-in">
   <div class="logo" data-act="goto" data-id="top"><span class="logo-ico" id="logoIco">🧡</span><span id="logoText">HTL</span></div>
@@ -298,7 +330,6 @@ const OFFICIAL={
   mace:'https://mctiers.net/tier_icons/mace.svg',
   spear:'https://mctiers.net/tier_icons/spear.png'
 };
-/* встроенные SVG-запаски на случай, если mctiers запретит хотлинк */
 const ICON_FB={
   overall:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3l7 4v6l-7 8-7-8V7z" fill="#b07cff"/><path d="M12 3l7 4-7 4-7-4z" fill="#d9b8ff"/></svg>`,
   vanilla:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3l7 4v6l-7 8-7-8V7z" fill="#b07cff"/><path d="M12 3l7 4-7 4-7-4z" fill="#d9b8ff"/><path d="M5 7v6l7 8V11z" fill="#8a5cff"/></svg>`,
@@ -311,7 +342,6 @@ const ICON_FB={
   spear:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="11" y="10" width="2" height="11" fill="#6b4a2b"/><path d="M6 3v6c0 2 3 3 6 3s6-1 6-3V3l-2 4-1-4v4h-2V3h-2v4H8V7z" fill="#4aa3ff"/><path d="M6 3v6c0 2 3 3 6 3V3l-2 4-1-4z" fill="#7cc0ff"/></svg>`,
   cart:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 8h16l-2 8H6z" fill="#7a5a3a"/><path d="M4 8h16l-1 3H5z" fill="#8b5a3c"/><rect x="8" y="4" width="8" height="4" fill="#4aa3ff"/><circle cx="8" cy="18" r="2" fill="#333"/><circle cx="16" cy="18" r="2" fill="#333"/></svg>`
 };
-/* старые самописные SVG — если они уже сохранены в data.json, заменим на официальные */
 const OLD_DEFAULT_ICONS={
   vanilla:'<svg viewBox="0 0 24 24"><path d="M12 3l7 4v6l-7 8-7-8V7z" fill="#b07cff"/><path d="M12 3l7 4-7 4-7-4z" fill="#d9b8ff"/><path d="M5 7v6l7 8V11z" fill="#8a5cff"/></svg>',
   sword:'<svg viewBox="0 0 24 24"><rect x="14" y="3" width="4" height="3" fill="#e8e8e8"/><rect x="12" y="5" width="4" height="3" fill="#d8d8d8"/><rect x="10" y="7" width="4" height="3" fill="#c8c8c8"/><rect x="8" y="9" width="4" height="3" fill="#d8d8d8"/><rect x="6" y="11" width="4" height="3" fill="#a8a8a8"/><rect x="4" y="13" width="3" height="3" fill="#6b4a2b"/><rect x="3" y="16" width="4" height="3" fill="#5b3a26"/><rect x="6" y="15" width="3" height="3" fill="#5b3a26"/><rect x="5" y="14" width="3" height="3" fill="#8b5a3c"/></svg>',
@@ -327,7 +357,7 @@ function iconHTML(icon){
   const ic=String(icon||'').trim();
   if(!ic)return `<span class="m-ico txt">🎮</span>`;
   if(ic.startsWith('<'))return `<span class="m-ico">${ic}</span>`;
-  if(ic.startsWith('http'))return `<span class="m-ico"><img src="${esc(ic)}" alt="" onerror="iconFail(this)"></span>`;
+  if(ic.startsWith('http'))return `<span class="m-ico"><img src="${esc(ic)}" alt="" onerror="iconFail(this)"> </span>`;
   return `<span class="m-ico txt">${ic}</span>`;
 }
 window.iconFail=function(img){
@@ -335,7 +365,6 @@ window.iconFail=function(img){
   const fb=ICON_FB[img.dataset.fb]||ICON_FB.overall;
   img.src='data:image/svg+xml;utf8,'+encodeURIComponent(fb);
 };
-window.ICON_FB=ICON_FB;
 
 /* ================= ДАННЫЕ ================= */
 const DEFAULTS={
@@ -398,10 +427,10 @@ function normalizePage(p){
 }
 function upgradeIcon(m){
   const ic=String(m.icon||'').trim();
-  if(!ic)return OFFICIAL[m.id]||'🎮';                                  /* пусто → официальная */
-  if(!ic.startsWith('<')&&!ic.startsWith('http'))return OFFICIAL[m.id]||ic; /* эмодзи → официальная */
-  if(ic.startsWith('<')&&OLD_DEFAULT_ICONS[m.id]===ic)return OFFICIAL[m.id]||ic; /* мой старый SVG → официальная */
-  return m.icon;                                                        /* своя кастомная → не трогаем */
+  if(!ic)return OFFICIAL[m.id]||'🎮';
+  if(!ic.startsWith('<')&&!ic.startsWith('http'))return OFFICIAL[m.id]||ic;
+  if(ic.startsWith('<')&&OLD_DEFAULT_ICONS[m.id]===ic)return OFFICIAL[m.id]||ic;
+  return m.icon;
 }
 function normalize(o){
   const d=clone(DEFAULTS);
@@ -434,7 +463,18 @@ async function boot(){
   if(!loaded){try{const l=JSON.parse(localStorage.getItem(KEY)||'null');if(l){S=normalize(l);loaded=true;}}catch(e){}}
   if(!loaded)S=clone(DEFAULTS);
   seedPages();renderAll();applyHash();
+  showSplash();
   if(!EDIT_MODE)startPolling();
+}
+function showSplash(){
+  const s=$('#splash');
+  $('.sp-logo').textContent=S.settings.logoEmoji;
+  $('.sp-name').textContent=S.settings.siteName;
+  $('.sp-sub').textContent=S.settings.subtitle;
+  const done=()=>{s.classList.add('hide');sessionStorage.setItem('htl_splash','1');};
+  s.onclick=done;
+  if(sessionStorage.getItem('htl_splash')){s.style.display='none';return;}
+  setTimeout(done,1900);
 }
 function startPolling(){
   setInterval(async()=>{
@@ -451,7 +491,7 @@ function mkBlock(type){const b={id:uid(),type};if(type==='h2')b.text='Загол
 function mkPage(title,icon,subtitle,blocks){return{id:uid(),title,icon,subtitle,updated:Date.now(),blocks};}
 function tplRules(){return mkPage('Правила тир-листа','📜','Как устроен рейтинг и как попасть в сетки',[{id:uid(),type:'h2',text:'🏆 Общие положения'},{id:uid(),type:'p',text:'Этот сайт — внутренний tier list нашего комьюнити. Игроки оцениваются по режимам (китам), а сумма очков определяет место в **Overall** и **звание**.'},{id:uid(),type:'list',ordered:false,items:['Оценку ставит только действующий тестер соответствующего кита.','Оценка — это текущий уровень игрока.','Рейтинг публичный: любой игрок может посмотреть свою карточку и скачать её.','Все спорные ситуации решает руководство сайта / старшие тестеры.']},{id:uid(),type:'h2',text:'⚔️ Как получить оценку'},{id:uid(),type:'list',ordered:true,items:['Договорись с тестером нужного кита.','Согласуй кит, регион и формат (обычно 1х1).','Проведи бой по регламенту.','Тестер выносит вердикт и вносит тир в таблицу.','После внесения тир появится у тебя в карточке и в Overall.']},{id:uid(),type:'note',tone:'warn',text:'Не проси завысить оценку и не дави на тестеров. Попытка повлиять на результат = отказ в оценке.'},{id:uid(),type:'h2',text:'🧮 Шкала очков'},{id:uid(),type:'tiers'},{id:uid(),type:'h2',text:'👑 Звания'},{id:uid(),type:'titles'}]);}
 function tplCalib(){return mkPage('Регламент калибровок и 1х1','🎯','Процедура оценки при вызове / выходе на тестера',[{id:uid(),type:'h2',text:'📌 Что такое калибровка'},{id:uid(),type:'p',text:'Калибровка — первичная оценка нового игрока в ките. Проводится в формате **1х1** с тестером этого кита до вынесения вердикта.'},{id:uid(),type:'h2',text:'🗡️ Формат боя'},{id:uid(),type:'list',ordered:false,items:['Кит выбирается из списка режимов сайта.','Арена — стандартная для кита.','Длительность: до явного преимущества или по решению тестера (обычно 1–4 раунда).','Запись боя (clip) желательна — она решает апелляции.']},{id:uid(),type:'h2',text:'👤 Кто вызывает'},{id:uid(),type:'list',ordered:true,items:['Игрок сам инициирует калибровку: пишет тестеру кита и договаривается о времени.','Тестер вправе отказать без объяснения причин.','Если тестер долго недоступен — калибровку проводит старший тестер кита.']},{id:uid(),type:'note',tone:'info',text:'Игрок без оценки в ките отображается как **Unranked** и не учитывается в Overall по этому режиму.'},{id:uid(),type:'h2',text:'📊 Как тестер ставит тир'},{id:uid(),type:'p',text:'Тестер оценивает: контроль дистанции, тайминги, урон, принятие решений, стабильность. Итог — один тир из шкалы HT1–LT5.'},{id:uid(),type:'tiers'}]);}
-function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['27.11 — официальные иконки китов с mctiers, страницы вынесены в отдельное меню.','27.11 — сайт опубликован на GitHub Pages, данные обновляются в реальном времени.','26.11 — добавлены страницы правил и регламентов.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
+function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['28.11 — splash-анимация при входе, каскадное появление игроков, выровнены шапки таблиц.','27.11 — официальные иконки китов с mctiers, страницы вынесены в отдельное меню.','27.11 — сайт опубликован на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
 function seedPages(){if(S._seeded)return;S._seeded=true;if(!S.pages.length){[tplRules(),tplCalib(),tplChangelog()].forEach(p=>{S.pages.push(p);S.nav.push({kind:'page',ref:p.id});});}save();}
 
 /* ================= ТЕМА ================= */
@@ -463,9 +503,12 @@ function applyTheme(){
   r.setProperty('--font-head',`'${st.headFont}',var(--font)`);
   document.body.dataset.compact=!!st.compact;
   $('#userCSS').textContent=st.customCSS||'';
+  setTierVar();
 }
+function tierWidth(){const n=S.modes.length;return Math.min(n*50+6*(n-1),520)+'px';}
+function setTierVar(){document.documentElement.style.setProperty('--tw',tierWidth());}
 
-/* ================= ВКЛАДКИ + ДРОПДАУН СТРАНИЦ ================= */
+/* ================= ВКЛАДКИ + ДРОПДАУН ================= */
 function navMeta(n){
   if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top'};
   if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall'};
@@ -475,9 +518,8 @@ function navMeta(n){
 }
 function renderTabs(){
   $('#tabbar').innerHTML=S.nav.map(n=>{
-    if(n.kind==='page')return '';   /* страницы — в отдельном меню */
+    if(n.kind==='page')return '';
     const m=navMeta(n);if(!m||n.hidden)return '';
-    const fb=m.page==='overall'?'overall':(m.page||'');
     return `<button class="tab ${UI.page===m.page?'active':''}" data-act="goto" data-id="${m.page}">${iconHTML(m.icon)}<span>${esc(m.label)}</span></button>`;}).join('');
   const pages=S.nav.filter(n=>n.kind==='page'&&!n.hidden).map(n=>page(n.ref)).filter(Boolean);
   $('#pagesDD').style.display=pages.length?'':'none';
@@ -495,14 +537,13 @@ function updateChrome(){
 /* ================= БЕЙДЖИ / СТРОКИ ================= */
 function tb(modeId,tier,big){
   const m=mode(modeId);
-  const ic=iconHTML(m?m.icon:'🎮');
-  const ic2=ic.replace('class="m-ico"','class="m-ico" data-fb="'+(m?m.id:'')+'"').replace('<img ','<img data-fb="'+(m?m.id:'')+'" ');
-  if(!tier)return `<span class="tb empty${big?' big':''}">${ic2}<span class="tb-lbl" style="color:var(--muted)">–</span></span>`;
+  let ic=iconHTML(m?m.icon:'🎮');
+  ic=ic.replace('class="m-ico"','class="m-ico" data-fb="'+(m?m.id:'')+'"').replace('<img ','<img data-fb="'+(m?m.id:'')+'" ');
+  if(!tier)return `<span class="tb empty${big?' big':''}">${ic}<span class="tb-lbl" style="color:var(--muted)">–</span></span>`;
   const c=S.settings.tierColors[tier]||'#8f97ab';
-  return `<span class="tb${big?' big':''}" style="--c:${c}">${ic2}<span class="tb-lbl">${tier}</span></span>`;
+  return `<span class="tb${big?' big':''}" style="--c:${c}">${ic}<span class="tb-lbl">${tier}</span></span>`;
 }
-function tierWidth(){const n=S.modes.length;return Math.min(n*50+6*(n-1),520)+'px';}
-function rowHTML(p,rank,showAll){
+function rowHTML(p,rank,showAll,idx){
   const pts=points(p),t=titleFor(pts),st=S.settings;
   const tags=st.showTags&&p.tags.length?p.tags.map(tg=>`<span class="tag" style="--c:${tagColor(tg)}">${esc(tg)}</span>`).join(''):'';
   const titleLine=st.showTitles?`<div class="p-title" style="--c:${t.color}">${t.emoji} <b>${esc(t.name)}</b>${st.showPoints?`<span>(${pts} очков)</span>`:''}</div>`:(st.showPoints?`<div class="p-title"><span>${pts} очков</span></div>`:'');
@@ -510,7 +551,8 @@ function rowHTML(p,rank,showAll){
   const rc=REGION_COLORS[p.region]||'#8f97ab';
   const region=st.showRegions?`<span class="rgn" style="background:${hexA(rc,.2)};border:1px solid ${hexA(rc,.5)};color:${rc}">${esc(p.region||'—')}</span>`:'';
   const rankCls=rank<=3?' r'+rank:'';
-  return `<div class="row" data-player="${p.id}">
+  const delay=Math.min((idx||0)*45,450);
+  return `<div class="row" data-player="${p.id}" style="animation-delay:${delay}ms">
     <div class="col-rank"><div class="rankb${rankCls}">${rank}</div></div>
     <img class="ava" src="${skinSrc(p)}" onerror="this.onerror=null;this.src=window.DEFAULT_AVA" alt="">
     <div class="col-info"><div class="p-name">${esc(p.nick)} <span>${flag(p.country)}</span> ${tags}</div>${titleLine}</div>
@@ -518,9 +560,11 @@ function rowHTML(p,rank,showAll){
     <div class="col-tiers">${badges}</div>
   </div>`;
 }
-const thead=showAll=>`<div class="thead" style="--tw:${showAll?tierWidth():'64px'}">
-  <div class="th-rank">#</div><div class="th-info" style="margin-left:60px">Игрок</div>
-  <div class="th-region">Регион</div><div class="th-tiers">Тиры</div></div>`;
+const thead=showAll=>`<div class="thead">
+  <div class="col-rank">#</div><div class="ava-spacer"></div>
+  <div class="col-info">Игрок</div>
+  <div class="col-region">Регион</div>
+  <div class="col-tiers">Тиры</div></div>`;
 
 /* ================= СТРАНИЦЫ ================= */
 function fmt(t){let h=esc(t);h=h.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');h=h.replace(/`([^`]+)`/g,'<code>$1</code>');h=h.replace(/\*([^*]+)\*/g,'<i>$1</i>');h=h.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');return h.replace(/\n/g,'<br>');}
@@ -556,10 +600,12 @@ function renderTop(){
   const html=S.grids.map(g=>{
     const list=g.auto?overallSorted().slice(0,Math.max(1,g.autoCount||3)):g.players.map(byId).filter(Boolean);
     const collapsed=UI.collapsed.has(g.id);
-    const head=`<div class="thead clickable" data-act="gridCollapse" data-id="${g.id}" style="--tw:${tierWidth()};cursor:pointer;user-select:none">
-      <div style="width:34px;text-align:center">${g.icon||'🏆'}</div><div style="flex:1;margin-left:60px">${esc(g.name)}${g.auto?' <span class="tag" style="--c:var(--accent)">AUTO</span>':''} <span class="muted">(${list.length})</span></div>
-      <div style="width:84px;text-align:center">Регион</div><div style="width:${tierWidth()};text-align:left">Тиры ${collapsed?'▸':'▾'}</div></div>`;
-    const body=collapsed?'':(list.length?list.map((p,i)=>rowHTML(p,offset+i,true)).join(''):`<div class="empty">Пусто — добавь игроков в редакторе сеток ⚙️</div>`);
+    const head=`<div class="thead clickable" data-act="gridCollapse" data-id="${g.id}" style="cursor:pointer;user-select:none">
+      <div class="col-rank">${g.icon||'🏆'}</div><div class="ava-spacer"></div>
+      <div class="col-info">${esc(g.name)}${g.auto?' <span class="tag" style="--c:var(--accent)">AUTO</span>':''} <span class="muted">(${list.length})</span></div>
+      <div class="col-region">Регион</div>
+      <div class="col-tiers">Тиры <span style="margin-left:6px">${collapsed?'▸':'▾'}</span></div></div>`;
+    const body=collapsed?'':(list.length?list.map((p,i)=>rowHTML(p,offset+i,true,i)).join(''):`<div class="empty">Пусто — добавь игроков в редакторе сеток ⚙️</div>`);
     offset+=list.length;
     return head+body;
   }).join('');
@@ -589,7 +635,7 @@ function renderRanking(key){
   </div>`;
   const stats=key!=='overall'?`<div class="toolbar">${TIERS.map(t=>{const n=base.filter(p=>p.tiers[key]===t).length;return n?`<span class="tb" style="--c:${S.settings.tierColors[t]}"><span class="tb-lbl">${t}</span><span class="tb-lbl" style="color:var(--muted)">×${n}</span></span>`:'';}).join('')}</div>`:'';
   const note=key==='overall'?`<div class="note">${esc(S.settings.overallNote)}</div>`:'';
-  return note+bar+stats+thead(key==='overall')+(list.length?list.map((p,i)=>rowHTML(p,i+1,key==='overall')).join(''):`<div class="empty">Никого нет 🔍</div>`);
+  return note+bar+stats+thead(key==='overall')+(list.length?list.map((p,i)=>rowHTML(p,i+1,key==='overall',i)).join(''):`<div class="empty">Никого нет 🔍</div>`);
 }
 
 /* ================= РЕДАКТОР ================= */
@@ -821,8 +867,8 @@ function act(a,el){
     case 'delPlayer':{if(!EDIT_MODE)break;const p=byId(id);if(!p)break;showConfirm(`Удалить игрока ${p.nick}?`,()=>{S.players=S.players.filter(x=>x.id!==id);S.grids.forEach(gr=>gr.players=gr.players.filter(x=>x!==id));save();closeModal('playerModal');renderAll();toast('🗑 Игрок удалён');});break;}
     case 'downloadCard':downloadCard(id);break;
     case 'copyLink':setHash('#/player/'+id);if(navigator.clipboard)navigator.clipboard.writeText(location.href).then(()=>toast('🔗 Ссылка скопирована')).catch(()=>toast('⚠️ Не удалось скопировать ссылку',true));else toast('⚠️ Буфер обмена недоступен',true);break;
-    case 'addMode':{const m={id:uid(),name:'Новый режим',icon:'🎮'};S.modes.push(m);S.nav.push({kind:'mode',ref:m.id});save();renderTabs();renderPage();toast('⚔️ Режим добавлен');break;}
-    case 'delMode':{const m=mode(id);showConfirm(`Удалить режим «${m.name}»? Оценки игроков в нём тоже удалятся.`,()=>{S.modes=S.modes.filter(x=>x.id!==id);S.nav=S.nav.filter(n=>!(n.kind==='mode'&&n.ref===id));S.players.forEach(p=>delete p.tiers[id]);if(UI.page===id)UI.page='overall';save();renderAll();toast('🗑 Режим удалён');});break;}
+    case 'addMode':{const m={id:uid(),name:'Новый режим',icon:'🎮'};S.modes.push(m);S.nav.push({kind:'mode',ref:m.id});save();setTierVar();renderTabs();renderPage();toast('⚔️ Режим добавлен');break;}
+    case 'delMode':{const m=mode(id);showConfirm(`Удалить режим «${m.name}»? Оценки игроков в нём тоже удалятся.`,()=>{S.modes=S.modes.filter(x=>x.id!==id);S.nav=S.nav.filter(n=>!(n.kind==='mode'&&n.ref===id));S.players.forEach(p=>delete p.tiers[id]);if(UI.page===id)UI.page='overall';save();setTierVar();renderAll();toast('🗑 Режим удалён');});break;}
     case 'moveMode':{const i=S.modes.findIndex(m=>m.id===id),j=i+dir;if(j<0||j>=S.modes.length)break;[S.modes[i],S.modes[j]]=[S.modes[j],S.modes[i]];save();renderPage();break;}
     case 'addTitle':S.titles.push({id:uid(),name:'Новое звание',emoji:'👑',color:'#8f97ab',min:0});save();renderPage();toast('👑 Звание добавлено');break;
     case 'delTitle':showConfirm('Удалить это звание?',()=>{S.titles=S.titles.filter(t=>t.id!==id);save();renderPage();toast('🗑 Звание удалено');});break;
@@ -894,6 +940,7 @@ window.addEventListener('hashchange',applyHash);
 function openPlayer(id){
   const p=byId(id);if(!p)return;
   const pts=points(p),t=titleFor(pts);
+  const rc=REGION_COLORS[p.region]||'#8f97ab';
   $('#pmBody').innerHTML=`
   <div class="pc-head"${p.bg?` style="background-image:url('${p.bg}')"`:''}><div class="pc-in">
     <img class="pc-ava" src="${skinSrc(p)}" onerror="this.onerror=null;this.src=window.DEFAULT_AVA" alt="">
@@ -901,7 +948,8 @@ function openPlayer(id){
       <div class="pc-name">${esc(p.nick)} <span>${flag(p.country)}</span></div>
       <div class="pc-tags">${p.tags.map(tg=>`<span class="tag" style="--c:${tagColor(tg)}">${esc(tg)}</span>`).join('')}</div>
       <div class="pc-title" style="--c:${t.color}">${t.emoji} ${esc(t.name)} <span class="muted">(${pts} очков)</span></div>
-      <div style="margin-top:8px"><span class="rgn" style="background:${hexA(REGION_COLORS[p.region]||'#8f97ab',.2)};border:1px solid ${hexA(REGION_COLORS[p.region]||'#8f97ab',.5)};color:${REGION_COLORS[p.region]||'#8f97ab'}">${esc(p.region||'—')}</span> <span class="muted" style="font-size:12px">${esc(regionText(p))}</span></div>
+      <div class="pc-loc"><span class="rgn" style="background:${hexA(rc,.2)};border:1px solid ${hexA(rc,.5)};color:${rc}">${esc(p.region||'—')}</span>
+      <span class="pc-loc-t">${flag(p.country)} ${esc(regionText(p))}</span></div>
     </div>
   </div></div>
   ${p.bio?`<div class="pc-bio">${esc(p.bio)}</div>`:''}
