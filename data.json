@@ -1,0 +1,98 @@
+{
+  "settings": {
+    "siteName": "HTL",
+    "logoEmoji": "🧡",
+    "subtitle": "HTL-рейтинг «наших» игроков",
+    "footer": "Официальный tier list сайт наших игроков.",
+    "overallNote": "ℹ️ Overall — суммарный рейтинг по очкам за тиры во всех режимах. Режимы без оценки (Unranked) не учитываются.",
+    "accent": "#f59e0b",
+    "bg": "#0a0c11",
+    "panel": "#12151d",
+    "font": "Inter",
+    "headFont": "Unbounded",
+    "radius": 14,
+    "side": "left",
+    "navStyle": "full",
+    "compact": true,
+    "showPoints": true,
+    "showTags": true,
+    "showRegions": true,
+    "showTitles": true,
+    "customCSS": "",
+    "tierColors": {
+      "HT1": "#ff4655",
+      "LT1": "#ff8a5c",
+      "HT2": "#ffb020",
+      "LT2": "#ffd166",
+      "HT3": "#3ddc84",
+      "LT3": "#7ce7a2",
+      "HT4": "#4aa3ff",
+      "LT4": "#7cc0ff",
+      "HT5": "#b07cff",
+      "LT5": "#c9a9ff"
+    }
+  },
+  "points": {
+    "HT1": 100,
+    "LT1": 80,
+    "HT2": 60,
+    "LT2": 45,
+    "HT3": 35,
+    "LT3": 25,
+    "HT4": 18,
+    "LT4": 12,
+    "HT5": 8,
+    "LT5": 4
+  },
+  "titles": [
+    {"id": "t1", "name": "Combat Grandmaster", "emoji": "👑", "color": "#ffd700", "min": 400},
+    {"id": "t2", "name": "Combat Master", "emoji": "👑", "color": "#ff9f43", "min": 250},
+    {"id": "t3", "name": "Combat Ace", "emoji": "👑", "color": "#ff6b6b", "min": 150},
+    {"id": "t4", "name": "Combat Specialist", "emoji": "👑", "color": "#b07cff", "min": 80},
+    {"id": "t5", "name": "Combat Cadet", "emoji": "👑", "color": "#4aa3ff", "min": 30},
+    {"id": "t6", "name": "Combat Novice", "emoji": "👑", "color": "#3ddc84", "min": 15},
+    {"id": "t7", "name": "Rookie", "emoji": "👑", "color": "#8f97ab", "min": 0}
+  ],
+  "modes": [
+    {"id": "vanilla", "name": "Vanilla", "icon": "🌿"},
+    {"id": "sword", "name": "Sword", "icon": "⚔️"},
+    {"id": "uhc", "name": "UHC", "icon": "🍎"},
+    {"id": "pot", "name": "Pot", "icon": "🧪"},
+    {"id": "smp", "name": "SMP", "icon": "🛡️"},
+    {"id": "axe", "name": "Axe", "icon": "🪓"},
+    {"id": "mace", "name": "Mace", "icon": "🔨"},
+    {"id": "cart", "name": "Cart", "icon": "🛒"},
+    {"id": "spear", "name": "Spear Mace", "icon": "🔱"}
+  ],
+  "nav": [
+    {"kind": "top"},
+    {"kind": "overall"},
+    {"kind": "mode", "ref": "vanilla"},
+    {"kind": "mode", "ref": "sword"},
+    {"kind": "mode", "ref": "uhc"},
+    {"kind": "mode", "ref": "pot"},
+    {"kind": "mode", "ref": "smp"},
+    {"kind": "mode", "ref": "axe"},
+    {"kind": "mode", "ref": "mace"},
+    {"kind": "mode", "ref": "cart"},
+    {"kind": "mode", "ref": "spear"}
+  ],
+  "pages": [],
+  "players": [
+    {"id": "p1", "nick": "meshnn", "country": "RU", "city": "Saint Petersburg", "region": "EU", "tags": ["Тестер: Sword", "Тестер: UHC", "Тестер: Axe"], "bio": "", "skin": "", "bg": "", "tiers": {"vanilla": "LT5", "sword": "HT1", "uhc": "HT1", "pot": "HT1", "smp": "LT4", "axe": "HT1", "mace": "LT5", "cart": "HT3", "spear": "LT5"}},
+    {"id": "p2", "nick": "JustBekon", "country": "UA", "city": "Kharkiv", "region": "EU", "tags": ["Тестер: Pot", "Тестер: Mace", "Тестер: Spear Mace"], "bio": "", "skin": "", "bg": "", "tiers": {"vanilla": "HT4", "sword": "LT2", "uhc": "LT4", "pot": "LT3", "smp": "HT3", "axe": "LT2", "mace": "LT2", "cart": "HT3", "spear": "LT1"}},
+    {"id": "p3", "nick": "burgarito", "country": "RU", "city": "Tyumen", "region": "EU", "tags": ["Тестер: Vanilla", "Тестер: SMP", "Тестер: Cart"], "bio": "", "skin": "", "bg": "", "tiers": {"vanilla": "HT4", "sword": "HT3", "uhc": "HT4", "pot": "HT3", "smp": "HT4", "axe": "HT4", "mace": "LT2", "cart": "LT2", "spear": "LT1"}},
+    {"id": "p4", "nick": "GavrilaQueen", "country": "RU", "city": "Tambov", "region": "EU", "tags": ["Разработчик сайта"], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "HT2", "uhc": "HT4", "axe": "HT3"}},
+    {"id": "p5", "nick": "EXDEN19", "country": "UA", "city": "Kharkiv", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "HT4", "uhc": "HT5", "axe": "LT2"}},
+    {"id": "p6", "nick": "Arbyzekk", "country": "RU", "city": "Tula", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "LT4", "uhc": "HT5", "axe": "HT5"}},
+    {"id": "p7", "nick": "rezelnt_", "country": "RU", "city": "Dzerzhinsk", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "LT5", "uhc": "LT5", "axe": "LT5"}},
+    {"id": "p8", "nick": "OmletPR", "country": "RU", "city": "Belgorod", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {}},
+    {"id": "x9p44kld", "nick": "M1styPSYCHO", "country": "RU", "city": "Tambov", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "LT4", "uhc": "HT5", "axe": "HT5"}},
+    {"id": "64f5jgb1", "nick": "GucoMC", "country": "RU", "city": "Belgorod", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "HT5", "axe": "HT4"}}
+  ],
+  "grids": [
+    {"id": "vyc0bv86", "name": "Верхняя сетка", "icon": "🏆", "auto": false, "autoCount": 3, "players": ["p1", "p2", "p3"]},
+    {"id": "0q807yo1", "name": "Продвиженцы: Попадают игроки начиная с 150 очков. Считаются новыми сильными игроками", "icon": "🚀", "auto": false, "autoCount": 3, "players": []},
+    {"id": "1uu3cuj8", "name": "Нижняя сетка", "icon": "🥈", "auto": false, "autoCount": 5, "players": ["p4", "p5", "p6", "x9p44kld", "64f5jgb1", "p7", "p8"]}
+  ]
+}
