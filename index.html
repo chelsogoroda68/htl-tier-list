@@ -44,18 +44,33 @@ body[data-mode="edit"] .live{display:none}
 .sp-bar{position:absolute;left:50%;top:56%;transform:translateX(-50%);width:180px;height:3px;background:var(--border);border-radius:3px;overflow:hidden;transition:opacity .4s}
 .sp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#ff6b6b);transition:width 1.7s cubic-bezier(.4,0,.2,1)}
 .sp-bar.go i{width:100%}
-.sp-players{position:absolute;right:6%;bottom:0;display:flex;align-items:flex-end;gap:10px;pointer-events:none;z-index:2}
-.sp-fig{width:150px;height:240px;opacity:0;transform:translateY(115%);transition:transform 1s cubic-bezier(.22,1.15,.36,1),opacity .7s}
+.sp-players{--h:min(76vh,35vw,740px);position:absolute;right:0;bottom:0;display:flex;align-items:flex-end;pointer-events:none;z-index:1}
+.sp-fig{position:relative;width:calc(var(--h)*.9);height:var(--h);margin-left:calc(var(--h)*-.45);opacity:0;transform:translate(45vw,25%);transition:transform 1.15s cubic-bezier(.2,1,.3,1),opacity .6s}
+.sp-fig.s0{margin-left:0;z-index:2;transform-origin:bottom}
+.sp-fig.s1{z-index:3}
+.sp-fig.s2{z-index:1}
 .sp-fig.in{opacity:1;transform:none}
-.sp-fig .bob{width:100%;height:100%;animation:bob 3.4s ease-in-out infinite}
-.sp-fig canvas{width:100%;height:100%;display:block}
+.sp-fig.s0.in,.sp-fig.s2.in{transform:scale(.88)}
+.sp-fig.s0,.sp-fig.s2{transform-origin:bottom center}
+.sp-fig .bob{width:100%;height:100%;animation:bob 3.4s ease-in-out infinite;transform-origin:bottom center;filter:drop-shadow(0 12px 22px rgba(0,0,0,.75))}
+.sp-fig canvas{display:block}
+.sp-render{width:100%;height:100%;object-fit:contain;object-position:bottom;display:block}
 .sp-fig-fb{width:110px;height:110px;margin:70px auto 0;border-radius:16px;image-rendering:pixelated;border:2px solid color-mix(in srgb,var(--accent) 50%,transparent);display:block}
-@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.02)}}
+@keyframes bob{0%,100%{transform:scale(1)}50%{transform:scale(1.022)}}
 .sp-text{position:absolute;left:50%;top:32%;transform:translate(-50%,16px);font-family:var(--font-head);font-size:clamp(20px,3.4vw,30px);font-weight:800;color:var(--text);opacity:0;transition:opacity .7s,transform .7s;text-align:center;padding:0 20px;z-index:2}
 .sp-text.show{opacity:1;transform:translate(-50%,0)}
 .sp-enter{position:absolute;left:50%;top:46%;transform:translate(-50%,12px);opacity:0;pointer-events:none;border:1px solid var(--accent);background:var(--accent);color:#0b0d12;font-weight:800;font-size:15px;padding:13px 28px;border-radius:12px;cursor:pointer;transition:opacity .6s,transform .6s;z-index:2}
 .sp-enter.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;animation:enterGlow 2s ease-in-out infinite}
 .sp-enter:hover{filter:brightness(1.12)}
+@media (min-width:901px){
+  .sp-text{left:26%;top:36%;width:min(42vw,560px);font-size:clamp(28px,3.2vw,52px);line-height:1.2}
+  .sp-enter{left:26%;top:60%}
+}
+@media (max-width:900px){
+  .sp-text{top:16%;width:100%}
+  .sp-enter{top:34%;white-space:nowrap}
+  .sp-players{--h:min(46vh,58vw);left:50%;right:auto;transform:translateX(-50%)}
+}
 @keyframes enterGlow{0%,100%{box-shadow:0 0 0 rgba(245,158,11,0)}50%{box-shadow:0 0 28px rgba(245,158,11,.55)}}
 
 /* ---------- TOPBAR ---------- */
@@ -155,8 +170,6 @@ body[data-compact="true"] .ava-spacer{width:38px}
   .thead,.row{gap:10px}
   .th-tiers,.col-tiers{width:auto;flex:1}
   main{padding:0 12px}
-  .sp-players{right:2%;gap:2px}
-  .sp-fig{width:105px;height:170px}
 }
 
 .ed-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
@@ -408,10 +421,16 @@ function updateSoundBtn(){const b=$('#soundBtn');b.textContent=SOUND_ON?'🔊':'
 
 /* ================= SPLASH: 3D-СКИНЫ ================= */
 /* Полный URL к локальным PNG в репозитории — никаких относительных путей и внешних доменов */
+/* render — своя картинка позы (PNG с прозрачным фоном). Если такого файла нет, рисуется 3D-поза.
+   turn — поворот тела; head/right/left/rleg/lleg — повороты [x,y,z] головы, рук и ног.
+   Порядок в списке = порядок вылета. slot: 0 слева, 1 по центру, 2 справа. */
 const SPLASH_PLAYERS=[
-  {id:'p1',skin:'https://chelsogoroda68.github.io/htl-tier-list/meshnn.png',rot:-0.5,anim:'idle',zoom:0.85},
-  {id:'p2',skin:'https://chelsogoroda68.github.io/htl-tier-list/JustBekon.png',rot:0.12,anim:'wave',zoom:0.95},
-  {id:'p4',skin:'https://chelsogoroda68.github.io/htl-tier-list/GavrilaQueen.png',rot:0.5,anim:'arms',zoom:0.85},
+  {id:'p1',skin:'meshnn.png',render:'meshnn_pose.png',slot:0,turn:0.55,
+    head:[0.06,-0.3,-0.08],right:[-1.2,-0.2,-0.2],left:[0.25,0,0.2],rleg:[0.15,0,-0.04],lleg:[-0.2,0,0.04]},
+  {id:'p2',skin:'JustBekon.png',render:'JustBekon_pose.png',slot:1,turn:-0.2,
+    head:[0.04,0.18,0.14],right:[0.12,0,-0.2],left:[-0.15,0,2.5],rleg:[-0.08,0,-0.05],lleg:[0.08,0,0.05]},
+  {id:'p4',skin:'GavrilaQueen.png',render:'GavrilaQueen_pose.png',slot:2,turn:-0.55,
+    head:[0.1,0.32,-0.12],right:[-0.75,-0.2,-0.25],left:[0.35,0,0.28],rleg:[-0.2,0,-0.04],lleg:[0.15,0,0.04]},
 ];
 let splashDone=false,viewers=[],spTimers=[],spPhase=0,svPromise=null;
 
@@ -447,44 +466,76 @@ async function pickSkinURL(p,c){
   for(const u of cand){const ok=await skinExists(u);if(ok)return ok;}
   return null;
 }
+function figSize(){
+  const wide=innerWidth>900;
+  const h=Math.round(wide?Math.min(innerHeight*0.76,innerWidth*0.35,740):Math.min(innerHeight*0.46,innerWidth*0.58));
+  return {w:Math.round(h*0.9),h};
+}
+function makeViewer(cv,url,c,i){
+  const {w,h}=figSize();
+  const v=new skinview3d.SkinViewer({canvas:cv,width:w,height:h});
+  v.pixelRatio=Math.min(devicePixelRatio||1,2);
+  v.fov=28;v.zoom=1.22;
+  v.globalLight.intensity=2.7;v.cameraLight.intensity=1;
+  const rim=v.cameraLight.clone();         /* цветная подсветка сбоку-сзади */
+  rim.color.set(S.settings.accent);rim.intensity=6;rim.position.set(c.turn>0?-30:30,12,-18);
+  v.scene.add(rim);
+  v.animation=new skinview3d.FunctionAnimation((player,t)=>{
+    const k=player.skin,b=Math.sin(t*1.6+i*1.3);   /* лёгкое «дыхание» */
+    k.head.rotation.set(c.head[0]+b*0.025,c.head[1],c.head[2]);
+    k.rightArm.rotation.set(c.right[0],c.right[1],c.right[2]-b*0.04);
+    k.leftArm.rotation.set(c.left[0],c.left[1],c.left[2]+b*0.04);
+    k.rightLeg.rotation.set(...c.rleg);
+    k.leftLeg.rotation.set(...c.lleg);
+  });
+  /* только ПОСЛЕ animation: она сбрасывает поворот и позицию модели */
+  v.playerObject.rotation.y=c.turn;
+  v.playerObject.position.y=-3.5;           /* кадр по колено, как на постере */
+  v.loadSkin(url);
+  return v;
+}
+async function buildFigure(fig,bob,p,c,i){
+  const custom=c.render&&await skinExists(c.render);
+  if(custom){
+    const img=document.createElement('img');img.className='sp-render';img.src=custom;img.alt=p.nick;
+    bob.appendChild(img);return;
+  }
+  const cv=document.createElement('canvas');
+  try{
+    await loadSkinview();
+    const url=await pickSkinURL(p,c);
+    if(!url)throw new Error('нет скина для '+p.nick);
+    bob.appendChild(cv);
+    viewers.push(makeViewer(cv,url,c,i));
+  }catch(e){
+    console.warn('⚠️ fallback для',p.nick,'-',e.message);
+    cv.remove();
+    const img=document.createElement('img');
+    img.className='sp-fig-fb';
+    img.src=`https://mc-heads.net/avatar/${encodeURIComponent(p.nick)}/120`;
+    img.alt=p.nick;
+    img.onerror=()=>{img.onerror=null;img.src=window.DEFAULT_AVA;};
+    bob.appendChild(img);
+  }
+}
 async function buildPlayers(instant){
   const wrap=$('#spPlayers');if(wrap._built)return;wrap._built=true;
   const list=SPLASH_PLAYERS.map(c=>{const p=byId(c.id);return p?{p,c}:null;}).filter(Boolean);
-  for(let i=0;i<list.length;i++){
-    const {p,c}=list[i];
-    const fig=document.createElement('div');fig.className='sp-fig';
+  const made=list.map(({p,c},i)=>{
+    const fig=document.createElement('div');fig.className='sp-fig s'+c.slot;
+    fig.style.order=c.slot;
     const bob=document.createElement('div');bob.className='bob';bob.style.animationDelay=(i*0.7)+'s';
-    const cv=document.createElement('canvas');cv.width=150;cv.height=240;
-    bob.appendChild(cv);fig.appendChild(bob);wrap.appendChild(fig);
-    try{
-      await loadSkinview();
-      const url=await pickSkinURL(p,c);
-      if(!url)throw new Error('нет скина для '+p.nick);
-      const v=new skinview3d.SkinViewer({canvas:cv,skin:url,width:150,height:240});
-      v.zoom=c.zoom||0.9;v.playerObject.rotation.y=c.rot||0;
-      v.animation=c.anim==='wave'?new skinview3d.WaveAnimation()
-                :c.anim==='arms'?new skinview3d.FunctionAnimation((player,t)=>{
-                    const sway=Math.sin(t*2)*0.05;
-                    player.skin.leftArm.rotation.z=1.3+sway;
-                    player.skin.rightArm.rotation.z=-1.3-sway;
-                  })
-                :new skinview3d.IdleAnimation();
-      viewers.push(v);
-      console.log('✅ 3D-скин',p.nick,'из',url);
-    }catch(e){
-      console.warn('⚠️ fallback для',p.nick,'-',e.message);
-      cv.remove();
-      const img=document.createElement('img');
-      img.className='sp-fig-fb';
-      img.src=`https://mc-heads.net/avatar/${encodeURIComponent(p.nick)}/120`;
-      img.alt=p.nick;
-      img.onerror=()=>{img.onerror=null;img.src=window.DEFAULT_AVA;};
-      bob.appendChild(img);
-    }
+    fig.appendChild(bob);wrap.appendChild(fig);
+    return {fig,bob,p,c};
+  });
+  for(let i=0;i<made.length;i++){
+    const {fig,bob,p,c}=made[i];
+    await buildFigure(fig,bob,p,c,i);
     if(instant)fig.classList.add('in');
-    else setTimeout(()=>fig.classList.add('in'),200+i*500);
+    else setTimeout(()=>fig.classList.add('in'),150+i*450);
   }
 }
+addEventListener('resize',()=>{if(splashDone)return;const {w,h}=figSize();viewers.forEach(v=>v.setSize(w,h));});
 function showSplash(){
   const s=$('#splash');if(!s)return;
   $('#spLogo').textContent=S.settings.logoEmoji;
