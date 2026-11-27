@@ -45,54 +45,373 @@
     "LT5": 4
   },
   "titles": [
-    {"id": "t1", "name": "Combat Grandmaster", "emoji": "👑", "color": "#ffd700", "min": 400},
-    {"id": "t2", "name": "Combat Master", "emoji": "👑", "color": "#ff9f43", "min": 250},
-    {"id": "t3", "name": "Combat Ace", "emoji": "👑", "color": "#ff6b6b", "min": 150},
-    {"id": "t4", "name": "Combat Specialist", "emoji": "👑", "color": "#b07cff", "min": 80},
-    {"id": "t5", "name": "Combat Cadet", "emoji": "👑", "color": "#4aa3ff", "min": 30},
-    {"id": "t6", "name": "Combat Novice", "emoji": "👑", "color": "#3ddc84", "min": 15},
-    {"id": "t7", "name": "Rookie", "emoji": "👑", "color": "#8f97ab", "min": 0}
+    {
+      "id": "t1",
+      "name": "Combat Grandmaster",
+      "emoji": "👑",
+      "color": "#ffd700",
+      "min": 400
+    },
+    {
+      "id": "t2",
+      "name": "Combat Master",
+      "emoji": "👑",
+      "color": "#ff9f43",
+      "min": 250
+    },
+    {
+      "id": "t3",
+      "name": "Combat Ace",
+      "emoji": "👑",
+      "color": "#ff6b6b",
+      "min": 150
+    },
+    {
+      "id": "t4",
+      "name": "Combat Specialist",
+      "emoji": "👑",
+      "color": "#b07cff",
+      "min": 80
+    },
+    {
+      "id": "t5",
+      "name": "Combat Cadet",
+      "emoji": "👑",
+      "color": "#4aa3ff",
+      "min": 30
+    },
+    {
+      "id": "t6",
+      "name": "Combat Novice",
+      "emoji": "👑",
+      "color": "#3ddc84",
+      "min": 15
+    },
+    {
+      "id": "t7",
+      "name": "Rookie",
+      "emoji": "👑",
+      "color": "#8f97ab",
+      "min": 0
+    }
   ],
   "modes": [
-    {"id": "vanilla", "name": "Vanilla", "icon": "🌿"},
-    {"id": "sword", "name": "Sword", "icon": "⚔️"},
-    {"id": "uhc", "name": "UHC", "icon": "🍎"},
-    {"id": "pot", "name": "Pot", "icon": "🧪"},
-    {"id": "smp", "name": "SMP", "icon": "🛡️"},
-    {"id": "axe", "name": "Axe", "icon": "🪓"},
-    {"id": "mace", "name": "Mace", "icon": "🔨"},
-    {"id": "cart", "name": "Cart", "icon": "🛒"},
-    {"id": "spear", "name": "Spear Mace", "icon": "🔱"}
+    {
+      "id": "vanilla",
+      "name": "Vanilla",
+      "icon": "🌿"
+    },
+    {
+      "id": "sword",
+      "name": "Sword",
+      "icon": "⚔️"
+    },
+    {
+      "id": "uhc",
+      "name": "UHC",
+      "icon": "🍎"
+    },
+    {
+      "id": "pot",
+      "name": "Pot",
+      "icon": "🧪"
+    },
+    {
+      "id": "smp",
+      "name": "SMP",
+      "icon": "🛡️"
+    },
+    {
+      "id": "axe",
+      "name": "Axe",
+      "icon": "🪓"
+    },
+    {
+      "id": "mace",
+      "name": "Mace",
+      "icon": "🔨"
+    },
+    {
+      "id": "cart",
+      "name": "Cart",
+      "icon": "🛒"
+    },
+    {
+      "id": "spear",
+      "name": "Spear Mace",
+      "icon": "🔱"
+    }
   ],
   "nav": [
-    {"kind": "top"},
-    {"kind": "overall"},
-    {"kind": "mode", "ref": "vanilla"},
-    {"kind": "mode", "ref": "sword"},
-    {"kind": "mode", "ref": "uhc"},
-    {"kind": "mode", "ref": "pot"},
-    {"kind": "mode", "ref": "smp"},
-    {"kind": "mode", "ref": "axe"},
-    {"kind": "mode", "ref": "mace"},
-    {"kind": "mode", "ref": "cart"},
-    {"kind": "mode", "ref": "spear"}
+    {
+      "kind": "top"
+    },
+    {
+      "kind": "overall"
+    },
+    {
+      "kind": "mode",
+      "ref": "vanilla"
+    },
+    {
+      "kind": "mode",
+      "ref": "sword"
+    },
+    {
+      "kind": "mode",
+      "ref": "uhc"
+    },
+    {
+      "kind": "mode",
+      "ref": "pot"
+    },
+    {
+      "kind": "mode",
+      "ref": "smp"
+    },
+    {
+      "kind": "mode",
+      "ref": "axe"
+    },
+    {
+      "kind": "mode",
+      "ref": "mace"
+    },
+    {
+      "kind": "mode",
+      "ref": "cart"
+    },
+    {
+      "kind": "mode",
+      "ref": "spear"
+    }
   ],
   "pages": [],
   "players": [
-    {"id": "p1", "nick": "meshnn", "country": "RU", "city": "Saint Petersburg", "region": "EU", "tags": ["Тестер: Sword", "Тестер: UHC", "Тестер: Axe"], "bio": "", "skin": "", "bg": "", "tiers": {"vanilla": "LT5", "sword": "HT1", "uhc": "HT1", "pot": "HT1", "smp": "LT4", "axe": "HT1", "mace": "LT5", "cart": "HT3", "spear": "LT5"}},
-    {"id": "p2", "nick": "JustBekon", "country": "UA", "city": "Kharkiv", "region": "EU", "tags": ["Тестер: Pot", "Тестер: Mace", "Тестер: Spear Mace"], "bio": "", "skin": "", "bg": "", "tiers": {"vanilla": "HT4", "sword": "LT2", "uhc": "LT4", "pot": "LT3", "smp": "HT3", "axe": "LT2", "mace": "LT2", "cart": "HT3", "spear": "LT1"}},
-    {"id": "p3", "nick": "burgarito", "country": "RU", "city": "Tyumen", "region": "EU", "tags": ["Тестер: Vanilla", "Тестер: SMP", "Тестер: Cart"], "bio": "", "skin": "", "bg": "", "tiers": {"vanilla": "HT4", "sword": "HT3", "uhc": "HT4", "pot": "HT3", "smp": "HT4", "axe": "HT4", "mace": "LT2", "cart": "LT2", "spear": "LT1"}},
-    {"id": "p4", "nick": "GavrilaQueen", "country": "RU", "city": "Tambov", "region": "EU", "tags": ["Разработчик сайта"], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "HT2", "uhc": "HT4", "axe": "HT3"}},
-    {"id": "p5", "nick": "EXDEN19", "country": "UA", "city": "Kharkiv", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "HT4", "uhc": "HT5", "axe": "LT2"}},
-    {"id": "p6", "nick": "Arbyzekk", "country": "RU", "city": "Tula", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "LT4", "uhc": "HT5", "axe": "HT5"}},
-    {"id": "p7", "nick": "rezelnt_", "country": "RU", "city": "Dzerzhinsk", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "LT5", "uhc": "LT5", "axe": "LT5"}},
-    {"id": "p8", "nick": "OmletPR", "country": "RU", "city": "Belgorod", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {}},
-    {"id": "x9p44kld", "nick": "M1styPSYCHO", "country": "RU", "city": "Tambov", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "LT4", "uhc": "HT5", "axe": "HT5"}},
-    {"id": "64f5jgb1", "nick": "GucoMC", "country": "RU", "city": "Belgorod", "region": "EU", "tags": [], "bio": "", "skin": "", "bg": "", "tiers": {"sword": "HT5", "axe": "HT4"}}
+    {
+      "id": "p1",
+      "nick": "meshnn",
+      "country": "RU",
+      "city": "Saint Petersburg",
+      "region": "EU",
+      "tags": [
+        "Тестер: Sword",
+        "Тестер: UHC",
+        "Тестер: Axe"
+      ],
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "vanilla": "LT5",
+        "sword": "HT1",
+        "uhc": "HT1",
+        "pot": "HT1",
+        "smp": "LT4",
+        "axe": "HT1",
+        "mace": "LT5",
+        "cart": "HT3",
+        "spear": "LT5"
+      },
+      "bio": ""
+    },
+    {
+      "id": "p2",
+      "nick": "JustBekon",
+      "country": "UA",
+      "city": "Kharkiv",
+      "region": "EU",
+      "tags": [
+        "Тестер: Pot",
+        "Тестер: Mace",
+        "Тестер: Spear Mace"
+      ],
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "vanilla": "HT4",
+        "sword": "LT2",
+        "uhc": "LT4",
+        "pot": "LT3",
+        "smp": "HT3",
+        "axe": "LT2",
+        "mace": "LT2",
+        "cart": "HT3",
+        "spear": "LT1"
+      },
+      "bio": ""
+    },
+    {
+      "id": "p3",
+      "nick": "burgarito",
+      "country": "RU",
+      "city": "Tyumen",
+      "region": "EU",
+      "tags": [
+        "Тестер: Vanilla",
+        "Тестер: SMP",
+        "Тестер: Cart"
+      ],
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "vanilla": "HT4",
+        "sword": "HT3",
+        "uhc": "HT4",
+        "pot": "HT3",
+        "smp": "HT4",
+        "axe": "HT4",
+        "mace": "LT2",
+        "cart": "LT2",
+        "spear": "LT1"
+      },
+      "bio": ""
+    },
+    {
+      "id": "p4",
+      "nick": "GavrilaQueen",
+      "country": "RU",
+      "city": "Tambov",
+      "region": "EU",
+      "tags": [
+        "Разработчик сайта"
+      ],
+      "skin": "data:image/png;base64,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",
+      "bg": "",
+      "tiers": {
+        "sword": "HT2",
+        "uhc": "HT4",
+        "axe": "HT3"
+      },
+      "bio": ""
+    },
+    {
+      "id": "p5",
+      "nick": "EXDEN19",
+      "country": "UA",
+      "city": "Kharkiv",
+      "region": "EU",
+      "tags": [],
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "sword": "HT4",
+        "uhc": "HT5",
+        "axe": "LT2"
+      },
+      "bio": ""
+    },
+    {
+      "id": "p6",
+      "nick": "Arbyzekk",
+      "country": "RU",
+      "city": "Tula",
+      "region": "EU",
+      "tags": [],
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "sword": "LT4",
+        "uhc": "HT5",
+        "axe": "HT5"
+      },
+      "bio": ""
+    },
+    {
+      "id": "p7",
+      "nick": "rezelnt_",
+      "country": "RU",
+      "city": "Dzerzhinsk",
+      "region": "EU",
+      "tags": [],
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "sword": "LT5",
+        "uhc": "LT5",
+        "axe": "LT5"
+      },
+      "bio": ""
+    },
+    {
+      "id": "p8",
+      "nick": "OmletPR",
+      "country": "RU",
+      "city": "Belgorod",
+      "region": "EU",
+      "tags": [],
+      "skin": "",
+      "bg": "",
+      "tiers": {},
+      "bio": ""
+    },
+    {
+      "id": "x9p44kld",
+      "nick": "M1styPSYCHO",
+      "country": "RU",
+      "city": "Tambov",
+      "region": "EU",
+      "tags": [],
+      "bio": "",
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "sword": "LT4",
+        "uhc": "HT5",
+        "axe": "HT5"
+      }
+    },
+    {
+      "id": "64f5jgb1",
+      "nick": "GucoMC",
+      "country": "RU",
+      "city": "Belgorod",
+      "region": "EU",
+      "tags": [],
+      "bio": "",
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "sword": "HT5",
+        "axe": "HT4"
+      }
+    }
   ],
   "grids": [
-    {"id": "vyc0bv86", "name": "Верхняя сетка", "icon": "🏆", "auto": false, "autoCount": 3, "players": ["p1", "p2", "p3"]},
-    {"id": "0q807yo1", "name": "Продвиженцы: Попадают игроки начиная с 150 очков. Считаются новыми сильными игроками", "icon": "🚀", "auto": false, "autoCount": 3, "players": []},
-    {"id": "1uu3cuj8", "name": "Нижняя сетка", "icon": "🥈", "auto": false, "autoCount": 5, "players": ["p4", "p5", "p6", "x9p44kld", "64f5jgb1", "p7", "p8"]}
+    {
+      "id": "vyc0bv86",
+      "name": "Верхняя сетка",
+      "icon": "🏆",
+      "auto": false,
+      "autoCount": 3,
+      "players": [
+        "p1",
+        "p2",
+        "p3"
+      ]
+    },
+    {
+      "id": "0q807yo1",
+      "name": "Продвиженцы: Попадают игроки начиная с 150 очков. Считаются новыми сильными игроками",
+      "icon": "🏆",
+      "auto": false,
+      "autoCount": 3,
+      "players": []
+    },
+    {
+      "id": "1uu3cuj8",
+      "name": "Нижняя сетка",
+      "icon": "🏆",
+      "auto": false,
+      "autoCount": 5,
+      "players": [
+        "p4",
+        "p5",
+        "p6",
+        "x9p44kld",
+        "64f5jgb1",
+        "p7",
+        "p8"
+      ]
+    }
   ]
 }
