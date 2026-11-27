@@ -402,7 +402,7 @@ window.iconFail=function(img){
   img.src='data:image/svg+xml;utf8,'+encodeURIComponent(fb);
 };
 
-/* ================= ЗВУКИ (ОРИГИНАЛЬНЫЕ MINECRAFT ФАЙЛЫ + РЕЗЕРВ) ================= */
+/* ================= ЗВУКИ (ТОЛЬКО ПРИ НАЖАТИИ) ================= */
 let SOUND_ON=localStorage.getItem(SOUND_KEY)==='1';
 let AC=null,NOISE_BUF=null;
 
@@ -422,7 +422,7 @@ const KIT_AUDIO_FILES={
 };
 const AUDIO_CACHE={};
 
-function tryPlayFile(key,vol=0.45){
+function tryPlayFile(key,vol=0.5){
   const list=KIT_AUDIO_FILES[key];
   if(!list)return false;
   if(AUDIO_CACHE[key]===false)return false;
@@ -468,7 +468,7 @@ function ensureAC(){
 
 function playClick(pitch=1,vol=0.06){
   if(!SOUND_ON)return;
-  if(tryPlayFile('click',vol*4))return;
+  if(tryPlayFile('click',vol*5))return;
   ensureAC();
   if(!AC||AC.state!=='running')return;
   try{
@@ -502,13 +502,13 @@ function playNoise(t,dur,type,freq,q,vol,endFreq){
   src.start(t);src.stop(t+dur+0.02);
 }
 
-function playKitSound(kitId,isHover=false){
+/* Вызывается исключительно при нажатии */
+function playKitSound(kitId){
   if(!SOUND_ON)return;
-  if(tryPlayFile(kitId,isHover?0.24:0.5))return;
+  if(tryPlayFile(kitId,0.5))return;
   ensureAC();
   if(!AC||AC.state!=='running')return;
   const t=AC.currentTime;
-  const v=isHover?0.45:1;
 
   try{
     switch(kitId){
@@ -520,7 +520,7 @@ function playKitSound(kitId,isHover=false){
           o.frequency.setValueAtTime(f,st);
           o.frequency.exponentialRampToValueAtTime(f*1.03,st+0.18);
           g.gain.setValueAtTime(0.0001,st);
-          g.gain.linearRampToValueAtTime(0.045*v,st+0.006);
+          g.gain.linearRampToValueAtTime(0.045,st+0.006);
           g.gain.exponentialRampToValueAtTime(0.0001,st+0.22);
           o.connect(g);g.connect(AC.destination);
           o.start(st);o.stop(st+0.24);
@@ -528,25 +528,25 @@ function playKitSound(kitId,isHover=false){
         break;
       }
       case 'sword':{
-        playNoise(t,0.13,'bandpass',1400,2.5,0.09*v,3600);
+        playNoise(t,0.13,'bandpass',1400,2.5,0.09,3600);
         const o=AC.createOscillator(),g=AC.createGain();
         o.type='triangle';
         o.frequency.setValueAtTime(620,t);
         o.frequency.exponentialRampToValueAtTime(190,t+0.1);
-        g.gain.setValueAtTime(0.03*v,t);
+        g.gain.setValueAtTime(0.03,t);
         g.gain.exponentialRampToValueAtTime(0.0001,t+0.11);
         o.connect(g);g.connect(AC.destination);
         o.start(t);o.stop(t+0.12);
         break;
       }
       case 'uhc':{
-        playNoise(t,0.06,'bandpass',950,1.8,0.07*v,500);
+        playNoise(t,0.06,'bandpass',950,1.8,0.07,500);
         [1046.5,1318.5].forEach((f,i)=>{
           const o=AC.createOscillator(),g=AC.createGain();
           o.type='sine';
           const st=t+0.04+i*0.045;
           o.frequency.setValueAtTime(f,st);
-          g.gain.setValueAtTime(0.045*v,st);
+          g.gain.setValueAtTime(0.045,st);
           g.gain.exponentialRampToValueAtTime(0.0001,st+0.16);
           o.connect(g);g.connect(AC.destination);
           o.start(st);o.stop(st+0.17);
@@ -554,13 +554,13 @@ function playKitSound(kitId,isHover=false){
         break;
       }
       case 'pot':{
-        playNoise(t,0.14,'highpass',2600,1.5,0.06*v,1200);
+        playNoise(t,0.14,'highpass',2600,1.5,0.06,1200);
         [1568,2093,1865].forEach((f,i)=>{
           const o=AC.createOscillator(),g=AC.createGain();
           o.type='sine';
           const st=t+i*0.022;
           o.frequency.setValueAtTime(f,st);
-          g.gain.setValueAtTime(0.035*v,st);
+          g.gain.setValueAtTime(0.035,st);
           g.gain.exponentialRampToValueAtTime(0.0001,st+0.09);
           o.connect(g);g.connect(AC.destination);
           o.start(st);o.stop(st+0.1);
@@ -573,55 +573,55 @@ function playKitSound(kitId,isHover=false){
         o.frequency.setValueAtTime(320,t);
         o.frequency.exponentialRampToValueAtTime(780,t+0.09);
         o.frequency.exponentialRampToValueAtTime(420,t+0.2);
-        g.gain.setValueAtTime(0.05*v,t);
+        g.gain.setValueAtTime(0.05,t);
         g.gain.exponentialRampToValueAtTime(0.0001,t+0.21);
         o.connect(g);g.connect(AC.destination);
         o.start(t);o.stop(t+0.22);
         break;
       }
       case 'axe':{
-        playNoise(t,0.11,'lowpass',900,1.2,0.09*v,220);
+        playNoise(t,0.11,'lowpass',900,1.2,0.09,220);
         const o=AC.createOscillator(),g=AC.createGain();
         o.type='triangle';
         o.frequency.setValueAtTime(240,t);
         o.frequency.exponentialRampToValueAtTime(75,t+0.12);
-        g.gain.setValueAtTime(0.075*v,t);
+        g.gain.setValueAtTime(0.075,t);
         g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
         o.connect(g);g.connect(AC.destination);
         o.start(t);o.stop(t+0.14);
         break;
       }
       case 'mace':{
-        playNoise(t,0.18,'lowpass',600,1.5,0.1*v,120);
+        playNoise(t,0.18,'lowpass',600,1.5,0.1,120);
         const o=AC.createOscillator(),g=AC.createGain();
         o.type='sine';
         o.frequency.setValueAtTime(165,t);
         o.frequency.exponentialRampToValueAtTime(42,t+0.22);
-        g.gain.setValueAtTime(0.11*v,t);
+        g.gain.setValueAtTime(0.11,t);
         g.gain.exponentialRampToValueAtTime(0.0001,t+0.24);
         o.connect(g);g.connect(AC.destination);
         o.start(t);o.stop(t+0.25);
         break;
       }
       case 'cart':{
-        playNoise(t,0.14,'bandpass',1800,5,0.075*v,1100);
+        playNoise(t,0.14,'bandpass',1800,5,0.075,1100);
         const o=AC.createOscillator(),g=AC.createGain();
         o.type='triangle';
         o.frequency.setValueAtTime(460,t);
         o.frequency.setValueAtTime(580,t+0.045);
-        g.gain.setValueAtTime(0.035*v,t);
+        g.gain.setValueAtTime(0.035,t);
         g.gain.exponentialRampToValueAtTime(0.0001,t+0.11);
         o.connect(g);g.connect(AC.destination);
         o.start(t);o.stop(t+0.12);
         break;
       }
       case 'spear':{
-        playNoise(t,0.15,'bandpass',2200,3.5,0.08*v,4500);
+        playNoise(t,0.15,'bandpass',2200,3.5,0.08,4500);
         const o=AC.createOscillator(),g=AC.createGain();
         o.type='sine';
         o.frequency.setValueAtTime(880,t);
         o.frequency.exponentialRampToValueAtTime(340,t+0.13);
-        g.gain.setValueAtTime(0.04*v,t);
+        g.gain.setValueAtTime(0.04,t);
         g.gain.exponentialRampToValueAtTime(0.0001,t+0.14);
         o.connect(g);g.connect(AC.destination);
         o.start(t);o.stop(t+0.15);
@@ -634,14 +634,14 @@ function playKitSound(kitId,isHover=false){
         o.type='sine';
         o.frequency.setValueAtTime(f,t);
         o.frequency.setValueAtTime(f*1.25,t+0.045);
-        g.gain.setValueAtTime(0.045*v,t);
+        g.gain.setValueAtTime(0.045,t);
         g.gain.exponentialRampToValueAtTime(0.0001,t+0.14);
         o.connect(g);g.connect(AC.destination);
         o.start(t);o.stop(t+0.15);
         break;
       }
       default:
-        playClick(isHover?1.15:0.95,isHover?0.03:0.06);
+        playClick(0.95,0.06);
     }
   }catch(e){}
 }
@@ -679,6 +679,7 @@ const SPLASH_PLAYERS=[
 let splashDone=false,viewers=[],spTimers=[],spPhase=0,svPromise=null;
 
 const SV_SRCS=[
+  'skinview3d.bundle.js',
   'https://chelsogoroda68.github.io/htl-tier-list/skinview3d.bundle.js',
   'https://unpkg.com/skinview3d@3.4.1/bundles/skinview3d.bundle.js',
   'https://fastly.jsdelivr.net/npm/skinview3d@3.4.1/bundles/skinview3d.bundle.js'
@@ -750,7 +751,6 @@ async function buildFigure(fig,bob,p,c,i){
     bob.appendChild(cv);
     viewers.push(makeViewer(cv,url,c,i));
   }catch(e){
-    console.warn('⚠️ fallback для',p.nick,'-',e.message);
     cv.remove();
     const img=document.createElement('img');
     img.className='sp-fig-fb';
@@ -845,7 +845,7 @@ const DEFAULTS={
   players:[
     {id:'p1',nick:'meshnn',country:'RU',city:'Saint Petersburg',region:'EU',tags:['Тестер: Sword','Тестер: UHC','Тестер: Axe'],bio:'',skin:'',bg:'',tiers:{vanilla:'LT5',sword:'HT1',uhc:'HT1',pot:'HT1',smp:'LT4',axe:'HT1',mace:'LT5',cart:'HT3',spear:'LT5'}},
     {id:'p2',nick:'JustBekon',country:'UA',city:'Kharkiv',region:'EU',tags:['Тестер: Pot','Тестер: Mace','Тестер: Spear Mace'],bio:'',skin:'',bg:'',tiers:{vanilla:'HT4',sword:'LT2',uhc:'LT4',pot:'LT3',smp:'HT3',axe:'LT2',mace:'LT2',cart:'HT3',spear:'LT1'}},
-    {id:'p3',nick:'burgarito',country:'RU',city:'Tyumen',region:'EU',tags:['Тестер: Vanilla','Тестер: SMP','Тестер: Cart'],bio:'',skin:'',bg:'',tiers:{vanilla:'HT4',sword:'HT3',uhc:'HT4',pot:'LT3',smp:'HT4',axe:'HT4',mace:'LT2',cart:'LT2',spear:'LT1'}},
+    {id:'p3',nick:'burgarito',country:'RU',city:'Tyumen',region:'EU',tags:['Тестер: Vanilla','Тестер: SMP','Тестер: Cart'],bio:'',skin:'',bg:'',tiers:{vanilla:'HT4',sword:'HT3',uhc:'HT4',pot:'HT3',smp:'HT4',axe:'HT4',mace:'LT2',cart:'LT2',spear:'LT1'}},
     {id:'p4',nick:'GavrilaQueen',country:'RU',city:'Tambov',region:'EU',tags:['Руководство сайта'],bio:'',skin:'',bg:'',tiers:{sword:'HT2',uhc:'HT4',pot:'HT1',axe:'HT3'}},
     {id:'p5',nick:'EXDEN19',country:'UA',city:'Kharkiv',region:'EU',tags:[],bio:'',skin:'',bg:'',tiers:{sword:'HT4',uhc:'HT5',axe:'LT2'}},
     {id:'p6',nick:'Arbyzekk',country:'RU',city:'Tula',region:'EU',tags:[],bio:'',skin:'',bg:'',tiers:{sword:'LT4',uhc:'HT5',axe:'HT5'}},
@@ -949,7 +949,7 @@ function mkBlock(type){const b={id:uid(),type};if(type==='h2')b.text='Загол
 function mkPage(title,icon,subtitle,blocks){return{id:uid(),title,icon,subtitle,updated:Date.now(),blocks};}
 function tplRules(){return mkPage('Правила тир-листа','📜','Как устроен рейтинг и как попасть в сетки',[{id:uid(),type:'h2',text:'🏆 Общие положения'},{id:uid(),type:'p',text:'Этот сайт — внутренний tier list нашего комьюнити. Игроки оцениваются по режимам (китам), а сумма очков определяет место в **Overall** и **звание**.'},{id:uid(),type:'list',ordered:false,items:['Оценку ставит только действующий тестер соответствующего кита.','Оценка — это текущий уровень игрока.','Рейтинг публичный: любой игрок может посмотреть свою карточку и скачать её.','Все спорные ситуации решает руководство сайта / старшие тестеры.']},{id:uid(),type:'h2',text:'⚔️ Как получить оценку'},{id:uid(),type:'list',ordered:true,items:['Договорись с тестером нужного кита.','Согласуй кит, регион и формат (обычно 1х1).','Проведи бой по регламенту.','Тестер выносит вердикт и вносит тир в таблицу.','После внесения тир появится у тебя в карточке и в Overall.']},{id:uid(),type:'note',tone:'warn',text:'Не проси завысить оценку и не дави на тестеров. Попытка повлиять на результат = отказ в оценке.'},{id:uid(),type:'h2',text:'🧮 Шкала очков'},{id:uid(),type:'tiers'},{id:uid(),type:'h2',text:'👑 Звания'},{id:uid(),type:'titles'}]);}
 function tplCalib(){return mkPage('Регламент калибровок и 1х1','🎯','Процедура оценки при вызове / выходе на тестера',[{id:uid(),type:'h2',text:'📌 Что такое калибровка'},{id:uid(),type:'p',text:'Калибровка — первичная оценка нового игрока в ките. Проводится в формате **1х1** с тестером этого кита до вынесения вердикта.'},{id:uid(),type:'h2',text:'🗡️ Формат боя'},{id:uid(),type:'list',ordered:false,items:['Кит выбирается из списка режимов сайта.','Арена — стандартная для кита.','Длительность: до явного преимущества или по решению тестера (обычно 1–4 раунда).','Запись боя (clip) желательна — она решает апелляции.']},{id:uid(),type:'h2',text:'👤 Кто вызывает'},{id:uid(),type:'list',ordered:true,items:['Игрок сам инициирует калибровку: пишет тестеру кита и договаривается о времени.','Тестер вправе отказать без объяснения причин.','Если тестер долго недоступен — калибровку проводит старший тестер кита.']},{id:uid(),type:'note',tone:'info',text:'Игрок без оценки в ките отображается как **Unranked** и не учитывается в Overall по этому режиму.'},{id:uid(),type:'h2',text:'📊 Как тестер ставит тир'},{id:uid(),type:'p',text:'Тестер оценивает: контроль дистанции, тайминги, урон, принятие решений, стабильность. Итог — один тир из шкалы HT1–LT5.'},{id:uid(),type:'tiers'}]);}
-function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['Добавлена поддержка оригинальных звуков Minecraft из папки sounds/ и мягкий клик интерфейса.','Заставка: локальные 3D-скины (skinview3d), текст появляется после вылета игроков.','Официальные иконки китов с mctiers, сайт на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
+function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['Добавлена поддержка оригинальных звуков Minecraft из папки sounds/ при нажатии.','Заставка: локальные 3D-скины (skinview3d), текст появляется после вылета игроков.','Официальные иконки китов с mctiers, сайт на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
 function seedPages(){if(S._seeded)return;S._seeded=true;if(!S.pages.length){[tplRules(),tplCalib(),tplChangelog()].forEach(p=>{S.pages.push(p);S.nav.push({kind:'page',ref:p.id});});}save();}
 
 /* ================= ТЕМА ================= */
@@ -968,10 +968,10 @@ function setTierVar(){document.documentElement.style.setProperty('--tw',tierWidt
 
 /* ================= ВКЛАДКИ + ИНДИКАТОР ================= */
 function navMeta(n){
-  if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top',fb:'overall',soundKey:'top'};
-  if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall',fb:'overall',soundKey:'overall'};
-  if(n.kind==='mode'){const m=mode(n.ref);return m?{icon:m.icon,label:m.name,page:m.id,fb:m.id,soundKey:m.id}:null;}
-  if(n.kind==='page'){const p=page(n.ref);return p?{icon:p.icon,label:p.title,page:p.id,fb:'',soundKey:'click'}:null;}
+  if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top',fb:'overall'};
+  if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall',fb:'overall'};
+  if(n.kind==='mode'){const m=mode(n.ref);return m?{icon:m.icon,label:m.name,page:m.id,fb:m.id}:null;}
+  if(n.kind==='page'){const p=page(n.ref);return p?{icon:p.icon,label:p.title,page:p.id,fb:''}:null;}
   return null;
 }
 function updateScrollFade(){
@@ -981,8 +981,8 @@ function updateScrollFade(){
 }
 function updateIndicator(center){
   const bar=$('#tabbar'),ind=$('#tabInd');
-  const act=bar?bar.querySelector('.tab.active'):null;
   if(!bar||!ind)return;
+  const act=bar.querySelector('.tab.active');
   if(!act){ind.style.opacity=0;return;}
   ind.style.opacity=1;
   ind.style.left=act.offsetLeft+'px';
@@ -994,567 +994,735 @@ function updateIndicator(center){
 }
 function renderTabs(){
   const pnav=S.settings.pagesInNav||'dropdown';
-  const items=S.nav.map(n=>({n,m:navMeta(n)})).filter(x=>x.m&&(pnav==='tabs'||x.n.kind!=='page'));
-  const main=items.filter(x=>x.n.kind!=='mode'),kit=items.filter(x=>x.n.kind==='mode');
-  const tabBtn=({n,m})=>`<button class="tab${UI.page===m.page?' active':''}" data-act="goto" data-id="${esc(m.page)}" data-sound="${esc(m.soundKey)}">${iconHTML(m.icon,m.fb)}<span>${esc(m.label)}</span></button>`;
+  const showTabs=n=>n.kind!=='page'||pnav==='tabs'||pnav==='both';
+  const showDD=pnav==='dropdown'||pnav==='both';
   const bar=$('#tabbar');
-  bar.innerHTML=main.map(tabBtn).join('')+(main.length&&kit.length?'<div class="tab-sep"></div>':'')+kit.map(tabBtn).join('')+'<div class="tab-ind" id="tabInd"></div>';
-  requestAnimationFrame(()=>{updateScrollFade();updateIndicator(false);});
+  const html=[];
+  let prevWasSpecial=false;
+  S.nav.forEach(n=>{
+    if(!showTabs(n))return;
+    const m=navMeta(n);if(!m)return;
+    const isSpec=(n.kind==='top'||n.kind==='overall');
+    if(!isSpec&&prevWasSpecial)html.push('<span class="tab-sep"></span>');
+    prevWasSpecial=isSpec;
+    const act=UI.page===m.page?'active':'';
+    const soundAttr=n.kind==='mode'?` data-sound="${esc(n.ref)}"`:(n.kind==='top'||n.kind==='overall'?` data-sound="${esc(n.kind)}"`:'');
+    html.push(`<button class="tab ${act}" data-act="goto" data-id="${esc(m.page)}"${soundAttr}>${iconHTML(m.icon,m.fb)}<span>${esc(m.label)}</span></button>`);
+  });
+  html.push('<span class="tab-ind" id="tabInd"></span>');
+  bar.innerHTML=html.join('');
+  updateScrollFade();
+  requestAnimationFrame(()=>updateIndicator(false));
 
-  const dd=$('#pagesDD'),menu=$('#ddMenu'),btn=$('#ddBtn');
-  if(pnav==='hidden'||!S.pages.length){dd.style.display='none';}
-  else{
-    dd.style.display='';
-    menu.innerHTML=S.pages.map(p=>`<button class="dd-item${UI.page===p.id?' active':''}" data-act="goto" data-id="${esc(p.id)}" data-sound="click">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
-    btn.classList.toggle('active',S.pages.some(p=>p.id===UI.page));
+  const dd=$('#pagesDD');
+  dd.style.display=showDD?'':'none';
+  if(showDD){
+    const menu=$('#ddMenu');
+    menu.innerHTML=S.pages.length
+      ?S.pages.map(p=>`<button class="dd-item ${UI.page===p.id?'active':''}" data-act="goto" data-id="${esc(p.id)}" data-sound="click">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('')
+      :'<div class="empty" style="padding:14px;border:0">Страниц пока нет</div>';
+    $('#ddBtn').classList.toggle('active',S.pages.some(p=>p.id===UI.page));
   }
-  $('#editorBtn').classList.toggle('active',UI.page==='editor');
 }
 addEventListener('resize',()=>{updateScrollFade();updateIndicator(false);});
 
-/* ================= КОМПОНЕНТЫ ИГРОКОВ ================= */
-function tierColor(t){return S.settings.tierColors[t]||'#8f97ab';}
-function tierBadge(m,t,big=false){
-  if(!t)return `<div class="tb empty${big?' big':''}" style="--c:#4a5266" title="${esc(m.name)}: Unranked">${iconHTML(m.icon,m.id)}<span class="tb-lbl">—</span></div>`;
-  const c=tierColor(t);
-  return `<div class="tb${big?' big':''}" style="--c:${c}" title="${esc(m.name)}: ${t}"><span class="tb-lbl">${esc(t)}</span>${iconHTML(m.icon,m.id)}</div>`;
+/* ================= РЕНДЕР БЕЙДЖЕЙ, СТРОК И СТРАНИЦ ================= */
+function tierBadge(t,modeId='',big=false){
+  const m=modeId?mode(modeId):null;
+  const ico=m?iconHTML(m.icon,m.id):'';
+  const cls='tb'+(big?' big':'')+(t?'':' empty');
+  const col=t?(S.settings.tierColors[t]||'#8f97ab'):'var(--muted)';
+  return `<span class="${cls}" style="--c:${col}">${ico}<span class="tb-lbl">${t||'—'}</span></span>`;
 }
 function regionBadge(p){
-  const c=REGION_COLORS[p.region]||'#8f97ab';
-  return `<span class="rgn" style="background:${hexA(c,.15)};color:${c};border:1px solid ${hexA(c,.38)}" title="${esc(regionText(p))}">${esc(p.region||'—')}</span>`;
+  if(!S.settings.showRegions)return '';
+  const r=p.region||'EU';
+  const c=REGION_COLORS[r]||'#8f97ab';
+  return `<span class="rgn" style="color:${c};background:${hexA(c,.13)};border:1px solid ${hexA(c,.34)}">${esc(r)}</span>`;
+}
+function pointsHTML(pts){
+  if(!S.settings.showPoints)return '';
+  return `<span class="pts">(${pts} очк.)</span>`;
 }
 function tagsHTML(p){
   if(!S.settings.showTags||!p.tags?.length)return '';
-  return p.tags.map(t=>{const c=tagColor(t);return `<span class="tag" style="--c:${c}">${esc(t)}</span>`;}).join('');
+  return p.tags.map(t=>`<span class="tag" style="--c:${tagColor(t)}">${esc(t)}</span>`).join('');
 }
-function playerRow(p,rank,modeId=null,delay=0){
-  const pts=points(p),ti=titleFor(pts),st=S.settings,rkCls=rank<=3?' r'+rank:'';
-  const rnk=(rank==null||Number.isNaN(rank))?'—':rank;
-  const subParts=[];
-  if(st.showTitles)subParts.push(`<b style="--c:${ti.color}">${esc(ti.emoji)} ${esc(ti.name)}</b>`);
-  if(st.showPoints)subParts.push(`<span class="pts" data-pts="${pts}">${pts} очк.</span>`);
+function titleLineHTML(p,pts){
+  if(!S.settings.showTitles)return '';
+  const tl=titleFor(pts);
+  return `<div class="p-title" style="--c:${tl.color}">${tl.emoji}<b>${esc(tl.name)}</b>${pointsHTML(pts)}</div>`;
+}
+function playerRow(p,rank,modeId,animIdx=0){
+  const pts=points(p);
+  const rc=rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+  const delay=Math.min(animIdx*35,350);
   const tiers=modeId
-    ?(()=>{const m=mode(modeId);return m?tierBadge(m,p.tiers?.[m.id],true):'';})()
-    :S.modes.map(m=>tierBadge(m,p.tiers?.[m.id])).join('');
-  return `<div class="row" style="animation-delay:${delay}ms" data-act="openPlayer" data-id="${esc(p.id)}">
-    <div class="col-rank"><div class="rankb${rkCls}">${rnk}</div></div>
-    <img class="ava" src="${esc(skinSrc(p))}" alt="${esc(p.nick)}" loading="lazy" onerror="this.onerror=null;this.src=window.DEFAULT_AVA">
+    ?tierBadge(p.tiers?.[modeId],modeId,true)
+    :S.modes.map(m=>tierBadge(p.tiers?.[m.id],m.id)).join('');
+  return `<div class="row" data-act="openPlayer" data-id="${esc(p.id)}" style="animation-delay:${delay}ms">
+    <div class="col-rank"><div class="rankb ${rc}">${rank}</div></div>
+    <img class="ava" src="${esc(skinSrc(p))}" alt="${esc(p.nick)}" onerror="this.onerror=null;this.src=window.DEFAULT_AVA">
     <div class="col-info">
-      <div class="p-name"><span>${esc(p.nick)}</span>${tagsHTML(p)}</div>
-      <div class="p-title">${subParts.join(' · ')}</div>
+      <div class="p-name">${esc(p.nick)}${tagsHTML(p)}</div>
+      ${titleLineHTML(p,pts)}
     </div>
-    ${st.showRegions?`<div class="col-region">${regionBadge(p)}</div>`:''}
+    <div class="col-region">${regionBadge(p)}</div>
     <div class="col-tiers">${tiers}</div>
   </div>`;
 }
-function animatePoints(){
-  if(!UI.animatePts)return;
-  UI.animatePts=false;
-  const els=[...document.querySelectorAll('.pts[data-pts]')];
-  if(!els.length||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  const start=performance.now(),dur=650;
-  els.forEach(el=>el.textContent='0 очк.');
-  function step(now){
-    const k=Math.min(1,(now-start)/dur),e=1-Math.pow(1-k,3);
-    els.forEach(el=>{el.textContent=Math.round(+el.dataset.pts*e)+' очк.';});
-    if(k<1)requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-function tableHead(modeId=null){
-  const st=S.settings;
+function tableHead(tiersLabel){
   return `<div class="thead">
     <div class="col-rank">#</div><div class="ava-spacer"></div>
     <div class="col-info">Игрок</div>
-    ${st.showRegions?'<div class="col-region th-region">Регион</div>':''}
-    <div class="col-tiers th-tiers">${modeId?'Тир':'Режимы'}</div>
+    <div class="col-region th-region">Регион</div>
+    <div class="col-tiers th-tiers">${tiersLabel}</div>
   </div>`;
-}
-function filterBar(){
-  const countries=[...new Set(S.players.map(p=>p.country).filter(Boolean))].sort();
-  return `<div class="toolbar">
-    <div class="search"><span>🔎</span><input id="qInput" value="${esc(UI.search)}" placeholder="Поиск по нику, городу, тегу..."></div>
-    <select class="inp f-sel" id="fRegion"><option value="">Все регионы</option>${REGIONS.map(r=>`<option value="${r}"${UI.region===r?' selected':''}>${r}</option>`).join('')}</select>
-    <select class="inp f-sel" id="fCountry"><option value="">Все страны</option>${countries.map(c=>`<option value="${c}"${UI.country===c?' selected':''}>${flag(c)} ${COUNTRIES[c]||c}</option>`).join('')}</select>
-    <select class="inp f-sel" id="fSort">
-      <option value="points"${UI.sort==='points'?' selected':''}>Сортировка: очки</option>
-      <option value="nick"${UI.sort==='nick'?' selected':''}>Сортировка: ник (А-Я)</option>
-      <option value="best"${UI.sort==='best'?' selected':''}>Сортировка: лучший тир</option>
-    </select>
-    <button class="btn edit-only" data-act="newPlayer">➕ Игрок</button>
-  </div>`;
-}
-function matchFilter(p){
-  const q=UI.search.trim().toLowerCase();
-  if(q&&!p.nick.toLowerCase().includes(q)&&!(p.city||'').toLowerCase().includes(q)&&!(p.tags||[]).some(t=>t.toLowerCase().includes(q)))return false;
-  if(UI.region&&p.region!==UI.region)return false;
-  if(UI.country&&p.country!==UI.country)return false;
-  return true;
-}
-function sortList(arr){
-  const a=[...arr];
-  if(UI.sort==='nick')return a.sort((x,y)=>x.nick.localeCompare(y.nick));
-  if(UI.sort==='best')return a.sort((x,y)=>bestTier(x)-bestTier(y)||points(y)-points(x));
-  return a.sort((x,y)=>points(y)-points(x)||x.nick.localeCompare(y.nick));
 }
 
-/* ================= СТРАНИЦЫ ================= */
 function renderTop(){
-  const all=overallSorted(),rankOf=id=>all.findIndex(p=>p.id===id)+1;
-  const used=new Set();
-  const secs=S.grids.map(g=>{
-    const list=g.auto?all.slice(0,+g.autoCount||3):g.players.map(byId).filter(Boolean);
-    list.forEach(p=>used.add(p.id));
-    const filtered=sortList(list.filter(matchFilter));
+  const h=[];
+  if(S.settings.subtitle)h.push(`<div class="note">🏆 <b>${esc(S.settings.siteName)}</b> — ${esc(S.settings.subtitle)}</div>`);
+  const ov=overallSorted();
+  if(!S.grids.length)return h.join('')+'<div class="empty">Сеток пока нет. Добавь их в редакторе.</div>';
+  S.grids.forEach(g=>{
+    const list=g.auto?ov.slice(0,g.autoCount):(g.players||[]).map(byId).filter(Boolean);
     const col=UI.collapsed.has(g.id);
-    const body=!filtered.length?`<div class="empty">В этой сетке пока никого нет.</div>`
-      :tableHead()+filtered.map((p,i)=>playerRow(p,g.auto?i+1:rankOf(p.id),null,i*35)).join('');
-    return `<section style="margin-bottom:26px">
-      <div class="page-head">
-        <span class="ph-ico">${iconHTML(g.icon)}</span>
-        <div><h1>${esc(g.name)}</h1><div class="ph-sub">Игроков: ${filtered.length}</div></div>
-        <button class="btn btn-sm" style="margin-left:auto" data-act="toggleGrid" data-id="${esc(g.id)}">${col?'▾ Развернуть':'▴ Свернуть'}</button>
+    h.push(`<div class="page-head" style="margin-top:12px">
+      <span class="ph-ico">${esc(g.icon||'🏆')}</span>
+      <div><h1>${esc(g.name)}</h1><div class="ph-sub">${list.length} игроков${g.auto?' · топ-'+g.autoCount+' по Overall':''}</div></div>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button class="btn btn-sm" data-act="toggleGrid" data-id="${esc(g.id)}">${col?'▾ Развернуть':'▴ Свернуть'}</button>
       </div>
-      ${col?'':body}
-    </section>`;
-  }).join('');
-  const rest=sortList(S.players.filter(p=>!used.has(p.id)&&matchFilter(p)));
-  const restHTML=rest.length?`<section style="margin-bottom:26px"><div class="page-head"><span class="ph-ico">📋</span><div><h1>Остальные игроки</h1><div class="ph-sub">${rest.length}</div></div></div>${tableHead()}${rest.map((p,i)=>playerRow(p,rankOf(p.id),null,i*30)).join('')}</section>`:'';
-  return `${filterBar()}${secs||''}${restHTML}${!secs&&!restHTML?'<div class="empty">Ничего не найдено.</div>':''}`;
-}
-function renderOverall(){
-  const list=sortList(overallSorted().filter(matchFilter));
-  return `${filterBar()}${S.settings.overallNote?`<div class="note">${esc(S.settings.overallNote)}</div>`:''}${list.length?tableHead()+list.map((p,i)=>playerRow(p,i+1,null,i*30)).join(''):'<div class="empty">Игроков пока нет.</div>'}`;
-}
-function renderMode(m){
-  const ranked=S.players.filter(p=>p.tiers?.[m.id]&&matchFilter(p)).sort((a,b)=>TIERS.indexOf(a.tiers[m.id])-TIERS.indexOf(b.tiers[m.id])||points(b)-points(a));
-  const unranked=S.players.filter(p=>!p.tiers?.[m.id]&&matchFilter(p));
-  const head=`<div class="page-head">${iconHTML(m.icon,m.id)}<div><h1>${esc(m.name)}</h1><div class="ph-sub">Оценено игроков: ${ranked.length}</div></div></div>`;
-  const ur=!unranked.length?'':`<div style="margin-top:24px"><div class="page-head"><span class="ph-ico">⏳</span><div><h1 style="font-size:18px">Unranked</h1><div class="ph-sub">Без тира в этом режиме (${unranked.length})</div></div></div>${unranked.map(p=>playerRow(p,NaN,m.id)).join('')}</div>`;
-  return `${filterBar()}${head}${ranked.length?tableHead(m.id)+ranked.map((p,i)=>playerRow(p,i+1,m.id,i*30)).join(''):'<div class="empty">В этом режиме пока никому не выставлен тир.</div>'}${ur}`;
-}
-
-/* ================= ПРОИЗВОЛЬНЫЕ СТРАНИЦЫ ================= */
-function fmtText(s){
-  return esc(s)
-    .replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')
-    .replace(/\*([^*\n]+)\*/g,'<em>$1</em>')
-    .replace(/`([^`\n]+)`/g,'<code>$1</code>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
-    .replace(/\n/g,'<br>');
-}
-function renderTiersTable(){
-  return `<table class="pt-table"><thead><tr><th>Тир</th><th>Очки</th></tr></thead><tbody>${TIERS.map(t=>{const c=tierColor(t);return `<tr><td><span class="tag" style="--c:${c}">${t}</span></td><td><b>${+S.points[t]||0}</b> очк.</td></tr>`;}).join('')}</tbody></table>`;
-}
-function renderTitlesTable(){
-  const sorted=[...S.titles].sort((a,b)=>b.min-a.min);
-  return `<table class="pt-table"><thead><tr><th>Звание</th><th>От скольких очков</th></tr></thead><tbody>${sorted.map(t=>`<tr><td><b style="color:${esc(t.color||'#e9edf5')}">${esc(t.emoji||'👑')} ${esc(t.name)}</b></td><td><b>${+t.min||0}</b> очк.</td></tr>`).join('')}</tbody></table>`;
-}
-function renderBlock(b){
-  switch(b.type){
-    case 'h2':return `<h2>${fmtText(b.text||'')}</h2>`;
-    case 'h3':return `<h3>${fmtText(b.text||'')}</h3>`;
-    case 'p':return `<p>${fmtText(b.text||'')}</p>`;
-    case 'list':{const tag=b.ordered?'ol':'ul';const items=(b.items||[]).filter(x=>String(x||'').trim()).map(x=>`<li>${fmtText(x)}</li>`).join('');return `<${tag}>${items}</${tag}>`;}
-    case 'note':{const tn=NOTE_TONES[b.tone]||NOTE_TONES.info;return `<div class="callout" style="--cc:${tn.c}"><span class="ci">${tn.i}</span><div>${fmtText(b.text||'')}</div></div>`;}
-    case 'quote':return `<blockquote>${fmtText(b.text||'')}</blockquote>`;
-    case 'divider':return `<hr>`;
-    case 'tiers':return renderTiersTable();
-    case 'titles':return renderTitlesTable();
-    case 'html':return b.code||'';
-    default:return '';
-  }
-}
-function renderCustomPage(pg){
-  const edBtn=EDIT_MODE?`<button class="btn btn-sm edit-only" style="margin-left:auto" data-act="editPageInPlace" data-id="${esc(pg.id)}">✏️ Редактировать страницу</button>`:'';
-  return `<div class="page-head"><span class="ph-ico">${iconHTML(pg.icon)}</span><div><h1>${esc(pg.title)}</h1><div class="ph-sub">${pg.subtitle?esc(pg.subtitle)+' · ':''}Обновлено ${fmtDate(pg.updated)}</div></div>${edBtn}</div>
-    <div class="ed-card prose">${(pg.blocks||[]).map(renderBlock).join('')||'<p class="muted">Страница пока пуста.</p>'}</div>`;
-}
-
-/* ================= РЕДАКТОР СТРАНИЦ ================= */
-function openPageEditor(id){
-  const pg=page(id);if(!pg)return;
-  normalizePage(pg);
-  UI.pageEdit={id:pg.id,title:pg.title,icon:pg.icon,subtitle:pg.subtitle||'',blocks:clone(pg.blocks)};
-  UI.page='editor';UI.edTab='pages';renderAll();toast('✏️ Редактируем «'+pg.title+'»');
-}
-function syncPageEditFromDOM(){
-  const pe=UI.pageEdit;if(!pe)return;
-  const t=$('#peTitle'),ic=$('#peIcon'),sub=$('#peSub');
-  if(t)pe.title=t.value;if(ic)pe.icon=ic.value;if(sub)pe.subtitle=sub.value;
-  pe.blocks.forEach(b=>{
-    const el=document.querySelector(`.blk[data-bid="${b.id}"]`);if(!el)return;
-    if(b.type==='h2'||b.type==='h3'||b.type==='p'||b.type==='quote'){const f=el.querySelector('[data-f="text"]');if(f)b.text=f.value;}
-    else if(b.type==='list'){const ord=el.querySelector('[data-f="ordered"]'),f=el.querySelector('[data-f="items"]');if(ord)b.ordered=ord.checked;if(f)b.items=f.value.split('\n');}
-    else if(b.type==='note'){const tn=el.querySelector('[data-f="tone"]'),f=el.querySelector('[data-f="text"]');if(tn)b.tone=tn.value;if(f)b.text=f.value;}
-    else if(b.type==='html'){const f=el.querySelector('[data-f="code"]');if(f)b.code=f.value;}
+    </div>`);
+    if(!col){
+      if(!list.length)h.push('<div class="empty">В этой сетке пока никого нет</div>');
+      else h.push(tableHead('Тиры по режимам'),list.map((p,i)=>playerRow(p,i+1,'',i)).join(''));
+    }
   });
+  return h.join('');
 }
-function savePageEdit(){
-  const pe=UI.pageEdit;if(!pe)return;
-  syncPageEditFromDOM();
-  const pg=page(pe.id);if(!pg)return;
-  pg.title=(pe.title||'').trim()||'Без названия';
-  pg.icon=(pe.icon||'').trim()||'📄';
-  pg.subtitle=(pe.subtitle||'').trim();
-  pg.blocks=pe.blocks.map(b=>b.type==='list'?{...b,items:(b.items||[]).map(x=>x.trim()).filter(Boolean)}:b);
-  pg.updated=Date.now();
-  UI.pageEdit=null;save();UI.page=pg.id;renderAll();toast('💾 Страница сохранена');
+
+function renderOverall(){
+  let list=overallSorted().map((p,i)=>({p,rank:i+1}));
+  if(UI.search){const q=UI.search.toLowerCase();list=list.filter(({p})=>p.nick.toLowerCase().includes(q)||(p.tags||[]).some(t=>t.toLowerCase().includes(q)));}
+  if(UI.region)list=list.filter(({p})=>p.region===UI.region);
+  if(UI.country)list=list.filter(({p})=>p.country===UI.country);
+  if(UI.sort==='nick')list.sort((a,b)=>a.p.nick.localeCompare(b.p.nick));
+  if(UI.sort==='best')list.sort((a,b)=>bestTier(a.p)-bestTier(b.p)||points(b.p)-points(a.p));
+
+  const countries=[...new Set(S.players.map(p=>p.country).filter(Boolean))];
+  const toolbar=`<div class="toolbar">
+    <div class="search">🔍<input id="searchInp" value="${esc(UI.search)}" placeholder="Поиск игрока или тега..."></div>
+    <select class="inp f-sel" id="regSel"><option value="">Все регионы</option>${REGIONS.map(r=>`<option value="${r}" ${UI.region===r?'selected':''}>${r}</option>`).join('')}</select>
+    <select class="inp f-sel" id="cntSel"><option value="">Все страны</option>${countries.map(c=>`<option value="${c}" ${UI.country===c?'selected':''}>${flag(c)} ${COUNTRIES[c]||c}</option>`).join('')}</select>
+    <select class="inp f-sel" id="sortSel">
+      <option value="points" ${UI.sort==='points'?'selected':''}>По очкам</option>
+      <option value="best" ${UI.sort==='best'?'selected':''}>По лучшему тиру</option>
+      <option value="nick" ${UI.sort==='nick'?'selected':''}>По нику (А–Я)</option>
+    </select>
+    <button class="btn btn-accent edit-only" data-act="openPlayerForm">+ Добавить игрока</button>
+  </div>`;
+  const note=S.settings.overallNote?`<div class="note">${esc(S.settings.overallNote)}</div>`:'';
+  const body=list.length
+    ?tableHead('Тиры по режимам')+list.map(({p,rank},i)=>playerRow(p,rank,'',i)).join('')
+    :'<div class="empty">Никого не найдено</div>';
+  return toolbar+note+body;
 }
-function renderPageEditor(){
-  const pe=UI.pageEdit;
-  const blocksHTML=pe.blocks.map((b,i)=>{
-    const top=`<div class="blk-head">
-      <span class="blk-type">${BLOCK_TYPES.find(x=>x[0]===b.type)?.[1]||b.type}</span>
-      <button class="icon-btn" style="margin-left:auto" data-act="peMove" data-idx="${i}" data-dir="-1" title="Выше">↑</button>
-      <button class="icon-btn" data-act="peMove" data-idx="${i}" data-dir="1" title="Ниже">↓</button>
-      <button class="icon-btn danger" data-act="peDel" data-idx="${i}" title="Удалить блок">🗑</button>
-    </div>`;
-    let body='';
-    if(b.type==='h2'||b.type==='h3'||b.type==='quote')body=`<input class="inp" data-f="text" value="${esc(b.text||'')}">`;
-    else if(b.type==='p')body=`<textarea class="inp" rows="3" data-f="text" style="font-family:var(--font)">${esc(b.text||'')}</textarea>`;
-    else if(b.type==='list')body=`<label class="sw-row" style="margin-bottom:8px"><input type="checkbox" class="sw" data-f="ordered"${b.ordered?' checked':''}><span>Нумерованный список (1, 2, 3...)</span></label><textarea class="inp" rows="4" data-f="items" style="font-family:var(--font)">${esc((b.items||[]).join('\n'))}</textarea><div class="blk-hint">Каждый пункт с новой строки.</div>`;
-    else if(b.type==='note')body=`<div style="display:flex;gap:8px;margin-bottom:8px"><select class="inp f-sel" data-f="tone">${Object.entries(NOTE_TONES).map(([k,v])=>`<option value="${k}"${b.tone===k?' selected':''}>${v.i} ${k}</option>`).join('')}</select><input class="inp" data-f="text" value="${esc(b.text||'')}"></div>`;
-    else if(b.type==='divider')body=`<div class="blk-hint">Горизонтальная разделительная линия.</div>`;
-    else if(b.type==='tiers')body=`<div class="blk-hint">Автоматически подставит актуальную таблицу очков из настроек.</div>`;
-    else if(b.type==='titles')body=`<div class="blk-hint">Автоматически подставит актуальную таблицу званий из настроек.</div>`;
-    else if(b.type==='html')body=`<textarea class="inp" rows="4" data-f="code">${esc(b.code||'')}</textarea>`;
-    return `<div class="blk" data-bid="${b.id}">${top}${body}</div>`;
+
+function renderMode(m){
+  const list=S.players
+    .filter(p=>!!p.tiers?.[m.id])
+    .sort((a,b)=>TIERS.indexOf(a.tiers[m.id])-TIERS.indexOf(b.tiers[m.id])||points(b)-points(a));
+  const head=`<div class="page-head">
+    <span class="ph-ico">${iconHTML(m.icon,m.id)}</span>
+    <div><h1>${esc(m.name)}</h1><div class="ph-sub">${list.length} оценённых игроков</div></div>
+    <button class="btn btn-accent edit-only" style="margin-left:auto" data-act="openPlayerForm">+ Добавить игрока</button>
+  </div>`;
+  const body=list.length
+    ?tableHead('Тир')+list.map((p,i)=>playerRow(p,i+1,m.id,i)).join('')
+    :'<div class="empty">В этом режиме пока никому не выставлен тир</div>';
+  return head+body;
+}
+
+/* ================= КАСТОМНЫЕ СТРАНИЦЫ ================= */
+function inlineFmt(s){
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function pointsTableHTML(){
+  return `<table class="pt-table"><thead><tr><th>Тир</th><th>Очки</th></tr></thead><tbody>${TIERS.map(t=>{const c=S.settings.tierColors[t]||'#8f97ab';return `<tr><td><span class="tb-lbl" style="--c:${c}">${t}</span></td><td><b>${+S.points[t]||0}</b></td></tr>`;}).join('')}</tbody></table>`;
+}
+function titlesTableHTML(){
+  const list=[...S.titles].sort((a,b)=>b.min-a.min);
+  return `<table class="pt-table"><thead><tr><th>Звание</th><th>От очков</th></tr></thead><tbody>${list.map(t=>`<tr><td><span style="color:${esc(t.color)};font-weight:700">${esc(t.emoji||'👑')} ${esc(t.name)}</span></td><td><b>${+t.min||0}+</b></td></tr>`).join('')}</tbody></table>`;
+}
+function renderBlocks(blocks){
+  return (blocks||[]).map(b=>{
+    if(b.type==='h2')return `<h2>${inlineFmt(b.text)}</h2>`;
+    if(b.type==='h3')return `<h3>${inlineFmt(b.text)}</h3>`;
+    if(b.type==='p')return `<p>${inlineFmt(b.text)}</p>`;
+    if(b.type==='quote')return `<blockquote>${inlineFmt(b.text)}</blockquote>`;
+    if(b.type==='divider')return `<hr>`;
+    if(b.type==='tiers')return pointsTableHTML();
+    if(b.type==='titles')return titlesTableHTML();
+    if(b.type==='note'){const tn=NOTE_TONES[b.tone]||NOTE_TONES.info;return `<div class="callout" style="--cc:${tn.c}"><span class="ci">${tn.i}</span><div>${inlineFmt(b.text)}</div></div>`;}
+    if(b.type==='list'){const tag=b.ordered?'ol':'ul';return `<${tag}>${(b.items||[]).map(it=>`<li>${inlineFmt(it)}</li>`).join('')}</${tag}>`;}
+    if(b.type==='html')return b.code||'';
+    return '';
   }).join('');
-  const addButtons=BLOCK_TYPES.map(([t,lbl])=>`<button class="btn btn-sm" data-act="peAdd" data-btype="${t}">+ ${lbl}</button>`).join('');
-  return `<div class="ed-card">
-    <h3>✏️ Редактор страницы</h3>
-    <div class="f-grid">
-      <div class="field"><label>Название</label><input class="inp" id="peTitle" value="${esc(pe.title)}"></div>
-      <div class="field"><label>Иконка</label><input class="inp" id="peIcon" value="${esc(pe.icon)}"></div>
-      <div class="field"><label>Подзаголовок</label><input class="inp" id="peSub" value="${esc(pe.subtitle)}"></div>
-    </div>
-    <div class="fmt-help">Разметка в тексте: <code>**жирный**</code> · <code>*курсив*</code> · <code>\`код\`</code> · <code>[текст](https://...)</code></div>
-    <div style="margin-top:14px">${blocksHTML||'<div class="empty">Блоков нет — добавь первый кнопкой ниже.</div>'}</div>
-    <div class="addbar">${addButtons}</div>
-    <div class="modal-actions">
-      <button class="btn btn-accent" data-act="peSave">💾 Сохранить страницу</button>
-      <button class="btn" data-act="peCancel">Отмена</button>
+}
+function renderCustomPage(p){
+  const editing=UI.pageEdit===p.id;
+  const head=`<div class="page-head">
+    <span class="ph-ico">${iconHTML(p.icon)}</span>
+    <div><h1>${esc(p.title)}</h1><div class="ph-sub">${p.subtitle?esc(p.subtitle)+' · ':''}обновлено ${fmtDate(p.updated)}</div></div>
+    <div style="margin-left:auto;display:flex;gap:6px" class="edit-only">
+      <button class="btn btn-sm ${editing?'btn-accent':''}" data-act="togglePageEdit" data-id="${esc(p.id)}">${editing?'✓ Готово':'✏️ Редактировать'}</button>
     </div>
   </div>`;
+  if(!editing)return head+`<div class="ed-card prose">${renderBlocks(p.blocks)}</div>`;
+
+  const blocksHTML=(p.blocks||[]).map((b,i)=>{
+    const info=BLOCK_TYPES.find(x=>x[0]===b.type)||[b.type,b.type];
+    let body='';
+    if(b.type==='h2'||b.type==='h3'||b.type==='p'||b.type==='quote')body=`<input class="inp" data-b="${b.id}" data-f="text" value="${esc(b.text||'')}">`;
+    else if(b.type==='note')body=`<div style="display:flex;gap:8px;flex-wrap:wrap"><select class="inp f-sel" data-b="${b.id}" data-f="tone">${Object.entries(NOTE_TONES).map(([k,v])=>`<option value="${k}" ${b.tone===k?'selected':''}>${v.i} ${k}</option>`).join('')}</select><input class="inp" style="flex:1;min-width:200px" data-b="${b.id}" data-f="text" value="${esc(b.text||'')}"></div>`;
+    else if(b.type==='list')body=`<label class="sw-row" style="margin-bottom:7px"><input type="checkbox" class="sw" data-b="${b.id}" data-f="ordered" ${b.ordered?'checked':''}>Нумерованный список</label><textarea class="inp" rows="4" data-b="${b.id}" data-f="items">${esc((b.items||[]).join('\n'))}</textarea>`;
+    else if(b.type==='html')body=`<textarea class="inp" rows="4" data-b="${b.id}" data-f="code">${esc(b.code||'')}</textarea>`;
+    else body=`<div class="blk-hint">Авто-блок — подставляет актуальные значения из настроек сайта.</div>`;
+    return `<div class="blk">
+      <div class="blk-head">
+        <span class="blk-type">${esc(info[1])}</span>
+        <button class="icon-btn" data-act="blkMove" data-id="${esc(p.id)}" data-bid="${b.id}" data-d="-1" title="Выше">↑</button>
+        <button class="icon-btn" data-act="blkMove" data-id="${esc(p.id)}" data-bid="${b.id}" data-d="1" title="Ниже">↓</button>
+        <button class="icon-btn danger" style="margin-left:auto" data-act="blkDel" data-id="${esc(p.id)}" data-bid="${b.id}" title="Удалить">🗑</button>
+      </div>${body}
+    </div>`;
+  }).join('');
+
+  return head+`<div class="ed-card">
+    <div class="f-grid">
+      <div class="field"><label>Заголовок</label><input class="inp" id="peTitle" value="${esc(p.title)}"></div>
+      <div class="field"><label>Иконка</label><input class="inp" id="peIcon" value="${esc(p.icon||'')}"></div>
+      <div class="field"><label>Подзаголовок</label><input class="inp" id="peSub" value="${esc(p.subtitle||'')}"></div>
+    </div>
+    <div class="addbar">${BLOCK_TYPES.map(([t,l])=>`<button class="btn btn-sm" data-act="blkAdd" data-id="${esc(p.id)}" data-t="${t}">+ ${esc(l)}</button>`).join('')}</div>
+    <div class="fmt-help">Форматирование в тексте: <code>**жирный**</code>, <code>*курсив*</code>, <code>\`код\`</code>, <code>[текст](https://...)</code>.</div>
+  </div>`+blocksHTML+`<div class="ed-card prose"><div class="blk-hint" style="margin-bottom:6px">Предпросмотр:</div>${renderBlocks(p.blocks)}</div>`;
 }
 
-/* ================= АДМИН-ПАНЕЛЬ ================= */
+/* ================= РЕДАКТОР ================= */
 function renderEditor(){
-  if(!EDIT_MODE)return `<div class="empty">Режим редактирования выключен. Открой сайт с <code>?edit</code> в конце ссылки, чтобы редактировать.</div>`;
-  if(UI.edTab==='pages'&&UI.pageEdit)return renderPageEditor();
-  const st=S.settings,t=UI.edTab;
-  const tabs=[['theme','🎨 Внешний вид'],['modes','⚔️ Режимы'],['nav','🧭 Меню'],['pages','📄 Страницы'],['grids','🏆 Сетки'],['players','👥 Игроки'],['points','🧮 Очки и звания'],['data','💾 Сохранение']];
-  const bar=`<div class="ed-tabs">${tabs.map(([k,l])=>`<button class="ed-tab${t===k?' active':''}" data-act="edTab" data-tab="${k}">${l}</button>`).join('')}</div>`;
+  if(!EDIT_MODE)return '<div class="empty">Режим редактирования выключен. Открой сайт со ссылкой <code>?edit</code> в конце адреса.</div>';
+  const tabs=[['theme','🎨 Тема и вид'],['modes','⚔️ Режимы и сетки'],['pages','📄 Страницы'],['players','👥 Игроки'],['points','🧮 Очки и звания'],['data','💾 Импорт / экспорт']];
+  const bar=`<div class="ed-tabs">${tabs.map(([k,l])=>`<button class="ed-tab ${UI.edTab===k?'active':''}" data-act="edTab" data-id="${k}">${l}</button>`).join('')}</div>`;
   let body='';
-  if(t==='theme'){
-    body=`<div class="ed-card"><h3>🎨 Бренд, цвета и шрифты</h3>
-      <div class="f-grid">
-        <div class="field"><label>Название сайта</label><input class="inp" data-s="siteName" value="${esc(st.siteName)}"></div>
-        <div class="field"><label>Эмодзи-логотип</label><input class="inp" data-s="logoEmoji" value="${esc(st.logoEmoji)}"></div>
-        <div class="field"><label>Подзаголовок</label><input class="inp" data-s="subtitle" value="${esc(st.subtitle)}"></div>
-        <div class="field"><label>Текст в подвале</label><input class="inp" data-s="footer" value="${esc(st.footer)}"></div>
-        <div class="field"><label>Шрифт текста</label><select class="inp" data-s="font">${FONTS.map(f=>`<option${st.font===f?' selected':''}>${f}</option>`).join('')}</select></div>
-        <div class="field"><label>Шрифт заголовков</label><select class="inp" data-s="headFont">${FONTS.map(f=>`<option${st.headFont===f?' selected':''}>${f}</option>`).join('')}</select></div>
-        <div class="field"><label>Акцентный цвет</label><input type="color" data-s="accent" value="${st.accent}"></div>
-        <div class="field"><label>Фон страницы</label><input type="color" data-s="bg" value="${st.bg}"></div>
-        <div class="field"><label>Фон карточек</label><input type="color" data-s="panel" value="${st.panel}"></div>
-        <div class="field"><label>Скругление: <span id="radVal">${st.radius}</span>px</label><input type="range" min="0" max="26" data-s="radius" value="${st.radius}"></div>
-      </div>
-      <div class="switches">
-        <label class="sw-row"><input type="checkbox" class="sw" data-s="compact"${st.compact?' checked':''}><span>Компактные карточки</span></label>
-        <label class="sw-row"><input type="checkbox" class="sw" data-s="showPoints"${st.showPoints?' checked':''}><span>Показывать очки</span></label>
-        <label class="sw-row"><input type="checkbox" class="sw" data-s="showTags"${st.showTags?' checked':''}><span>Показывать теги</span></label>
-        <label class="sw-row"><input type="checkbox" class="sw" data-s="showRegions"${st.showRegions?' checked':''}><span>Показывать регионы</span></label>
-        <label class="sw-row"><input type="checkbox" class="sw" data-s="showTitles"${st.showTitles?' checked':''}><span>Показывать звания</span></label>
-      </div>
-      <div class="field" style="margin-top:16px"><label>Цвета тиров</label><div class="tier-colors">${TIERS.map(k=>`<div class="tc"><span class="tag" style="--c:${tierColor(k)}">${k}</span><input type="color" data-tc="${k}" value="${tierColor(k)}"></div>`).join('')}</div></div>
-      <div class="field" style="margin-top:16px"><label>Свой CSS (для продвинутых)</label><textarea class="inp" data-s="customCSS" placeholder=".row { ... }">${esc(st.customCSS||'')}</textarea></div>
-    </div>`;
-  }else if(t==='modes'){
-    body=`<div class="ed-card"><h3>⚔️ Режимы (киты)</h3><div class="ed-hint">По умолчанию подставляются официальные иконки с mctiers.net (с авто-резервом). Можно вставить свой URL, SVG или эмодзи.</div>
-      ${S.modes.map((m,i)=>`<div class="ed-row" draggable="true" data-drag="modes" data-idx="${i}">
-        <span class="drag">⋮⋮</span><span class="icoprev">${iconHTML(m.icon,m.id)}</span>
-        <input class="inp grow" data-m="name" data-idx="${i}" value="${esc(m.name)}" placeholder="Название режима">
-        <input class="inp icon-inp" data-m="icon" data-idx="${i}" value="${esc(m.icon)}" placeholder="URL / SVG / эмодзи">
-        <button class="icon-btn danger" data-act="delMode" data-idx="${i}">🗑</button>
-      </div>`).join('')}
-      <button class="btn btn-accent" data-act="addMode">➕ Добавить режим</button>
-    </div>`;
-  }else if(t==='nav'){
-    const pnav=st.pagesInNav||'dropdown';
-    body=`<div class="ed-card"><h3>🧭 Навигация</h3>
-      <div class="field" style="margin-bottom:14px"><label>Как показывать пользовательские страницы</label>
-        <select class="inp f-sel" data-s="pagesInNav">
-          <option value="dropdown"${pnav==='dropdown'?' selected':''}>В выпадающем меню «Страницы»</option>
-          <option value="tabs"${pnav==='tabs'?' selected':''}>Отдельными вкладками в шапке</option>
-          <option value="hidden"${pnav==='hidden'?' selected':''}>Скрыть из меню (доступны по ссылке)</option>
-        </select>
-      </div>
-      ${S.nav.map((n,i)=>{const m=navMeta(n);if(!m)return '';return `<div class="ed-row" draggable="true" data-drag="nav" data-idx="${i}">
-        <span class="drag">⋮⋮</span>${iconHTML(m.icon,m.fb)}<strong style="min-width:95px">${esc(m.label)}</strong>
-        <input class="inp grow" data-n="label" data-idx="${i}" value="${esc(n.label||'')}" placeholder="Своё название (необязательно)">
-        <input class="inp icon-inp" data-n="icon" data-idx="${i}" value="${esc(n.icon||'')}" placeholder="Своя иконка">
-        ${n.kind==='page'?`<button class="icon-btn danger" data-act="delNav" data-idx="${i}">✕</button>`:''}
-      </div>`;}).join('')}
-    </div>`;
-  }else if(t==='pages'){
-    body=`<div class="ed-card"><h3>📄 Страницы</h3>
-      <div class="tplbar">
-        <button class="btn btn-sm" data-act="tplPage" data-tpl="rules">📜 + Правила</button>
-        <button class="btn btn-sm" data-act="tplPage" data-tpl="calib">🎯 + Регламент 1х1</button>
-        <button class="btn btn-sm" data-act="tplPage" data-tpl="changelog">📰 + Журнал</button>
-        <button class="btn btn-sm btn-accent" data-act="newPage">➕ Пустая страница</button>
-      </div>
-      ${S.pages.length?S.pages.map(p=>`<div class="ed-row">
-        <span class="icoprev">${iconHTML(p.icon)}</span>
-        <div class="grow"><strong>${esc(p.title)}</strong><div class="blk-hint">${esc(p.subtitle||'')} · ${fmtDate(p.updated)}</div></div>
-        <button class="btn btn-sm" data-act="openPageEdit" data-id="${esc(p.id)}">✏️ Изменить</button>
-        <button class="btn btn-sm" data-act="goto" data-id="${esc(p.id)}">👁</button>
-        <button class="icon-btn danger" data-act="delPage" data-id="${esc(p.id)}">🗑</button>
-      </div>`).join(''):'<div class="empty">Страниц пока нет. Выбери шаблон выше или создай пустую.</div>'}
-    </div>`;
-  }else if(t==='grids'){
-    body=`<div class="ed-card"><h3>🏆 Сетки на главной</h3>
-      ${S.grids.map((g,gi)=>`<div class="ed-row" style="flex-direction:column;align-items:stretch">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span class="drag" draggable="true" data-drag="grids" data-idx="${gi}">⋮⋮</span>
-          <input class="inp icon-inp" data-g="icon" data-gi="${gi}" value="${esc(g.icon)}">
-          <input class="inp grow" data-g="name" data-gi="${gi}" value="${esc(g.name)}">
-          <label class="sw-row"><input type="checkbox" class="sw" data-g="auto" data-gi="${gi}"${g.auto?' checked':''}><span>Авто-топ</span></label>
-          ${g.auto?`<input type="number" class="inp num-inp" min="1" max="50" data-g="autoCount" data-gi="${gi}" value="${g.autoCount}">`:''}
-          <button class="icon-btn danger" data-act="delGrid" data-gi="${gi}">🗑</button>
-        </div>
-        ${g.auto?`<div class="blk-hint" style="margin-top:6px">Автоматически берёт топ-${g.autoCount} игроков по очкам Overall.</div>`
-          :`<div class="chips" style="margin-top:8px">${g.players.map(pid=>{const pl=byId(pid);return pl?`<span class="chip" style="--c:var(--accent)">${esc(pl.nick)}<button data-act="rmGridPlayer" data-gi="${gi}" data-pid="${esc(pid)}">✕</button></span>`:'';}).join('')}</div>
-            <div class="grid-add"><select class="inp" id="addGridSel_${gi}"><option value="">+ Выбрать игрока...</option>${S.players.map(p=>`<option value="${p.id}">${esc(p.nick)} (${points(p)} очк.)</option>`).join('')}</select><button class="btn btn-sm" data-act="addGridPlayer" data-gi="${gi}">Добавить</button></div>`}
-      </div>`).join('')}
-      <button class="btn btn-accent" data-act="addGrid">➕ Добавить сетку</button>
-    </div>`;
-  }else if(t==='players'){
-    body=`<div class="ed-card"><h3>👥 Игроки (${S.players.length})</h3>
-      <div class="toolbar"><button class="btn btn-accent" data-act="newPlayer">➕ Новый игрок</button></div>
-      ${S.players.map(p=>`<div class="ed-row">
-        <img class="ava" style="width:34px;height:34px" src="${esc(skinSrc(p))}" alt="" onerror="this.onerror=null;this.src=window.DEFAULT_AVA">
-        <div class="grow"><strong>${esc(p.nick)}</strong> <span class="muted">· ${points(p)} очк. · ${esc(titleFor(points(p)).name)}</span></div>
-        <button class="btn btn-sm" data-act="editPlayer" data-id="${esc(p.id)}">✏️</button>
-        <button class="icon-btn danger" data-act="delPlayer" data-id="${esc(p.id)}">🗑</button>
-      </div>`).join('')}
-    </div>`;
-  }else if(t==='points'){
-    body=`<div class="ed-card"><h3>🧮 Очки за тиры</h3><div class="f-grid">${TIERS.map(k=>`<div class="field"><label><span class="tag" style="--c:${tierColor(k)}">${k}</span></label><input type="number" class="inp" data-pt="${k}" value="${+S.points[k]||0}"></div>`).join('')}</div></div>
-    <div class="ed-card"><h3>👑 Звания по очкам</h3>
-      ${S.titles.map((tl,i)=>`<div class="ed-row">
-        <input class="inp num-inp" data-tl="emoji" data-idx="${i}" value="${esc(tl.emoji||'👑')}">
-        <input class="inp grow" data-tl="name" data-idx="${i}" value="${esc(tl.name)}">
-        <input type="color" data-tl="color" data-idx="${i}" value="${tl.color||'#8f97ab'}">
-        <input type="number" class="inp num-inp" data-tl="min" data-idx="${i}" value="${+tl.min||0}" placeholder="Мин. очки">
-        <button class="icon-btn danger" data-act="delTitle" data-idx="${i}">🗑</button>
-      </div>`).join('')}
-      <button class="btn btn-accent" data-act="addTitle">➕ Добавить звание</button>
-    </div>`;
-  }else if(t==='data'){
-    body=`<div class="ed-card"><h3>💾 Сохранение и перенос на GitHub</h3>
-      <div class="ed-hint">1. Нажми <b>«📥 Скачать data.json»</b>.<br>2. В репозитории на GitHub открой файл <code>data.json</code> → нажми карандаш (Edit) → вставь скачанное (или загрузи файл) → <b>Commit changes</b>. Через минуту он обновится у всех.</div>
-      <div class="toolbar">
-        <button class="btn btn-accent" data-act="exportJSON">📥 Скачать data.json</button>
-        <button class="btn" data-act="importJSON">📤 Загрузить JSON</button>
-        <button class="btn btn-danger" data-act="resetDemo">🔄 Сбросить до примера</button>
-      </div>
-      <div class="stats">
-        <div class="stat">Игроков: <b>${S.players.length}</b></div>
-        <div class="stat">Режимов: <b>${S.modes.length}</b></div>
-        <div class="stat">Страниц: <b>${S.pages.length}</b></div>
-        <div class="stat">Сеток: <b>${S.grids.length}</b></div>
-      </div>
-    </div>`;
-  }
+  if(UI.edTab==='theme')body=edTheme();
+  if(UI.edTab==='modes')body=edModes();
+  if(UI.edTab==='pages')body=edPages();
+  if(UI.edTab==='players')body=edPlayers();
+  if(UI.edTab==='points')body=edPoints();
+  if(UI.edTab==='data')body=edData();
   return bar+body;
 }
 
-/* ================= МОДАЛКА ИГРОКА ================= */
-function openPlayerModal(id){
+function edTheme(){
+  const st=S.settings;
+  return `<div class="ed-card">
+    <h3>🎨 Цвета, шрифты и вид</h3>
+    <div class="f-grid">
+      <div class="field"><label>Название сайта</label><input class="inp" data-s="siteName" value="${esc(st.siteName)}"></div>
+      <div class="field"><label>Эмодзи логотипа</label><input class="inp" data-s="logoEmoji" value="${esc(st.logoEmoji)}"></div>
+      <div class="field"><label>Подзаголовок на главной</label><input class="inp" data-s="subtitle" value="${esc(st.subtitle)}"></div>
+      <div class="field"><label>Подвал сайта</label><input class="inp" data-s="footer" value="${esc(st.footer)}"></div>
+      <div class="field"><label>Шрифт текста</label><select class="inp" data-s="font">${FONTS.map(f=>`<option ${st.font===f?'selected':''}>${f}</option>`).join('')}</select></div>
+      <div class="field"><label>Шрифт заголовков</label><select class="inp" data-s="headFont">${FONTS.map(f=>`<option ${st.headFont===f?'selected':''}>${f}</option>`).join('')}</select></div>
+      <div class="field"><label>Скругление (${st.radius}px)</label><input type="range" min="0" max="24" data-s="radius" value="${st.radius}"></div>
+      <div class="field"><label>Страницы в шапке</label><select class="inp" data-s="pagesInNav">
+        <option value="dropdown" ${st.pagesInNav==='dropdown'?'selected':''}>В выпадающем меню «Страницы»</option>
+        <option value="tabs" ${st.pagesInNav==='tabs'?'selected':''}>Отдельными вкладками</option>
+        <option value="both" ${st.pagesInNav==='both'?'selected':''}>И там, и там</option>
+      </select></div>
+    </div>
+    <div class="f-grid" style="margin-top:14px">
+      <div class="field"><label>Акцент</label><div class="file-row"><input type="color" data-s="accent" value="${st.accent}"><input class="inp" style="flex:1" data-s="accent" value="${st.accent}"></div></div>
+      <div class="field"><label>Фон</label><div class="file-row"><input type="color" data-s="bg" value="${st.bg}"><input class="inp" style="flex:1" data-s="bg" value="${st.bg}"></div></div>
+      <div class="field"><label>Карточки</label><div class="file-row"><input type="color" data-s="panel" value="${st.panel}"><input class="inp" style="flex:1" data-s="panel" value="${st.panel}"></div></div>
+    </div>
+    <div class="switches">
+      <label class="sw-row"><input type="checkbox" class="sw" data-s="compact" ${st.compact?'checked':''}>Компактные строки</label>
+      <label class="sw-row"><input type="checkbox" class="sw" data-s="showPoints" ${st.showPoints?'checked':''}>Показывать очки</label>
+      <label class="sw-row"><input type="checkbox" class="sw" data-s="showTags" ${st.showTags?'checked':''}>Теги игроков</label>
+      <label class="sw-row"><input type="checkbox" class="sw" data-s="showRegions" ${st.showRegions?'checked':''}>Регионы</label>
+      <label class="sw-row"><input type="checkbox" class="sw" data-s="showTitles" ${st.showTitles?'checked':''}>Звания</label>
+    </div>
+  </div>
+  <div class="ed-card">
+    <h3>🌈 Цвета тиров</h3>
+    <div class="tier-colors">${TIERS.map(t=>{const c=st.tierColors[t]||'#8f97ab';return `<div class="tc"><span class="tb-lbl" style="--c:${c}">${t}</span><input type="color" data-tc="${t}" value="${c}"></div>`;}).join('')}</div>
+  </div>
+  <div class="ed-card">
+    <h3>💬 Подсказка на вкладке Overall</h3>
+    <input class="inp" data-s="overallNote" value="${esc(st.overallNote||'')}">
+  </div>
+  <div class="ed-card">
+    <h3>✨ Свой CSS</h3>
+    <textarea class="inp" rows="4" data-s="customCSS" placeholder="/* например: .row { border-radius: 20px; } */">${esc(st.customCSS||'')}</textarea>
+    <div style="margin-top:12px"><button class="btn" data-act="resetTheme">↺ Сбросить тему</button></div>
+  </div>`;
+}
+
+function edModes(){
+  const modesHTML=S.modes.map(m=>`<div class="ed-row" draggable="true" data-drag="mode" data-id="${m.id}">
+    <span class="drag" title="Перетащить">⋮⋮</span>
+    <span class="icoprev">${iconHTML(m.icon,m.id)}</span>
+    <input class="inp grow" data-m="${m.id}" data-f="name" value="${esc(m.name)}">
+    <input class="inp icon-inp" data-m="${m.id}" data-f="icon" value="${esc(m.icon)}" placeholder="URL, эмодзи или <svg>">
+    <button class="icon-btn danger" data-act="delMode" data-id="${m.id}" title="Удалить">🗑</button>
+  </div>`).join('');
+
+  const gridsHTML=S.grids.map(g=>{
+    const pills=(g.players||[]).map(id=>{const p=byId(id);return p?`<span class="chip" style="--c:var(--accent)">${esc(p.nick)}<button data-act="gridRem" data-gid="${g.id}" data-pid="${id}">✕</button></span>`:'';}).join('');
+    const opts=S.players.filter(p=>!(g.players||[]).includes(p.id)).map(p=>`<option value="${p.id}">${esc(p.nick)}</option>`).join('');
+    return `<div class="ed-row" style="flex-direction:column;align-items:stretch" draggable="true" data-drag="grid" data-id="${g.id}">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="drag">⋮⋮</span>
+        <input class="inp" style="width:60px" data-g="${g.id}" data-f="icon" value="${esc(g.icon)}">
+        <input class="inp grow" data-g="${g.id}" data-f="name" value="${esc(g.name)}">
+        <label class="sw-row"><input type="checkbox" class="sw" data-g="${g.id}" data-f="auto" ${g.auto?'checked':''}>Авто-топ</label>
+        <input type="number" min="1" max="50" class="inp num-inp" data-g="${g.id}" data-f="autoCount" value="${g.autoCount}" ${g.auto?'':'disabled'}>
+        <button class="icon-btn danger" data-act="delGrid" data-id="${g.id}">🗑</button>
+      </div>
+      ${g.auto
+        ?`<div class="ed-hint" style="margin:6px 0 0">Берёт топ-${g.autoCount} игроков по очкам Overall.</div>`
+        :`<div style="margin-top:8px"><div class="chips">${pills||'<span class="muted" style="font-size:12px">Пусто</span>'}</div>${opts?`<div class="grid-add"><select class="inp" id="gAddSel_${g.id}">${opts}</select><button class="btn btn-sm" data-act="gridAdd" data-gid="${g.id}">+ В сетку</button></div>`:''}</div>`}
+    </div>`;
+  }).join('');
+
+  const navHTML=S.nav.map((n,i)=>{
+    const m=navMeta(n);if(!m)return '';
+    return `<div class="ed-row" draggable="true" data-drag="nav" data-idx="${i}">
+      <span class="drag">⋮⋮</span>${iconHTML(m.icon,m.fb)}<span class="grow" style="font-weight:700">${esc(m.label)}</span>
+      <span class="muted" style="font-size:11px">${n.kind}</span>
+      ${(n.kind!=='top'&&n.kind!=='overall')?`<button class="icon-btn danger" data-act="delNav" data-idx="${i}">✕</button>`:''}
+    </div>`;
+  }).join('');
+
+  return `<div class="ed-card">
+    <h3>⚔️ Режимы (киты)</h3>
+    <div class="ed-hint">Иконкой может быть эмодзи, ссылка на картинку/SVG (например, с <code>mctiers.net/tier_icons/...</code>) или свой <code>&lt;svg&gt;</code>.</div>
+    ${modesHTML}
+    <button class="btn btn-sm" style="margin-top:6px" data-act="addMode">+ Добавить режим</button>
+  </div>
+  <div class="ed-card">
+    <h3>🏆 Сетки на главной вкладке</h3>
+    ${gridsHTML}
+    <button class="btn btn-sm" style="margin-top:6px" data-act="addGrid">+ Добавить сетку</button>
+  </div>
+  <div class="ed-card">
+    <h3>🧭 Порядок вкладок</h3>
+    ${navHTML}
+  </div>`;
+}
+
+function edPages(){
+  const list=S.pages.length?S.pages.map(p=>`<div class="ed-row">
+    <span class="icoprev">${iconHTML(p.icon)}</span>
+    <div class="grow"><div style="font-weight:700">${esc(p.title)}</div><div class="muted" style="font-size:11.5px">${esc(p.subtitle||'')} · ${(p.blocks||[]).length} блоков · ${fmtDate(p.updated)}</div></div>
+    <button class="btn btn-sm" data-act="openPage" data-id="${esc(p.id)}">Открыть и править</button>
+    <button class="icon-btn danger" data-act="delPage" data-id="${esc(p.id)}" title="Удалить">🗑</button>
+  </div>`).join(''):'<div class="empty">Страниц пока нет. Создай пустую или выбери готовый шаблон ниже.</div>';
+
+  return `<div class="ed-card">
+    <h3>📄 Кастомные страницы</h3>
+    <div class="tplbar">
+      <button class="btn btn-accent btn-sm" data-act="newPage" data-tpl="blank">+ Пустая страница</button>
+      <button class="btn btn-sm" data-act="newPage" data-tpl="rules">📜 Шаблон: Правила</button>
+      <button class="btn btn-sm" data-act="newPage" data-tpl="calib">🎯 Шаблон: Калибровки 1х1</button>
+      <button class="btn btn-sm" data-act="newPage" data-tpl="changelog">📰 Шаблон: Журнал обновлений</button>
+    </div>
+    ${list}
+  </div>`;
+}
+
+function edPlayers(){
+  const rows=overallSorted().map(p=>{
+    const pts=points(p),tl=titleFor(pts);
+    return `<div class="ed-row">
+      <img class="ava" style="width:36px;height:36px" src="${esc(skinSrc(p))}" alt="" onerror="this.onerror=null;this.src=window.DEFAULT_AVA">
+      <div class="grow"><div style="font-weight:700">${esc(p.nick)} ${regionBadge(p)}</div><div class="muted" style="font-size:11.5px">${esc(regionText(p))} · <span style="color:${tl.color}">${tl.emoji} ${esc(tl.name)}</span> (${pts} очк.)</div></div>
+      <button class="btn btn-sm" data-act="editPlayer" data-id="${esc(p.id)}">✏️ Изменить</button>
+      <button class="icon-btn danger" data-act="delPlayer" data-id="${esc(p.id)}" title="Удалить">🗑</button>
+    </div>`;
+  }).join('');
+  return `<div class="ed-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+      <h3 style="margin:0">👥 Игроки (${S.players.length})</h3>
+      <button class="btn btn-accent btn-sm" data-act="openPlayerForm">+ Добавить игрока</button>
+    </div>${rows||'<div class="empty">Игроков пока нет</div>'}
+  </div>`;
+}
+
+function edPoints(){
+  const ptsHTML=TIERS.map(t=>`<div class="field"><label>${t}</label><input type="number" class="inp" data-pt="${t}" value="${+S.points[t]||0}"></div>`).join('');
+  const titlesHTML=S.titles.map(t=>`<div class="ed-row">
+    <input class="inp" style="width:56px" data-tl="${t.id}" data-f="emoji" value="${esc(t.emoji||'👑')}">
+    <input class="inp grow" data-tl="${t.id}" data-f="name" value="${esc(t.name)}">
+    <input type="color" data-tl="${t.id}" data-f="color" value="${t.color}">
+    <input type="number" class="inp num-inp" data-tl="${t.id}" data-f="min" value="${t.min}" title="От очков">
+    <button class="icon-btn danger" data-act="delTitle" data-id="${t.id}">🗑</button>
+  </div>`).join('');
+  return `<div class="ed-card"><h3>🧮 Очки за тиры</h3><div class="f-grid">${ptsHTML}</div></div>
+  <div class="ed-card"><h3>👑 Звания (по сумме очков)</h3>${titlesHTML}<button class="btn btn-sm" style="margin-top:6px" data-act="addTitle">+ Добавить звание</button></div>`;
+}
+
+function edData(){
+  return `<div class="ed-card">
+    <h3>💾 Данные и публикация</h3>
+    <div class="ed-hint">Сайт читает <code>data.json</code> из репозитория. Изменил что-то в режиме <code>?edit</code> — нажми «Скачать data.json» и замени файл на GitHub.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-accent" data-act="exportData">📥 Скачать data.json</button>
+      <button class="btn" data-act="importData">📤 Загрузить JSON</button>
+      <button class="btn" data-act="copyJSON">📋 Копировать JSON</button>
+      <button class="btn btn-danger" data-act="resetAll">⚠️ Сбросить всё к дефолту</button>
+    </div>
+    <div class="stats">
+      <div class="stat">Игроков: <b>${S.players.length}</b></div>
+      <div class="stat">Режимов: <b>${S.modes.length}</b></div>
+      <div class="stat">Сеток: <b>${S.grids.length}</b></div>
+      <div class="stat">Страниц: <b>${S.pages.length}</b></div>
+    </div>
+  </div>`;
+}
+
+/* ================= КАРТОЧКА ИГРОКА ================= */
+function openPlayer(id){
   const p=byId(id);if(!p)return;
-  const all=overallSorted(),rk=all.findIndex(x=>x.id===p.id)+1,pts=points(p),ti=titleFor(pts),st=S.settings;
-  const headStyle=p.bg?`style="background-image:url('${esc(p.bg)}')"`:'';
-  const loc=regionText(p);
-  const locHTML=st.showRegions&&(p.country||p.city||p.region)?`<div class="pc-loc">${regionBadge(p)}${loc?`<span class="pc-loc-t">${flag(p.country)} ${esc(loc)}</span>`:''}</div>`:'';
-  const bioHTML=p.bio?`<div class="pc-bio">${esc(p.bio)}</div>`:'';
-  const cells=S.modes.map(m=>{const t=p.tiers?.[m.id];return `<div class="tg-cell" data-act="gotoModeFromCard" data-id="${esc(m.id)}" data-sound="${esc(m.id)}">${iconHTML(m.icon,m.id)}<span>${esc(m.name)}</span>${tierBadge(m,t)}</div>`;}).join('');
-  const ed=EDIT_MODE?`<div class="modal-actions edit-only"><button class="btn btn-accent" data-act="editPlayer" data-id="${esc(p.id)}">✏️ Редактировать</button><button class="btn btn-danger" data-act="delPlayer" data-id="${esc(p.id)}">🗑 Удалить</button></div>`:'';
-  $('#pmBody').innerHTML=`<div class="pc-head"${headStyle}><div class="pc-in">
+  const ov=overallSorted();const rank=ov.findIndex(x=>x.id===id)+1;const pts=points(p);const tl=titleFor(pts);
+  const bg=p.bg?`style="background-image:url(${esc(p.bg)})"`:'';
+  const rgn=S.settings.showRegions?`<div class="pc-loc">${regionBadge(p)}<span class="pc-loc-t">${flag(p.country)} ${esc(regionText(p))}</span></div>`:'';
+  const bio=p.bio?`<div class="pc-bio">${esc(p.bio)}</div>`:'';
+  const gridCells=S.modes.map(m=>{
+    const t=p.tiers?.[m.id]||'';
+    return `<div class="tg-cell" data-act="goto" data-id="${esc(m.id)}" data-sound="${esc(m.id)}">${iconHTML(m.icon,m.id)}<span>${esc(m.name)}</span>${tierBadge(t)}</div>`;
+  }).join('');
+  $('#pmBody').innerHTML=`<div class="pc-head" ${bg}><div class="pc-in">
     <img class="pc-ava" src="${esc(skinSrc(p))}" alt="${esc(p.nick)}" onerror="this.onerror=null;this.src=window.DEFAULT_AVA">
     <div>
-      <div class="pc-name"><span>${esc(p.nick)}</span><span class="tag" style="--c:var(--accent)">#${rk} Overall</span></div>
-      <div class="pc-tags">${tagsHTML(p)}</div>
-      <div class="pc-title">${st.showTitles?`<b style="--c:${ti.color}">${esc(ti.emoji)} ${esc(ti.name)}</b>`:''}${st.showPoints?`<span class="muted">${st.showTitles?' · ':''}${pts} очков</span>`:''}</div>
-      ${locHTML}
+      <div class="pc-name">${esc(p.nick)} <span class="muted" style="font-size:15px">#${rank}</span></div>
+      ${S.settings.showTags&&p.tags?.length?`<div class="pc-tags">${tagsHTML(p)}</div>`:''}
+      ${S.settings.showTitles?`<div class="pc-title" style="--c:${tl.color}">${tl.emoji} ${esc(tl.name)}${S.settings.showPoints?` <span class="muted">· ${pts} очк.</span>`:''}</div>`:''}
+      ${rgn}
     </div>
-  </div></div>${bioHTML}<div class="tiers-grid">${cells}</div>${ed}`;
-  setHash('#/player/'+encodeURIComponent(p.id));
+  </div></div>
+  ${bio}
+  <div class="tiers-grid">${gridCells}</div>
+  <div class="modal-actions edit-only">
+    <button class="btn btn-sm" data-act="editPlayer" data-id="${esc(p.id)}">✏️ Изменить</button>
+    <button class="btn btn-danger btn-sm" data-act="delPlayer" data-id="${esc(p.id)}">🗑 Удалить</button>
+  </div>`;
   openModal('playerModal');
+  if(!location.hash.startsWith('#/player/'))setHash('#/player/'+encodeURIComponent(p.nick));
 }
 
 /* ================= ФОРМА ИГРОКА ================= */
-function fillSelects(p){
-  $('#pfCountry').innerHTML='<option value="">— не указана —</option>'+Object.entries(COUNTRIES).map(([k,v])=>`<option value="${k}"${p.country===k?' selected':''}>${flag(k)} ${v}</option>`).join('');
-  $('#pfRegion').innerHTML=REGIONS.map(r=>`<option value="${r}"${p.region===r?' selected':''}>${r}</option>`).join('');
+function openPlayerForm(id=null){
+  if(!EDIT_MODE)return;
+  const p=id?byId(id):null;
+  PF={id:p?p.id:null,skin:p?p.skin:'',bg:p?p.bg:'',tags:p?[...(p.tags||[])]:[],tiers:p?{...(p.tiers||{})}:{}};
+  $('#pfTitle').textContent=p?'Редактировать: '+p.nick:'Новый игрок';
+  $('#pfNick').value=p?p.nick:'';
+  $('#pfCity').value=p?p.city||'':'';
+  $('#pfBio').value=p?p.bio||'':'';
+  $('#pfCountry').innerHTML=Object.entries(COUNTRIES).map(([k,v])=>`<option value="${k}" ${(p?p.country:'RU')===k?'selected':''}>${flag(k)} ${v}</option>`).join('');
+  $('#pfRegion').innerHTML=REGIONS.map(r=>`<option value="${r}" ${(p?p.region:'EU')===r?'selected':''}>${r}</option>`).join('');
+  $('#pfSkinPrev').src=p?skinSrc(p):DEFAULT_AVA;
+  $('#pfBgPrev').src=PF.bg||DEFAULT_AVA;
+  renderPFTags();
+  $('#pfTiers').innerHTML=S.modes.map(m=>`<div class="field"><label style="display:flex;align-items:center;gap:6px">${iconHTML(m.icon,m.id)} ${esc(m.name)}</label>
+    <select class="inp" data-pft="${m.id}"><option value="">Unranked</option>${TIERS.map(t=>`<option value="${t}" ${PF.tiers[m.id]===t?'selected':''}>${t} (${+S.points[t]||0})</option>`).join('')}</select></div>`).join('');
+  openModal('playerForm');
 }
 function renderPFTags(){
-  $('#pfTags').innerHTML=(PF.tags||[]).map((t,i)=>`<span class="chip" style="--c:${tagColor(t)}">${esc(t)}<button data-act="pfDelTag" data-idx="${i}">✕</button></span>`).join('');
+  $('#pfTags').innerHTML=PF.tags.map((t,i)=>`<span class="chip" style="--c:${tagColor(t)}">${esc(t)}<button data-act="pfDelTag" data-idx="${i}">✕</button></span>`).join('');
 }
-function renderPFTiers(){
-  $('#pfTiers').innerHTML=S.modes.map(m=>`<div class="field"><label style="display:flex;align-items:center;gap:6px">${iconHTML(m.icon,m.id)} ${esc(m.name)}</label><select class="inp" data-pft="${m.id}"><option value="">Unranked</option>${TIERS.map(t=>`<option value="${t}"${PF.tiers?.[m.id]===t?' selected':''}>${t} (${+S.points[t]||0})</option>`).join('')}</select></div>`).join('');
+function readFile(file,cb){
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=600;let w=img.width,h=img.height;
+      if(w>max||h>max){const k=Math.min(max/w,max/h);w=Math.round(w*k);h=Math.round(h*k);}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      cb(c.toDataURL('image/png',.85));
+    };
+    img.onerror=()=>cb(r.result);
+    img.src=r.result;
+  };
+  r.readAsDataURL(file);
 }
-function openPlayerForm(id=null){
-  const ex=id?byId(id):null;
-  PF=ex?clone(ex):{id:uid(),nick:'',country:'RU',city:'',region:'EU',tags:[],bio:'',skin:'',bg:'',tiers:{}};
-  $('#pfTitle').textContent=ex?'Редактировать: '+ex.nick:'Новый игрок';
-  $('#pfNick').value=PF.nick;$('#pfCity').value=PF.city||'';$('#pfBio').value=PF.bio||'';$('#pfTagInput').value='';
-  $('#pfSkinPrev').src=PF.skin||DEFAULT_AVA;$('#pfBgPrev').src=PF.bg||DEFAULT_AVA;
-  fillSelects(PF);renderPFTags();renderPFTiers();openModal('playerForm');
-}
-function pickImg(cb){const inp=$('#pfSkinFile');inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{if(r.result.length>900000)toast('⚠️ Файл большой — может не влезть в хранилище',true);cb(r.result);};r.readAsDataURL(f);inp.value='';};inp.click();}
-function pickBgImg(cb){const inp=$('#pfBgFile');inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(f);inp.value='';};inp.click();}
 function savePlayerForm(){
+  if(!PF)return;
   const nick=$('#pfNick').value.trim();if(!nick)return toast('Введи ник игрока',true);
-  PF.nick=nick;PF.country=$('#pfCountry').value;PF.city=$('#pfCity').value.trim();PF.region=$('#pfRegion').value;PF.bio=$('#pfBio').value.trim();
-  PF.tiers={};document.querySelectorAll('[data-pft]').forEach(sel=>{if(sel.value)PF.tiers[sel.dataset.pft]=sel.value;});
-  const i=S.players.findIndex(x=>x.id===PF.id);if(i>=0)S.players[i]=PF;else S.players.push(PF);
-  save();closeModal('playerForm');if($('#playerModal').classList.contains('open'))openPlayerModal(PF.id);renderAll();toast('💾 Сохранено');
+  const tiers={};
+  document.querySelectorAll('[data-pft]').forEach(s=>{if(s.value)tiers[s.dataset.pft]=s.value;});
+  const data={nick,country:$('#pfCountry').value,city:$('#pfCity').value.trim(),region:$('#pfRegion').value,tags:[...PF.tags],bio:$('#pfBio').value.trim(),skin:PF.skin,bg:PF.bg,tiers};
+  if(PF.id){Object.assign(byId(PF.id),data);toast('Сохранено');}
+  else{S.players.push({id:uid(),...data});toast('Игрок добавлен');}
+  save();closeModal('playerForm');renderAll();
 }
 
-/* ================= РЕНДЕР И РОУТИНГ ================= */
+/* ================= НАВИГАЦИЯ И СОБЫТИЯ ================= */
+function goto(id,{centerTab=true}={}){
+  if(id==='editor'&&!EDIT_MODE)id='top';
+  UI.page=id;
+  if(id!=='editor')UI.pageEdit=null;
+  closeDD();
+  renderTabs();renderContent();
+  if(centerTab)requestAnimationFrame(()=>updateIndicator(true));
+  setHash('#/'+id);
+  scrollTo({top:0,behavior:'smooth'});
+}
+function setHash(h){if(location.hash!==h)history.replaceState(null,'',h);}
+function applyHash(){
+  const raw=decodeURIComponent((location.hash||'').replace(/^#\/?/,''))||'top';
+  if(raw.startsWith('player/')){
+    const nick=raw.slice(7).toLowerCase();
+    const p=S.players.find(x=>x.nick.toLowerCase()===nick||x.id===raw.slice(7));
+    if(p){openPlayer(p.id);return;}
+  }
+  const valid=raw==='top'||raw==='overall'||(raw==='editor'&&EDIT_MODE)||S.modes.some(m=>m.id===raw)||S.pages.some(p=>p.id===raw);
+  UI.page=valid?raw:'top';
+  renderTabs();renderContent();
+}
+addEventListener('hashchange',applyHash);
+
+function toggleDD(force){
+  const d=$('#pagesDD'),open=force!==undefined?force:!d.classList.contains('open');
+  d.classList.toggle('open',open);
+  if(open)playClick(1.1,0.05);
+}
+function closeDD(){$('#pagesDD')?.classList.remove('open');}
+
 function renderAll(){
   applyTheme();
-  $('#logoIco').textContent=S.settings.logoEmoji;$('#logoText').textContent=S.settings.siteName;
-  document.title=`${S.settings.siteName} | ${S.settings.subtitle}`;
-  $('#footer').innerHTML=`${esc(S.settings.footer)}${EDIT_MODE?'':' · <a href="?edit">Режим редактора</a>'}`;
-  renderTabs();
+  $('#logoIco').textContent=S.settings.logoEmoji;
+  $('#logoText').textContent=S.settings.siteName;
+  document.title=`${S.settings.siteName} | Tier List`;
+  $('#footer').innerHTML=`${esc(S.settings.footer)}${EDIT_MODE?'':' · <a href="?edit">Режим редактирования</a>'}`;
+  renderTabs();renderContent();
+}
+function renderContent(){
+  $('#editorBtn').classList.toggle('active',UI.page==='editor');
   const c=$('#content');
   if(UI.page==='top')c.innerHTML=renderTop();
   else if(UI.page==='overall')c.innerHTML=renderOverall();
   else if(UI.page==='editor')c.innerHTML=renderEditor();
   else if(page(UI.page))c.innerHTML=renderCustomPage(page(UI.page));
   else if(mode(UI.page))c.innerHTML=renderMode(mode(UI.page));
-  else{UI.page='top';c.innerHTML=renderTop();renderTabs();}
-  animatePoints();
-}
-function goto(id){
-  if(id==='editor'&&!EDIT_MODE)return;
-  if(id!==UI.page){UI.animatePts=true;UI.pageEdit=null;}
-  UI.page=id;$('#pagesDD').classList.remove('open');
-  setHash('#/'+id);renderAll();
-  requestAnimationFrame(()=>updateIndicator(true));
-}
-function setHash(h){if(location.hash!==h)history.replaceState(null,'',h);}
-function applyHash(){
-  const h=location.hash.replace(/^#\/?/,'');if(!h)return;
-  if(h.startsWith('player/')){const p=byId(decodeURIComponent(h.slice(7)));if(p)openPlayerModal(p.id);return;}
-  if(h==='editor'&&!EDIT_MODE)return;
-  if(h==='top'||h==='overall'||h==='editor'||mode(h)||page(h)){UI.page=h;renderAll();}
-}
-addEventListener('hashchange',applyHash);
+  else{UI.page='top';c.innerHTML=renderTop();}
 
-/* ================= СОБЫТИЯ ================= */
-document.addEventListener('click',e=>{
-  const dd=$('#pagesDD');if(dd&&!dd.contains(e.target))dd.classList.remove('open');
-  const el=e.target.closest('[data-act]');if(!el)return;
-  const a=el.dataset.act,id=el.dataset.id;
-  if(a==='goto'){
-    if(el.dataset.sound)playKitSound(el.dataset.sound,false);
-    else playClick(1,0.06);
-    goto(id);
+  const s=$('#searchInp');
+  if(s){
+    s.oninput=e=>{UI.search=e.target.value;renderContent();const el=$('#searchInp');el.focus();el.setSelectionRange(el.value.length,el.value.length);};
+    $('#regSel').onchange=e=>{UI.region=e.target.value;renderContent();};
+    $('#cntSel').onchange=e=>{UI.country=e.target.value;renderContent();};
+    $('#sortSel').onchange=e=>{UI.sort=e.target.value;renderContent();};
   }
-  else if(a==='gotoModeFromCard'){
-    if(el.dataset.sound)playKitSound(el.dataset.sound,false);
-    closeModal('playerModal');
-    goto(id);
-  }
-  else if(a==='toggleDD'){playClick(1.1,0.05);dd.classList.toggle('open');}
-  else if(a==='closeModal'){playClick(0.9,0.05);closeModal(id);}
-  else if(a==='openPlayer'){playClick(1.05,0.06);openPlayerModal(id);}
-  else if(a==='toggleGrid'){playClick(1,0.05);UI.collapsed.has(id)?UI.collapsed.delete(id):UI.collapsed.add(id);renderAll();}
-  else if(a==='confirmYes'){if(_cf)_cf();_cf=null;closeModal('confirmModal');}
-  else if(!EDIT_MODE)return;
-  else if(a==='edTab'){UI.pageEdit=null;UI.edTab=el.dataset.tab;renderAll();}
-  else if(a==='editPageInPlace'||a==='openPageEdit')openPageEditor(id);
-  else if(a==='peAdd'){syncPageEditFromDOM();UI.pageEdit.blocks.push(mkBlock(el.dataset.btype));renderAll();}
-  else if(a==='peDel'){syncPageEditFromDOM();UI.pageEdit.blocks.splice(+el.dataset.idx,1);renderAll();}
-  else if(a==='peMove'){syncPageEditFromDOM();const bs=UI.pageEdit.blocks,i=+el.dataset.idx,j=i+ +el.dataset.dir;if(j>=0&&j<bs.length){[bs[i],bs[j]]=[bs[j],bs[i]];renderAll();}}
-  else if(a==='peSave')savePageEdit();
-  else if(a==='peCancel'){UI.pageEdit=null;renderAll();}
-  else if(a==='tplPage'){const map={rules:tplRules,calib:tplCalib,changelog:tplChangelog};const pg=(map[el.dataset.tpl]||tplRules)();S.pages.push(pg);S.nav.push({kind:'page',ref:pg.id});save();renderAll();toast('📄 Страница добавлена');}
-  else if(a==='newPage'){const pg=mkPage('Новая страница','📄','Описание',[mkBlock('h2'),mkBlock('p')]);S.pages.push(pg);S.nav.push({kind:'page',ref:pg.id});save();openPageEditor(pg.id);}
-  else if(a==='delPage')showConfirm('Удалить страницу?',()=>{S.pages=S.pages.filter(p=>p.id!==id);S.nav=S.nav.filter(n=>!(n.kind==='page'&&n.ref===id));if(UI.page===id)UI.page='top';save();renderAll();toast('🗑 Удалено');});
-  else if(a==='delNav'){S.nav.splice(+el.dataset.idx,1);save();renderAll();}
-  else if(a==='addMode'){const mid='m_'+uid();S.modes.push({id:mid,name:'Новый режим',icon:'⚔️'});S.nav.push({kind:'mode',ref:mid});save();renderAll();}
-  else if(a==='delMode'){const m=S.modes[+el.dataset.idx];if(!m)return;showConfirm(`Удалить режим «${m.name}»?`,()=>{S.modes.splice(+el.dataset.idx,1);S.nav=S.nav.filter(n=>!(n.kind==='mode'&&n.ref===m.id));save();renderAll();});}
-  else if(a==='addGrid'){S.grids.push({id:uid(),name:'Новая сетка',icon:'🏅',auto:false,autoCount:3,players:[]});save();renderAll();}
-  else if(a==='delGrid')showConfirm('Удалить эту сетку?',()=>{S.grids.splice(+el.dataset.gi,1);save();renderAll();});
-  else if(a==='addGridPlayer'){const gi=+el.dataset.gi,pid=$('#addGridSel_'+gi).value;if(!pid)return;const g=S.grids[gi];if(!g.players.includes(pid))g.players.push(pid);save();renderAll();}
-  else if(a==='rmGridPlayer'){S.grids[+el.dataset.gi].players=S.grids[+el.dataset.gi].players.filter(x=>x!==el.dataset.pid);save();renderAll();}
-  else if(a==='newPlayer')openPlayerForm();
-  else if(a==='editPlayer')openPlayerForm(id);
-  else if(a==='delPlayer'){const p=byId(id);if(!p)return;showConfirm(`Удалить игрока ${p.nick}?`,()=>{S.players=S.players.filter(x=>x.id!==id);S.grids.forEach(g=>g.players=g.players.filter(x=>x!==id));save();closeModal('playerModal');renderAll();toast('🗑 Удалён');});}
-  else if(a==='pfAddTag'){const inp=$('#pfTagInput'),v=inp.value.trim();if(!v)return;PF.tags.push(v);inp.value='';renderPFTags();}
-  else if(a==='pfDelTag'){PF.tags.splice(+el.dataset.idx,1);renderPFTags();}
-  else if(a==='pfSkinPick')pickImg(u=>{PF.skin=u;$('#pfSkinPrev').src=u;});
-  else if(a==='pfSkinClear'){PF.skin='';$('#pfSkinPrev').src=DEFAULT_AVA;}
-  else if(a==='pfBgPick')pickBgImg(u=>{PF.bg=u;$('#pfBgPrev').src=u;});
-  else if(a==='pfBgClear'){PF.bg='';$('#pfBgPrev').src=DEFAULT_AVA;}
-  else if(a==='pfSave')savePlayerForm();
-  else if(a==='addTitle'){S.titles.push({id:uid(),name:'Новое звание',emoji:'👑',color:'#e9edf5',min:0});save();renderAll();}
-  else if(a==='delTitle'){S.titles.splice(+el.dataset.idx,1);save();renderAll();}
-  else if(a==='exportJSON'){const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a2=document.createElement('a');a2.href=url;a2.download='data.json';a2.click();URL.revokeObjectURL(url);toast('📥 Скачан data.json');}
-  else if(a==='importJSON')$('#importFile').click();
-  else if(a==='resetDemo')showConfirm('Сбросить все данные к примеру по умолчанию?',()=>{localStorage.removeItem(KEY);localStorage.removeItem(DRAFT_KEY);S=clone(DEFAULTS);S._seeded=false;seedPages();save();renderAll();toast('🔄 Сброшено');});
-});
+}
 
-/* Звук при наведении на вкладку кита или карточку игрока */
-document.addEventListener('mouseover',e=>{
-  if(!SOUND_ON)return;
-  const tab=e.target.closest('.tab[data-sound]');
-  if(tab&&!tab.contains(e.relatedTarget)){
-    playKitSound(tab.dataset.sound,true);
-  }
-});
-
-$('#soundBtn').addEventListener('click',()=>{
+$('#soundBtn').addEventListener('click',e=>{
+  e.stopPropagation();
   SOUND_ON=!SOUND_ON;
   localStorage.setItem(SOUND_KEY,SOUND_ON?'1':'0');
   updateSoundBtn();
-  if(SOUND_ON){ensureAC();playLevelUp();toast('🔊 Звуки включены');}
+  if(SOUND_ON){ensureAC();playLevelUp();toast('🔊 Звуки включены (только при нажатии)');}
   else toast('🔇 Звуки выключены');
 });
 
-document.addEventListener('input',e=>{
-  const el=e.target;
-  if(el.id==='qInput'){UI.search=el.value;const pos=el.selectionStart;renderAll();const n=$('#qInput');if(n){n.focus();n.setSelectionRange(pos,pos);}}
-  else if(el.dataset.s==='radius')$('#radVal').textContent=el.value;
-});
-document.addEventListener('change',e=>{
-  const el=e.target;
-  if(el.id==='fRegion'){UI.region=el.value;renderAll();}
-  else if(el.id==='fCountry'){UI.country=el.value;renderAll();}
-  else if(el.id==='fSort'){UI.sort=el.value;renderAll();}
-  else if(!EDIT_MODE)return;
-  else if(el.dataset.s){const k=el.dataset.s;S.settings[k]=el.type==='checkbox'?el.checked:(el.type==='range'?+el.value:el.value);save();renderAll();}
-  else if(el.dataset.tc){S.settings.tierColors[el.dataset.tc]=el.value;save();renderAll();}
-  else if(el.dataset.m){S.modes[+el.dataset.idx][el.dataset.m]=el.value;save();renderTabs();}
-  else if(el.dataset.n){S.nav[+el.dataset.idx][el.dataset.n]=el.value.trim();save();renderTabs();}
-  else if(el.dataset.g){const g=S.grids[+el.dataset.gi],k=el.dataset.g;g[k]=el.type==='checkbox'?el.checked:(el.type==='number'?Math.max(1,+el.value||1):el.value);save();renderAll();}
-  else if(el.dataset.pt){S.points[el.dataset.pt]=+el.value||0;save();}
-  else if(el.dataset.tl){const k=el.dataset.tl;S.titles[+el.dataset.idx][k]=k==='min'?+el.value||0:el.value;save();}
-});
-$('#pfTagInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.querySelector('[data-act="pfAddTag"]').click();}});
-$('#importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{S=normalize(JSON.parse(r.result));save();renderAll();toast('📤 Импортировано');}catch{toast('Ошибка в JSON',true);}};r.readAsText(f);e.target.value='';});
+/* Звук срабатывает только при нажатии */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');
+  if(!el)return;
+  const a=el.dataset.act,id=el.dataset.id;
 
-let dragSrc=null;
-document.addEventListener('dragstart',e=>{const r=e.target.closest('[data-drag]');if(!r||!EDIT_MODE)return;dragSrc={kind:r.dataset.drag,idx:+r.dataset.idx};e.dataTransfer.effectAllowed='move';});
-document.addEventListener('dragover',e=>{if(dragSrc&&e.target.closest('[data-drag="'+dragSrc.kind+'"]'))e.preventDefault();});
-document.addEventListener('drop',e=>{const r=e.target.closest('[data-drag]');if(!r||!dragSrc||!EDIT_MODE)return;const k=r.dataset.drag;if(dragSrc.kind!==k)return;const to=+r.dataset.idx,arr=S[k];if(dragSrc.idx===to)return;const [item]=arr.splice(dragSrc.idx,1);arr.splice(to,0,item);dragSrc=null;save();renderAll();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')['playerModal','playerForm','confirmModal'].forEach(closeModal);});
+  if(a==='goto'){
+    const snd=el.dataset.sound;
+    if(snd)playKitSound(snd);
+    else playClick(1,0.06);
+    goto(id);
+  }
+  else if(a==='toggleDD'){toggleDD();}
+  else if(a==='openPlayer'){
+    playClick(1.08,0.06);
+    openPlayer(id);
+  }
+  else if(a==='closeModal'){playClick(0.85,0.05);closeModal(id);}
+  else if(a==='confirmYes'){playClick(0.9,0.06);closeModal('confirmModal');if(_cf)_cf();_cf=null;}
+  else if(a==='toggleGrid'){playClick(1,0.05);UI.collapsed.has(id)?UI.collapsed.delete(id):UI.collapsed.add(id);renderContent();}
+  else if(a==='edTab'){playClick(1.05,0.05);UI.edTab=id;renderContent();}
+  else if(a==='openPlayerForm'){playClick(1.05,0.05);openPlayerForm(null);}
+  else if(a==='editPlayer'){playClick(1.05,0.05);closeModal('playerModal');openPlayerForm(id);}
+  else if(a==='delPlayer'){
+    playClick(0.85,0.06);
+    const p=byId(id);if(!p)return;
+    showConfirm(`Удалить игрока «${p.nick}»?`,()=>{
+      S.players=S.players.filter(x=>x.id!==id);
+      S.grids.forEach(g=>g.players=(g.players||[]).filter(x=>x!==id));
+      save();closeModal('playerModal');renderAll();toast('Удалено');
+    });
+  }
+  else if(a==='pfAddTag'){playClick(1.1,0.05);const i=$('#pfTagInput'),t=i.value.trim();if(!t)return;PF.tags.push(t);i.value='';renderPFTags();}
+  else if(a==='pfDelTag'){playClick(0.9,0.05);PF.tags.splice(+el.dataset.idx,1);renderPFTags();}
+  else if(a==='pfSkinPick'){playClick(1,0.05);$('#pfSkinFile').click();}
+  else if(a==='pfSkinClear'){playClick(0.9,0.05);PF.skin='';$('#pfSkinPrev').src=DEFAULT_AVA;}
+  else if(a==='pfBgPick'){playClick(1,0.05);$('#pfBgFile').click();}
+  else if(a==='pfBgClear'){playClick(0.9,0.05);PF.bg='';$('#pfBgPrev').src=DEFAULT_AVA;}
+  else if(a==='pfSave'){savePlayerForm();}
+  else if(a==='resetTheme'){
+    playClick(0.95,0.05);
+    showConfirm('Вернуть стандартные цвета, шрифты и переключатели?',()=>{
+      const keep={siteName:S.settings.siteName,logoEmoji:S.settings.logoEmoji,subtitle:S.settings.subtitle,footer:S.settings.footer,overallNote:S.settings.overallNote};
+      S.settings=Object.assign(clone(DEFAULTS.settings),keep);save();renderAll();toast('Тема сброшена');
+    });
+  }
+  else if(a==='addMode'){
+    playClick(1.1,0.05);
+    const nid='m_'+uid();S.modes.push({id:nid,name:'Новый режим',icon:'⚔️'});S.nav.push({kind:'mode',ref:nid});save();renderAll();
+  }
+  else if(a==='delMode'){
+    playClick(0.85,0.06);
+    showConfirm('Удалить этот режим и оценки игроков в нём?',()=>{
+      S.modes=S.modes.filter(x=>x.id!==id);S.nav=S.nav.filter(n=>!(n.kind==='mode'&&n.ref===id));
+      S.players.forEach(p=>delete p.tiers[id]);if(UI.page===id)UI.page='top';save();renderAll();
+    });
+  }
+  else if(a==='addGrid'){playClick(1.1,0.05);S.grids.push({id:uid(),name:'Новая сетка',icon:'🏅',auto:false,autoCount:3,players:[]});save();renderContent();}
+  else if(a==='delGrid'){playClick(0.85,0.06);showConfirm('Удалить сетку?',()=>{S.grids=S.grids.filter(x=>x.id!==id);save();renderContent();});}
+  else if(a==='gridAdd'){playClick(1.1,0.05);const g=grid(el.dataset.gid),pid=$('#gAddSel_'+g.id)?.value;if(g&&pid){g.players.push(pid);save();renderContent();}}
+  else if(a==='gridRem'){playClick(0.9,0.05);const g=grid(el.dataset.gid);if(g){g.players=g.players.filter(x=>x!==el.dataset.pid);save();renderContent();}}
+  else if(a==='delNav'){playClick(0.9,0.05);S.nav.splice(+el.dataset.idx,1);save();renderTabs();renderContent();}
+  else if(a==='newPage'){
+    playClick(1.1,0.05);
+    const tpl=el.dataset.tpl;
+    const p=tpl==='rules'?tplRules():tpl==='calib'?tplCalib():tpl==='changelog'?tplChangelog():mkPage('Новая страница','📄','Подзаголовок');
+    S.pages.push(p);S.nav.push({kind:'page',ref:p.id});UI.pageEdit=p.id;save();goto(p.id);
+  }
+  else if(a==='openPage'){playClick(1,0.05);UI.pageEdit=id;goto(id);}
+  else if(a==='delPage'){
+    playClick(0.85,0.06);
+    const p=page(id);
+    showConfirm(`Удалить страницу «${p?.title||''}»?`,()=>{
+      S.pages=S.pages.filter(x=>x.id!==id);S.nav=S.nav.filter(n=>!(n.kind==='page'&&n.ref===id));
+      if(UI.page===id)UI.page='top';save();renderAll();
+    });
+  }
+  else if(a==='togglePageEdit'){playClick(1,0.05);UI.pageEdit=UI.pageEdit===id?null:id;renderContent();}
+  else if(a==='blkAdd'){playClick(1.1,0.05);const p=page(id);if(!p)return;p.blocks.push(mkBlock(el.dataset.t));p.updated=Date.now();save();renderContent();}
+  else if(a==='blkDel'){playClick(0.9,0.05);const p=page(id);if(!p)return;p.blocks=p.blocks.filter(b=>b.id!==el.dataset.bid);p.updated=Date.now();save();renderContent();}
+  else if(a==='blkMove'){
+    playClick(1,0.05);
+    const p=page(id);if(!p)return;
+    const idx=p.blocks.findIndex(b=>b.id===el.dataset.bid),ni=idx+(+el.dataset.d);
+    if(idx<0||ni<0||ni>=p.blocks.length)return;
+    const [item]=p.blocks.splice(idx,1);p.blocks.splice(ni,0,item);p.updated=Date.now();save();renderContent();
+  }
+  else if(a==='addTitle'){playClick(1.1,0.05);S.titles.push({id:uid(),name:'Новое звание',emoji:'👑',color:'#e9edf5',min:0});save();renderContent();}
+  else if(a==='delTitle'){playClick(0.9,0.05);S.titles=S.titles.filter(x=>x.id!==id);save();renderContent();}
+  else if(a==='exportData'){
+    playClick(1.1,0.06);
+    const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+    const aEl=document.createElement('a');aEl.href=URL.createObjectURL(blob);aEl.download='data.json';aEl.click();
+    toast('📥 Скачан data.json — замени его в репозитории на GitHub');
+  }
+  else if(a==='importData'){playClick(1,0.05);$('#importFile').click();}
+  else if(a==='copyJSON'){playClick(1.1,0.06);navigator.clipboard?.writeText(JSON.stringify(S,null,2)).then(()=>toast('📋 JSON скопирован'));}
+  else if(a==='resetAll'){
+    playClick(0.8,0.07);
+    showConfirm('Сбросить вообще все данные, игроков и настройки к исходным?',()=>{
+      localStorage.removeItem(KEY);localStorage.removeItem(DRAFT_KEY);S=clone(DEFAULTS);seedPages();save();renderAll();toast('Сброшено');
+    });
+  }
+});
+
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='pfSkinFile')readFile(t.files[0],u=>{PF.skin=u;$('#pfSkinPrev').src=u;});
+  if(t.id==='pfBgFile')readFile(t.files[0],u=>{PF.bg=u;$('#pfBgPrev').src=u;});
+  if(t.id==='importFile'&&t.files[0]){
+    const r=new FileReader();
+    r.onload=()=>{try{S=normalize(JSON.parse(r.result));save();renderAll();toast('Импортировано');}catch{toast('Ошибка в JSON',true);}};
+    r.readAsText(t.files[0]);t.value='';
+  }
+});
+
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.s){
+    const k=t.dataset.s;
+    S.settings[k]=t.type==='checkbox'?t.checked:(t.type==='range'?+t.value:t.value);
+    document.querySelectorAll(`[data-s="${k}"]`).forEach(o=>{if(o!==t&&o.type!=='checkbox')o.value=S.settings[k];});
+    save();applyTheme();
+    if(['siteName','logoEmoji','pagesInNav','showPoints','showTags','showRegions','showTitles'].includes(k))renderAll();
+    if(k==='radius')renderContent();
+    return;
+  }
+  if(t.dataset.tc){S.settings.tierColors[t.dataset.tc]=t.value;save();applyTheme();renderContent();return;}
+  if(t.dataset.pt){S.points[t.dataset.pt]=+t.value||0;save();return;}
+  if(t.dataset.m){const m=mode(t.dataset.m);if(m){m[t.dataset.f]=t.value;save();if(t.dataset.f==='icon'){const p=t.closest('.ed-row')?.querySelector('.icoprev');if(p)p.innerHTML=iconHTML(m.icon,m.id);}renderTabs();setTierVar();}return;}
+  if(t.dataset.g){
+    const g=grid(t.dataset.g);
+    if(g){
+      g[t.dataset.f]=t.type==='checkbox'?t.checked:(t.type==='number'?Math.max(1,+t.value||1):t.value);
+      save();
+      if(t.dataset.f==='auto')renderContent();
+    }
+    return;
+  }
+  if(t.dataset.tl){const tl=S.titles.find(x=>x.id===t.dataset.tl);if(tl){tl[t.dataset.f]=t.dataset.f==='min'?+t.value||0:t.value;save();}return;}
+  if(t.id==='peTitle'||t.id==='peIcon'||t.id==='peSub'){
+    const p=page(UI.page);if(!p)return;
+    p.title=$('#peTitle').value.trim()||'Без названия';
+    p.icon=$('#peIcon').value.trim()||'📄';
+    p.subtitle=$('#peSub').value.trim();
+    p.updated=Date.now();save();renderTabs();
+    return;
+  }
+  if(t.dataset.b){
+    const p=page(UI.page);const b=p?.blocks.find(x=>x.id===t.dataset.b);if(!b)return;
+    const f=t.dataset.f;
+    if(f==='ordered')b.ordered=t.checked;
+    else if(f==='items')b.items=t.value.split('\n').map(s=>s.trim()).filter(Boolean);
+    else b[f]=t.value;
+    p.updated=Date.now();save();
+  }
+});
+
+document.addEventListener('dragstart',e=>{const row=e.target.closest('[draggable="true"]');if(!row)return;UI.drag={kind:row.dataset.drag,id:row.dataset.id,idx:row.dataset.idx};e.dataTransfer.effectAllowed='move';});
+document.addEventListener('dragover',e=>{if(UI.drag&&e.target.closest('[draggable="true"]'))e.preventDefault();});
+document.addEventListener('drop',e=>{
+  const target=e.target.closest('[draggable="true"]');if(!target||!UI.drag)return;e.preventDefault();
+  if(UI.drag.kind==='mode'&&target.dataset.drag==='mode'){
+    const a=S.modes.findIndex(x=>x.id===UI.drag.id),b=S.modes.findIndex(x=>x.id===target.dataset.id);
+    if(a>=0&&b>=0&&a!==b){const [m]=S.modes.splice(a,1);S.modes.splice(b,0,m);save();renderAll();}
+  }else if(UI.drag.kind==='grid'&&target.dataset.drag==='grid'){
+    const a=S.grids.findIndex(x=>x.id===UI.drag.id),b=S.grids.findIndex(x=>x.id===target.dataset.id);
+    if(a>=0&&b>=0&&a!==b){const [g]=S.grids.splice(a,1);S.grids.splice(b,0,g);save();renderContent();}
+  }else if(UI.drag.kind==='nav'&&target.dataset.drag==='nav'){
+    const a=+UI.drag.idx,b=+target.dataset.idx;
+    if(a!==b){const [n]=S.nav.splice(a,1);S.nav.splice(b,0,n);save();renderTabs();renderContent();}
+  }
+  UI.drag=null;
+});
+
+document.addEventListener('click',e=>{if(!e.target.closest('#pagesDD'))closeDD();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDD();document.querySelectorAll('.modal.open').forEach(m=>closeModal(m.id));}});
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
 
 boot();
