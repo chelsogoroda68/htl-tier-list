@@ -481,11 +481,11 @@
       "skin": "",
       "bg": "",
       "tiers": {
-        "vanilla": "LT5",
+        "vanilla": "LT4",
         "sword": "HT1",
         "uhc": "HT1",
         "pot": "HT1",
-        "smp": "LT4",
+        "smp": "LT2",
         "axe": "HT1",
         "mace": "LT5",
         "cart": "HT2",
