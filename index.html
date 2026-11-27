@@ -27,8 +27,6 @@ button{font-family:var(--font)}
 body[data-mode="view"] .edit-only{display:none !important}
 #editBanner{display:none;background:color-mix(in srgb,#ffb020 16%,var(--panel));border-bottom:1px solid color-mix(in srgb,#ffb020 45%,transparent);padding:9px 22px;font-size:12.5px;font-weight:700;color:#ffd166}
 body[data-mode="edit"] #editBanner{display:block}
-
-/* ---------- LIVE ---------- */
 .live{display:flex;align-items:center;gap:6px;font:800 9px var(--font);letter-spacing:1.4px;color:#3ddc84;flex:0 0 auto}
 .live i{width:7px;height:7px;border-radius:50%;background:#3ddc84;box-shadow:0 0 10px #3ddc84;animation:pulse 1.7s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
@@ -60,7 +58,7 @@ body[data-mode="edit"] .live{display:none}
 .sp-enter:hover{filter:brightness(1.12)}
 @keyframes enterGlow{0%,100%{box-shadow:0 0 0 rgba(245,158,11,0)}50%{box-shadow:0 0 28px rgba(245,158,11,.55)}}
 
-/* ---------- TOPBAR + TABS ---------- */
+/* ---------- TOPBAR ---------- */
 #topbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 .tb-in{width:min(1240px,100%);margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:10px}
 .logo{font-family:var(--font-head);font-weight:800;font-size:18px;color:var(--accent);display:flex;gap:9px;align-items:center;cursor:pointer;white-space:nowrap;padding:16px 8px 16px 0;flex:0 0 auto}
@@ -100,7 +98,6 @@ body[data-mode="edit"] .live{display:none}
 .dd-item.active{color:var(--text);background:color-mix(in srgb,var(--accent) 12%,transparent)}
 .dd-item .m-ico{opacity:.8}
 
-/* ---------- LAYOUT ---------- */
 main{max-width:1240px;margin:0 auto;padding:0 22px}
 #content{padding:20px 0 46px}
 #footer{padding:0 22px 30px;text-align:center;color:var(--muted);font-size:12px}
@@ -119,7 +116,6 @@ main{max-width:1240px;margin:0 auto;padding:0 22px}
 .btn-danger{background:color-mix(in srgb,#ff4655 16%,var(--panel2));border-color:color-mix(in srgb,#ff4655 45%,transparent);color:#ff8a94}
 .btn-sm{padding:6px 11px;font-size:12px;border-radius:8px}
 
-/* ---------- TABLE ROWS ---------- */
 .thead{display:flex;align-items:center;gap:14px;padding:6px 16px 10px;color:var(--muted);font:800 10px var(--font);letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--border);margin-bottom:10px}
 .thead .col-rank,.thead .col-region,.thead .col-tiers,.thead .col-info{display:flex;align-items:center}
 .thead .col-region{justify-content:center}
@@ -163,7 +159,6 @@ body[data-compact="true"] .ava-spacer{width:38px}
   .sp-fig{width:105px;height:170px}
 }
 
-/* ---------- EDITOR ---------- */
 .ed-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
 .ed-tab{border-radius:999px;padding:8px 14px;font-weight:700;font-size:12.5px;cursor:pointer;border:1px solid var(--border);background:var(--panel);color:var(--muted);transition:.15s}
 .ed-tab:hover{color:var(--text)}
@@ -205,7 +200,6 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 .prev-img{width:52px;height:52px;border-radius:9px;object-fit:cover;border:1px solid var(--border);image-rendering:pixelated;background:var(--panel2)}
 .file-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
-/* ---------- PAGES ---------- */
 .prose{line-height:1.75;font-size:14px}
 .prose h1,.prose h2,.prose h3{font-family:var(--font-head);margin:18px 0 9px}
 .prose h1{font-size:22px}.prose h2{font-size:17px;color:var(--accent)}.prose h3{font-size:14.5px}
@@ -237,7 +231,6 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 .fmt-help code{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:1px 6px;font:600 11px 'JetBrains Mono',monospace}
 .icoprev{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--panel);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
 
-/* ---------- MODALS ---------- */
 .modal{position:fixed;inset:0;background:rgba(4,6,10,.72);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
 .modal.open{display:flex}
 .sheet{width:min(600px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px;position:relative;animation:pop .22s cubic-bezier(.2,1.2,.4,1)}
@@ -414,24 +407,39 @@ document.addEventListener('pointerdown',()=>{ensureAC();if(AC&&AC.state==='suspe
 function updateSoundBtn(){const b=$('#soundBtn');b.textContent=SOUND_ON?'🔊':'🔇';b.classList.toggle('active',SOUND_ON);}
 
 /* ================= SPLASH: 3D-СКИНЫ ================= */
-/* Здесь настраивается, кто и в какой позе вылетает на заставке.
-   anim: 'idle' (дышит) | 'wave' (машет) | 'arms' (расставил руки)
-   rot: ракурс камеры (вправо/влево), zoom: размер
-   Если позже дашь свои PNG-скины — добавь поле skin:'skins/meshnn.png' */
 const SPLASH_PLAYERS=[
   {id:'p1',rot:-0.5,anim:'idle',zoom:0.85},
   {id:'p2',rot:0.12,anim:'wave',zoom:0.95},
   {id:'p4',rot:0.5,anim:'arms',zoom:0.85},
 ];
-let splashDone=false,viewers=[],spTimers=[],spPhase=0;
+let splashDone=false,viewers=[],spTimers=[],spPhase=0,svPromise=null;
+
+const SV_SRCS=[
+  'https://chelsogoroda68.github.io/htl-tier-list/skinview3d.bundle.js',
+  'https://unpkg.com/skinview3d@3.4.1/bundles/skinview3d.bundle.js',
+  'https://fastly.jsdelivr.net/npm/skinview3d@3.4.1/bundles/skinview3d.bundle.js'
+];
 function loadSkinview(){
-  return new Promise((res,rej)=>{
-    if(window.skinview3d)return res();
-    const sc=document.createElement('script');
-    sc.src='https://chelsogoroda68.github.io/htl-tier-list/skinview3d.bundle.js';
-    sc.onload=()=>res();sc.onerror=rej;
-    document.head.appendChild(sc);
+  if(window.skinview3d&&window.skinview3d.SkinViewer)return Promise.resolve();
+  if(svPromise)return svPromise;
+  svPromise=new Promise((res,rej)=>{
+    let i=0;
+    const next=()=>{
+      if(i>=SV_SRCS.length){rej(new Error('skinview3d не загрузился'));return;}
+      const sc=document.createElement('script');
+      sc.src=SV_SRCS[i++];
+      sc.onload=()=>{(window.skinview3d&&window.skinview3d.SkinViewer)?res():next();};
+      sc.onerror=()=>{sc.remove();next();};
+      document.head.appendChild(sc);
+    };
+    next();
   });
+  return svPromise;
+}
+function pickSkinURL(p,c){
+  if(c.skin) return c.skin;
+  if(p.skin) return p.skin;
+  return 'https://mc-heads.net/skin/'+encodeURIComponent(p.nick);
 }
 async function buildPlayers(instant){
   const wrap=$('#spPlayers');if(wrap._built)return;wrap._built=true;
@@ -444,7 +452,7 @@ async function buildPlayers(instant){
     bob.appendChild(cv);fig.appendChild(bob);wrap.appendChild(fig);
     try{
       await loadSkinview();
-      const url=c.skin||`https://minotar.net/skin/${encodeURIComponent(p.nick)}`;
+      const url=pickSkinURL(p,c);
       const v=new skinview3d.SkinViewer({canvas:cv,skin:url,width:150,height:240});
       v.zoom=c.zoom||0.9;v.rotation.y=c.rot||0;
       v.animation=c.anim==='wave'?new skinview3d.WavingAnimation()
