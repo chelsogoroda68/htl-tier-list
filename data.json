@@ -184,9 +184,193 @@
     {
       "kind": "mode",
       "ref": "spear"
+    },
+    {
+      "kind": "page",
+      "ref": "l6ikwuqb"
+    },
+    {
+      "kind": "page",
+      "ref": "zobiik1v"
+    },
+    {
+      "kind": "page",
+      "ref": "yrvce37f"
     }
   ],
-  "pages": [],
+  "pages": [
+    {
+      "id": "l6ikwuqb",
+      "title": "Правила тир-листа",
+      "icon": "📜",
+      "subtitle": "Как устроен рейтинг и как попасть в сетки",
+      "updated": 1795743284199,
+      "blocks": [
+        {
+          "id": "go906yrn",
+          "type": "h2",
+          "text": "Общие положения"
+        },
+        {
+          "id": "nfm3nbna",
+          "type": "p",
+          "text": "Этот сайт — внутренний tier list нашего комьюнити. Игроки оцениваются по режимам (китам), а сумма очков определяет место в **Overall** и **звание**."
+        },
+        {
+          "id": "8cqq938k",
+          "type": "list",
+          "ordered": false,
+          "items": [
+            "Оценку ставит только действующий тестер соответствующего кита.",
+            "Оценка — это текущий уровень игрока. Прошлые (пиковые) тиры не понижаются без причины.",
+            "Рейтинг публичный: любой игрок может посмотреть свою карточку и скачать её.",
+            "Все спорные ситуации решает руководство сайта / старшие тестеры."
+          ]
+        },
+        {
+          "id": "0qiwzqkb",
+          "type": "h2",
+          "text": "Как получить оценку"
+        },
+        {
+          "id": "jgfqdkzd",
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Договорись с тестером нужного кита.",
+            "Согласуй кит.",
+            "Проведи бой по регламенту (см. «Регламент калибровок»).",
+            "Тестер выносит вердикт и вносит тир в таблицу.",
+            "После внесения тир появится у тебя в карточке и в Overall."
+          ]
+        },
+        {
+          "id": "cqyepykz",
+          "type": "note",
+          "tone": "warn",
+          "text": "Не проси завысить оценку и не дави на тестеров. Попытка повлиять на результат = отказ в оценке."
+        },
+        {
+          "id": "f4qcmkcp",
+          "type": "h2",
+          "text": "Шкала очков"
+        },
+        {
+          "id": "tkw9tlju",
+          "type": "tiers"
+        },
+        {
+          "id": "rsuui2iu",
+          "type": "h2",
+          "text": "Звания"
+        },
+        {
+          "id": "ugsnb8dt",
+          "type": "titles"
+        },
+        {
+          "id": "erm6f2p0",
+          "type": "divider"
+        },
+        {
+          "id": "5dpr0l7m",
+          "type": "p",
+          "text": "Вопросы по правилам — к руководству проекта."
+        }
+      ]
+    },
+    {
+      "id": "zobiik1v",
+      "title": "Регламент калибровок",
+      "icon": "🎯",
+      "subtitle": "Процедура оценки при вызове / выходе на тестера",
+      "updated": 1795743215543,
+      "blocks": [
+        {
+          "id": "7g8j0x15",
+          "type": "h2",
+          "text": "Что такое калибровка"
+        },
+        {
+          "id": "74ho1cvn",
+          "type": "p",
+          "text": "Калибровка — первичная оценка нового игрока в ките. Проводится в формате **1х1** с тестером этого кита до вынесения вердикта."
+        },
+        {
+          "id": "o0qk1zll",
+          "type": "h2",
+          "text": "Формат боя"
+        },
+        {
+          "id": "41fb3fzn",
+          "type": "list",
+          "ordered": false,
+          "items": [
+            "Кит выбирается из списка режимов сайта (Sword, UHC, Pot, Axe, Mace и т.д.).",
+            "Арена — стандартная для кита",
+            "Длительность: до явного преимущества или по решению тестера (обычно 1–4 раунда)."
+          ]
+        },
+        {
+          "id": "865js969",
+          "type": "h2",
+          "text": "Кто вызывает"
+        },
+        {
+          "id": "z3rafzqk",
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Игрок сам инициирует калибровку: пишет тестеру кита и договаривается о времени.",
+            "Тестер вправе отказать без объяснения причин, если игрок не готов или нарушает правила.",
+            "Если тестер долго недоступен — калибровку проводит старший тестер кита (если тот имеется)."
+          ]
+        },
+        {
+          "id": "kjp9i0sp",
+          "type": "note",
+          "tone": "info",
+          "text": "Игрок без оценки в ките отображается как **Unranked** и не учитывается в Overall по этому режиму."
+        },
+        {
+          "id": "hk1c5yf4",
+          "type": "h2",
+          "text": "Как тестер ставит тир"
+        },
+        {
+          "id": "pm37segu",
+          "type": "p",
+          "text": "Тестер оценивает: контроль дистанции, тайминги, урон, принятие решений, стабильность. Итог — один тир из шкалы HT1–LT5."
+        },
+        {
+          "id": "nahjsf7h",
+          "type": "tiers"
+        }
+      ]
+    },
+    {
+      "id": "yrvce37f",
+      "title": "Журнал обновлений",
+      "icon": "📰",
+      "subtitle": "Что меняется в тир-листе и на сайте",
+      "updated": 1795743143387,
+      "blocks": [
+        {
+          "id": "m1rp03dw",
+          "type": "h2",
+          "text": "27.11.2026"
+        },
+        {
+          "id": "vb0ldqsd",
+          "type": "list",
+          "ordered": false,
+          "items": [
+            "27.11 — сайт опубликован на GitHub Pages, данные обновляются в реальном времени."
+          ]
+        }
+      ]
+    }
+  ],
   "players": [
     {
       "id": "p1",
@@ -273,13 +457,14 @@
       "city": "Tambov",
       "region": "EU",
       "tags": [
-        "Разработчик сайта"
+        "Руководство сайта"
       ],
       "skin": "data:image/png;base64,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",
       "bg": "",
       "tiers": {
         "sword": "HT2",
         "uhc": "HT4",
+        "pot": "HT1",
         "axe": "HT3"
       },
       "bio": ""
@@ -380,7 +565,7 @@
     {
       "id": "vyc0bv86",
       "name": "Верхняя сетка",
-      "icon": "🏆",
+      "icon": "",
       "auto": false,
       "autoCount": 3,
       "players": [
@@ -392,19 +577,20 @@
     {
       "id": "0q807yo1",
       "name": "Продвиженцы: Попадают игроки начиная с 150 очков. Считаются новыми сильными игроками",
-      "icon": "🏆",
+      "icon": "",
       "auto": false,
       "autoCount": 3,
-      "players": []
+      "players": [
+        "p4"
+      ]
     },
     {
       "id": "1uu3cuj8",
       "name": "Нижняя сетка",
-      "icon": "🏆",
+      "icon": "",
       "auto": false,
       "autoCount": 5,
       "players": [
-        "p4",
         "p5",
         "p6",
         "x9p44kld",
@@ -413,5 +599,6 @@
         "p8"
       ]
     }
-  ]
+  ],
+  "_seeded": true
 }
