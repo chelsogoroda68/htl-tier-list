@@ -387,11 +387,12 @@ const OLD_DEFAULT_ICONS={
   cart:'<svg viewBox="0 0 24 24"><path d="M4 8h16l-2 8H6z" fill="#7a5a3a"/><path d="M4 8h16l-1 3H5z" fill="#8b5a3c"/><rect x="8" y="4" width="8" height="4" fill="#4aa3ff"/><circle cx="8" cy="18" r="2" fill="#333"/><circle cx="16" cy="18" r="2" fill="#333"/></svg>',
   spear:'<svg viewBox="0 0 24 24"><rect x="11" y="10" width="2" height="11" fill="#6b4a2b"/><path d="M6 3v6c0 2 3 3 6 3s6-1 6-3V3l-2 4-1-4v4h-2V3h-2v4H8V7z" fill="#4aa3ff"/><path d="M6 3v6c0 2 3 3 6 3V3l-2 4-1-4z" fill="#7cc0ff"/></svg>'
 };
-function iconHTML(icon){
+function iconHTML(icon,fbKey=''){
   const ic=String(icon||'').trim();
+  const fbAttr=fbKey?` data-fb="${esc(fbKey)}"`:'';
   if(!ic)return `<span class="m-ico txt">🎮</span>`;
   if(ic.startsWith('<'))return `<span class="m-ico">${ic}</span>`;
-  if(ic.startsWith('http'))return `<span class="m-ico"><img src="${esc(ic)}" alt="" onerror="iconFail(this)"></span>`;
+  if(ic.startsWith('http'))return `<span class="m-ico"><img src="${esc(ic)}"${fbAttr} alt="" onerror="iconFail(this)"></span>`;
   return `<span class="m-ico txt">${ic}</span>`;
 }
 window.iconFail=function(img){
@@ -400,30 +401,236 @@ window.iconFail=function(img){
   img.src='data:image/svg+xml;utf8,'+encodeURIComponent(fb);
 };
 
-/* ================= ЗВУКИ ================= */
+/* ================= ЗВУКИ (МЯГКИЙ КЛИЧОК + MINECRAFT КИТЫ) ================= */
 let SOUND_ON=localStorage.getItem(SOUND_KEY)==='1';
-let AC=null;
-function ensureAC(){if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
-function tick(freq=760,dur=.05,vol=.05){
-  if(!SOUND_ON||!AC||AC.state!=='running')return;
+let AC=null,NOISE_BUF=null;
+
+function ensureAC(){
+  if(!AC){
+    try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
+  }
+  if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});
+  if(AC&&!NOISE_BUF){
+    const len=AC.sampleRate*0.6;
+    NOISE_BUF=AC.createBuffer(1,len,AC.sampleRate);
+    const d=NOISE_BUF.getChannelData(0);
+    for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+  }
+}
+
+/* Мягкий, приятный «кличок» мышки */
+function playClick(pitch=1,vol=0.06){
+  if(!SOUND_ON)return;
+  ensureAC();
+  if(!AC||AC.state!=='running')return;
   try{
+    const t=AC.currentTime;
     const o=AC.createOscillator(),g=AC.createGain();
-    o.type='square';o.frequency.setValueAtTime(freq,AC.currentTime);
-    o.frequency.exponentialRampToValueAtTime(freq*.6,AC.currentTime+dur);
-    g.gain.setValueAtTime(vol,AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+dur);
+    o.type='sine';
+    o.frequency.setValueAtTime(520*pitch,t);
+    o.frequency.exponentialRampToValueAtTime(140*pitch,t+0.032);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.036);
     o.connect(g);g.connect(AC.destination);
-    o.start();o.stop(AC.currentTime+dur+.01);
+    o.start(t);o.stop(t+0.04);
   }catch(e){}
 }
-document.addEventListener('pointerdown',()=>{ensureAC();if(AC&&AC.state==='suspended')AC.resume();});
+
+/* Вспомогательный генератор шума с фильтром (для меча, зелий, вагонетки) */
+function playNoise(t,dur,type,freq,q,vol,endFreq){
+  if(!NOISE_BUF)return;
+  const src=AC.createBufferSource();
+  src.buffer=NOISE_BUF;
+  const flt=AC.createBiquadFilter();
+  flt.type=type;
+  flt.frequency.setValueAtTime(freq,t);
+  if(endFreq)flt.frequency.exponentialRampToValueAtTime(endFreq,t+dur);
+  flt.Q.value=q||1;
+  const g=AC.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.linearRampToValueAtTime(vol,t+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  src.connect(flt);flt.connect(g);g.connect(AC.destination);
+  src.start(t);src.stop(t+dur+0.02);
+}
+
+/* Уникальные звуки Minecraft для каждого кита и вкладок */
+function playKitSound(kitId,isHover=false){
+  if(!SOUND_ON)return;
+  ensureAC();
+  if(!AC||AC.state!=='running')return;
+  const t=AC.currentTime;
+  const v=isHover?0.45:1; // при наведении чуть тише и деликатнее
+
+  try{
+    switch(kitId){
+      case 'vanilla':{
+        // End Crystal / Amethyst — звонкий кристальный перелив
+        [1318.5,1760,2349].forEach((f,i)=>{
+          const o=AC.createOscillator(),g=AC.createGain();
+          o.type='sine';
+          const st=t+i*0.025;
+          o.frequency.setValueAtTime(f,st);
+          o.frequency.exponentialRampToValueAtTime(f*1.03,st+0.18);
+          g.gain.setValueAtTime(0.0001,st);
+          g.gain.linearRampToValueAtTime(0.045*v,st+0.006);
+          g.gain.exponentialRampToValueAtTime(0.0001,st+0.22);
+          o.connect(g);g.connect(AC.destination);
+          o.start(st);o.stop(st+0.24);
+        });
+        break;
+      }
+      case 'sword':{
+        // Взмах меча (Sword sweep)
+        playNoise(t,0.13,'bandpass',1400,2.5,0.09*v,3600);
+        const o=AC.createOscillator(),g=AC.createGain();
+        o.type='triangle';
+        o.frequency.setValueAtTime(620,t);
+        o.frequency.exponentialRampToValueAtTime(190,t+0.1);
+        g.gain.setValueAtTime(0.03*v,t);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.11);
+        o.connect(g);g.connect(AC.destination);
+        o.start(t);o.stop(t+0.12);
+        break;
+      }
+      case 'uhc':{
+        // Золотое яблоко / Укус и звон (Golden Apple)
+        playNoise(t,0.06,'bandpass',950,1.8,0.07*v,500);
+        [1046.5,1318.5].forEach((f,i)=>{
+          const o=AC.createOscillator(),g=AC.createGain();
+          o.type='sine';
+          const st=t+0.04+i*0.045;
+          o.frequency.setValueAtTime(f,st);
+          g.gain.setValueAtTime(0.045*v,st);
+          g.gain.exponentialRampToValueAtTime(0.0001,st+0.16);
+          o.connect(g);g.connect(AC.destination);
+          o.start(st);o.stop(st+0.17);
+        });
+        break;
+      }
+      case 'pot':{
+        // Бросок / звон зелья (Splash Potion)
+        playNoise(t,0.14,'highpass',2600,1.5,0.06*v,1200);
+        [1568,2093,1865].forEach((f,i)=>{
+          const o=AC.createOscillator(),g=AC.createGain();
+          o.type='sine';
+          const st=t+i*0.022;
+          o.frequency.setValueAtTime(f,st);
+          g.gain.setValueAtTime(0.035*v,st);
+          g.gain.exponentialRampToValueAtTime(0.0001,st+0.09);
+          o.connect(g);g.connect(AC.destination);
+          o.start(st);o.stop(st+0.1);
+        });
+        break;
+      }
+      case 'smp':{
+        // Эндер-жемчуг / портал (Ender Pearl)
+        const o=AC.createOscillator(),g=AC.createGain();
+        o.type='sine';
+        o.frequency.setValueAtTime(320,t);
+        o.frequency.exponentialRampToValueAtTime(780,t+0.09);
+        o.frequency.exponentialRampToValueAtTime(420,t+0.2);
+        g.gain.setValueAtTime(0.05*v,t);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.21);
+        o.connect(g);g.connect(AC.destination);
+        o.start(t);o.stop(t+0.22);
+        break;
+      }
+      case 'axe':{
+        // Тяжёлый удар топора (Axe Crit / Shield disable)
+        playNoise(t,0.11,'lowpass',900,1.2,0.09*v,220);
+        const o=AC.createOscillator(),g=AC.createGain();
+        o.type='triangle';
+        o.frequency.setValueAtTime(240,t);
+        o.frequency.exponentialRampToValueAtTime(75,t+0.12);
+        g.gain.setValueAtTime(0.075*v,t);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
+        o.connect(g);g.connect(AC.destination);
+        o.start(t);o.stop(t+0.14);
+        break;
+      }
+      case 'mace':{
+        // Удар булавы (Mace Smash)
+        playNoise(t,0.18,'lowpass',600,1.5,0.1*v,120);
+        const o=AC.createOscillator(),g=AC.createGain();
+        o.type='sine';
+        o.frequency.setValueAtTime(165,t);
+        o.frequency.exponentialRampToValueAtTime(42,t+0.22);
+        g.gain.setValueAtTime(0.11*v,t);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.24);
+        o.connect(g);g.connect(AC.destination);
+        o.start(t);o.stop(t+0.25);
+        break;
+      }
+      case 'cart':{
+        // Вагонетка / TNT-карт (Minecart)
+        playNoise(t,0.14,'bandpass',1800,5,0.075*v,1100);
+        const o=AC.createOscillator(),g=AC.createGain();
+        o.type='triangle';
+        o.frequency.setValueAtTime(460,t);
+        o.frequency.setValueAtTime(580,t+0.045);
+        g.gain.setValueAtTime(0.035*v,t);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.11);
+        o.connect(g);g.connect(AC.destination);
+        o.start(t);o.stop(t+0.12);
+        break;
+      }
+      case 'spear':{
+        // Выпад копьём / трезубцем (Spear / Trident)
+        playNoise(t,0.15,'bandpass',2200,3.5,0.08*v,4500);
+        const o=AC.createOscillator(),g=AC.createGain();
+        o.type='sine';
+        o.frequency.setValueAtTime(880,t);
+        o.frequency.exponentialRampToValueAtTime(340,t+0.13);
+        g.gain.setValueAtTime(0.04*v,t);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.14);
+        o.connect(g);g.connect(AC.destination);
+        o.start(t);o.stop(t+0.15);
+        break;
+      }
+      case 'top':
+      case 'overall':{
+        // Сфера опыта Minecraft (XP Orb)
+        const f=kitId==='top'?1174.6:987.7;
+        const o=AC.createOscillator(),g=AC.createGain();
+        o.type='sine';
+        o.frequency.setValueAtTime(f,t);
+        o.frequency.setValueAtTime(f*1.25,t+0.045);
+        g.gain.setValueAtTime(0.045*v,t);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.14);
+        o.connect(g);g.connect(AC.destination);
+        o.start(t);o.stop(t+0.15);
+        break;
+      }
+      default:
+        playClick(isHover?1.15:0.95,isHover?0.03:0.06);
+    }
+  }catch(e){}
+}
+
+/* Аккорд получения уровня (Level Up) при входе на сайт */
+function playLevelUp(){
+  if(!SOUND_ON)return;
+  ensureAC();
+  if(!AC||AC.state!=='running')return;
+  const t=AC.currentTime;
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=>{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='triangle';
+    const st=t+i*0.065;
+    o.frequency.setValueAtTime(f,st);
+    g.gain.setValueAtTime(0.055,st);
+    g.gain.exponentialRampToValueAtTime(0.0001,st+0.25);
+    o.connect(g);g.connect(AC.destination);
+    o.start(st);o.stop(st+0.26);
+  });
+}
+
+document.addEventListener('pointerdown',()=>{ensureAC();});
 function updateSoundBtn(){const b=$('#soundBtn');b.textContent=SOUND_ON?'🔊':'🔇';b.classList.toggle('active',SOUND_ON);}
 
 /* ================= SPLASH: 3D-СКИНЫ ================= */
-/* Полный URL к локальным PNG в репозитории — никаких относительных путей и внешних доменов */
-/* render — своя картинка позы (PNG с прозрачным фоном). Если такого файла нет, рисуется 3D-поза.
-   turn — поворот тела; head/right/left/rleg/lleg — повороты [x,y,z] головы, рук и ног.
-   Порядок в списке = порядок вылета. slot: 0 слева, 1 по центру, 2 справа. */
 const SPLASH_PLAYERS=[
   {id:'p1',skin:'meshnn.png',render:'meshnn_pose.png',slot:0,turn:0.55,
     head:[0.06,-0.3,-0.08],right:[-1.2,-0.2,-0.2],left:[0.25,0,0.2],rleg:[0.15,0,-0.04],lleg:[-0.2,0,0.04]},
@@ -456,7 +663,6 @@ function loadSkinview(){
   });
   return svPromise;
 }
-/* Проверяем, реально ли PNG грузится, прежде чем создавать 3D-вьювер */
 function skinExists(url){return new Promise(res=>{const i=new Image();i.onload=()=>res(url);i.onerror=()=>res(null);i.src=url;});}
 async function pickSkinURL(p,c){
   const cand=[];
@@ -477,20 +683,19 @@ function makeViewer(cv,url,c,i){
   v.pixelRatio=Math.min(devicePixelRatio||1,2);
   v.fov=28;v.zoom=1.22;
   v.globalLight.intensity=2.7;v.cameraLight.intensity=1;
-  const rim=v.cameraLight.clone();         /* цветная подсветка сбоку-сзади */
+  const rim=v.cameraLight.clone();
   rim.color.set(S.settings.accent);rim.intensity=6;rim.position.set(c.turn>0?-30:30,12,-18);
   v.scene.add(rim);
   v.animation=new skinview3d.FunctionAnimation((player,t)=>{
-    const k=player.skin,b=Math.sin(t*1.6+i*1.3);   /* лёгкое «дыхание» */
+    const k=player.skin,b=Math.sin(t*1.6+i*1.3);
     k.head.rotation.set(c.head[0]+b*0.025,c.head[1],c.head[2]);
     k.rightArm.rotation.set(c.right[0],c.right[1],c.right[2]-b*0.04);
     k.leftArm.rotation.set(c.left[0],c.left[1],c.left[2]+b*0.04);
     k.rightLeg.rotation.set(...c.rleg);
     k.leftLeg.rotation.set(...c.lleg);
   });
-  /* только ПОСЛЕ animation: она сбрасывает поворот и позицию модели */
   v.playerObject.rotation.y=c.turn;
-  v.playerObject.position.y=-3.5;           /* кадр по колено, как на постере */
+  v.playerObject.position.y=-3.5;
   v.loadSkin(url);
   return v;
 }
@@ -546,7 +751,6 @@ function showSplash(){
     $('#spBar').style.opacity=0;
     const lg=$('#spLogo');lg.classList.remove('pulse');lg.classList.add('fly');
     buildPlayers(true);
-    /* текст и кнопка появляются ПОСЛЕ вылета игроков */
     setTimeout(()=>{$('#spText').classList.add('show');},600);
     setTimeout(()=>{$('#spEnter').classList.add('show');},1100);
     spPhase=9;
@@ -556,7 +760,6 @@ function showSplash(){
     if(spPhase<9)final();
   });
   $('#spEnter').addEventListener('click',e=>{e.stopPropagation();dismissSplash();});
-  /* пропуск по ?nointro=1; иначе анимация всегда */
   if(new URLSearchParams(location.search).has('nointro')||matchMedia('(prefers-reduced-motion: reduce)').matches){final();return;}
   requestAnimationFrame(()=>$('#spBar').classList.add('go'));
   const T=(fn,ms)=>spTimers.push(setTimeout(fn,ms));
@@ -564,14 +767,13 @@ function showSplash(){
   T(()=>{spPhase=1;$('#spBar').style.opacity=0;$('#spLogo').classList.add('pulse');},1800);
   T(()=>{spPhase=2;$('#spLogo').classList.remove('pulse');$('#spLogo').classList.add('fly');},2600);
   T(()=>{spPhase=3;buildPlayers(false);},3000);
-  /* текст: после последнего игрока (3000 + N*500 + 1000 переход) */
   T(()=>{spPhase=4;$('#spText').classList.add('show');},3000+N*500+1200);
   T(()=>{spPhase=5;$('#spEnter').classList.add('show');},3000+N*500+1700);
 }
 function dismissSplash(){
   splashDone=true;
   $('#splash').classList.add('hide');
-  tick(880,.08,.06);
+  playLevelUp();
   setTimeout(()=>{viewers.forEach(v=>{try{v.dispose();}catch(e){}});viewers=[];},700);
 }
 function startSplashFX(alive){
@@ -710,7 +912,7 @@ function mkBlock(type){const b={id:uid(),type};if(type==='h2')b.text='Загол
 function mkPage(title,icon,subtitle,blocks){return{id:uid(),title,icon,subtitle,updated:Date.now(),blocks};}
 function tplRules(){return mkPage('Правила тир-листа','📜','Как устроен рейтинг и как попасть в сетки',[{id:uid(),type:'h2',text:'🏆 Общие положения'},{id:uid(),type:'p',text:'Этот сайт — внутренний tier list нашего комьюнити. Игроки оцениваются по режимам (китам), а сумма очков определяет место в **Overall** и **звание**.'},{id:uid(),type:'list',ordered:false,items:['Оценку ставит только действующий тестер соответствующего кита.','Оценка — это текущий уровень игрока.','Рейтинг публичный: любой игрок может посмотреть свою карточку и скачать её.','Все спорные ситуации решает руководство сайта / старшие тестеры.']},{id:uid(),type:'h2',text:'⚔️ Как получить оценку'},{id:uid(),type:'list',ordered:true,items:['Договорись с тестером нужного кита.','Согласуй кит, регион и формат (обычно 1х1).','Проведи бой по регламенту.','Тестер выносит вердикт и вносит тир в таблицу.','После внесения тир появится у тебя в карточке и в Overall.']},{id:uid(),type:'note',tone:'warn',text:'Не проси завысить оценку и не дави на тестеров. Попытка повлиять на результат = отказ в оценке.'},{id:uid(),type:'h2',text:'🧮 Шкала очков'},{id:uid(),type:'tiers'},{id:uid(),type:'h2',text:'👑 Звания'},{id:uid(),type:'titles'}]);}
 function tplCalib(){return mkPage('Регламент калибровок и 1х1','🎯','Процедура оценки при вызове / выходе на тестера',[{id:uid(),type:'h2',text:'📌 Что такое калибровка'},{id:uid(),type:'p',text:'Калибровка — первичная оценка нового игрока в ките. Проводится в формате **1х1** с тестером этого кита до вынесения вердикта.'},{id:uid(),type:'h2',text:'🗡️ Формат боя'},{id:uid(),type:'list',ordered:false,items:['Кит выбирается из списка режимов сайта.','Арена — стандартная для кита.','Длительность: до явного преимущества или по решению тестера (обычно 1–4 раунда).','Запись боя (clip) желательна — она решает апелляции.']},{id:uid(),type:'h2',text:'👤 Кто вызывает'},{id:uid(),type:'list',ordered:true,items:['Игрок сам инициирует калибровку: пишет тестеру кита и договаривается о времени.','Тестер вправе отказать без объяснения причин.','Если тестер долго недоступен — калибровку проводит старший тестер кита.']},{id:uid(),type:'note',tone:'info',text:'Игрок без оценки в ките отображается как **Unranked** и не учитывается в Overall по этому режиму.'},{id:uid(),type:'h2',text:'📊 Как тестер ставит тир'},{id:uid(),type:'p',text:'Тестер оценивает: контроль дистанции, тайминги, урон, принятие решений, стабильность. Итог — один тир из шкалы HT1–LT5.'},{id:uid(),type:'tiers'}]);}
-function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['28.11 — заставка: локальные 3D-скины (skinview3d), текст появляется после вылета игроков.','27.11 — официальные иконки китов с mctiers, сайт на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
+function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['Добавлены уникальные звуки Minecraft для каждого кита и мягкий клик интерфейса.','Заставка: локальные 3D-скины (skinview3d), текст появляется после вылета игроков.','Официальные иконки китов с mctiers, сайт на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
 function seedPages(){if(S._seeded)return;S._seeded=true;if(!S.pages.length){[tplRules(),tplCalib(),tplChangelog()].forEach(p=>{S.pages.push(p);S.nav.push({kind:'page',ref:p.id});});}save();}
 
 /* ================= ТЕМА ================= */
@@ -729,10 +931,10 @@ function setTierVar(){document.documentElement.style.setProperty('--tw',tierWidt
 
 /* ================= ВКЛАДКИ + ИНДИКАТОР ================= */
 function navMeta(n){
-  if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top'};
-  if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall'};
-  if(n.kind==='mode'){const m=mode(n.ref);return m?{icon:m.icon,label:m.name,page:m.id}:null;}
-  if(n.kind==='page'){const p=page(n.ref);return p?{icon:p.icon,label:p.title,page:p.id}:null;}
+  if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top',fb:'overall'};
+  if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall',fb:'overall'};
+  if(n.kind==='mode'){const m=mode(n.ref);return m?{icon:m.icon,label:m.name,page:m.id,fb:m.id}:null;}
+  if(n.kind==='page'){const p=page(n.ref);return p?{icon:p.icon,label:p.title,page:p.id,fb:''}:null;}
   return null;
 }
 function updateScrollFade(){
@@ -757,15 +959,15 @@ function renderTabs(){
   let html=S.nav.map(n=>{
     if(n.kind==='page'&&pnav!=='tabs')return '';
     const m=navMeta(n);if(!m||n.hidden)return '';
-    return `<button class="tab ${UI.page===m.page?'active':''}" data-act="goto" data-id="${m.page}">${iconHTML(m.icon)}<span>${esc(m.label)}</span></button>`;}).join('');
+    return `<button class="tab ${UI.page===m.page?'active':''}" data-act="goto" data-id="${m.page}" data-kind="${n.kind}">${iconHTML(m.icon,m.fb)}<span>${esc(m.label)}</span></button>`;}).join('');
   const pages=S.nav.filter(n=>n.kind==='page'&&!n.hidden).map(n=>page(n.ref)).filter(Boolean);
   if(pnav==='tabs'&&pages.length){
-    html+=`<span class="tab-sep"></span>`+pages.map(p=>`<button class="tab ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
+    html+=`<span class="tab-sep"></span>`+pages.map(p=>`<button class="tab ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}" data-kind="page">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
   }
   $('#tabbar').innerHTML=html+'<span class="tab-ind" id="tabInd"></span>';
   const showDD=pnav==='dropdown'&&pages.length>0;
   $('#pagesDD').style.display=showDD?'':'none';
-  $('#ddMenu').innerHTML=pages.map(p=>`<button class="dd-item ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
+  $('#ddMenu').innerHTML=pages.map(p=>`<button class="dd-item ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}" data-kind="page">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
   $('#ddBtn').classList.toggle('active',showDD&&pages.some(p=>p.id===UI.page));
   $('#editorBtn').classList.toggle('active',UI.page==='editor');
   requestAnimationFrame(()=>{updateScrollFade();updateIndicator(false);});
@@ -780,7 +982,14 @@ $('#tabbar').addEventListener('wheel',e=>{
   const t=$('#tabbar');
   if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&t.scrollWidth>t.clientWidth){e.preventDefault();t.scrollLeft+=e.deltaY;}
 },{passive:false});
-$('#tabbar').addEventListener('mouseover',e=>{const t=e.target.closest('.tab');if(t&&t!==$('#tabbar')._lh){$('#tabbar')._lh=t;tick(720,.04,.04);}});
+$('#tabbar').addEventListener('mouseover',e=>{
+  const t=e.target.closest('.tab');
+  if(t&&t!==$('#tabbar')._lh){
+    $('#tabbar')._lh=t;
+    if(t.dataset.kind==='mode')playKitSound(t.dataset.id,true);
+    else playClick(1.2,0.03);
+  }
+});
 $('#tabbar').addEventListener('mouseleave',()=>{$('#tabbar')._lh=null;});
 window.addEventListener('resize',()=>{updateScrollFade();updateIndicator(false);});
 
@@ -808,8 +1017,7 @@ function animatePoints(){
 /* ================= БЕЙДЖИ / СТРОКИ ================= */
 function tb(modeId,tier,big){
   const m=mode(modeId);
-  let ic=iconHTML(m?m.icon:'🎮');
-  ic=ic.replace('class="m-ico"','class="m-ico" data-fb="'+(m?m.id:'')+'"').replace('<img ','<img data-fb="'+(m?m.id:'')+'" ');
+  const ic=iconHTML(m?m.icon:'🎮',m?m.id:'');
   if(!tier)return `<span class="tb empty${big?' big':''}">${ic}<span class="tb-lbl" style="color:var(--muted)">–</span></span>`;
   const c=S.settings.tierColors[tier]||'#8f97ab';
   return `<span class="tb${big?' big':''}" style="--c:${c}">${ic}<span class="tb-lbl">${tier}</span></span>`;
@@ -1131,17 +1339,21 @@ document.addEventListener('change',e=>{
 function act(a,el){
   const id=el.dataset.id,dir=+el.dataset.dir||0,idx=+el.dataset.idx,g=el.dataset.grid;
   switch(a){
-    case 'goto':UI.page=id;UI.search='';UI.animatePts=true;$('#pagesDD').classList.remove('open');renderTabs();renderPage();setHash('#/'+id);requestAnimationFrame(()=>updateIndicator(true));window.scrollTo({top:0});break;
-    case 'toggleDD':$('#pagesDD').classList.toggle('open');tick(640,.04,.04);break;
-    case 'edTab':UI.edTab=id;renderPage();break;
-    case 'gridsOpen':UI.page='editor';UI.edTab='grids';renderTabs();renderPage();setHash('#/editor');break;
-    case 'closeModal':closeModal(id);break;
-    case 'confirmYes':closeModal('confirmModal');if(_cf){const f=_cf;_cf=null;f();}break;
-    case 'addPlayer':if(!EDIT_MODE)break;openForm(null);break;
-    case 'editPlayer':if(!EDIT_MODE)break;closeModal('playerModal');openForm(id);break;
+    case 'goto':
+      if(el.dataset.kind==='mode'||mode(id)||id==='top'||id==='overall')playKitSound(id,false);
+      else playClick(1.05,0.06);
+      UI.page=id;UI.search='';UI.animatePts=true;$('#pagesDD').classList.remove('open');renderTabs();renderPage();setHash('#/'+id);requestAnimationFrame(()=>updateIndicator(true));window.scrollTo({top:0});
+      break;
+    case 'toggleDD':$('#pagesDD').classList.toggle('open');playClick(1.1,0.05);break;
+    case 'edTab':UI.edTab=id;playClick(1.15,0.05);renderPage();break;
+    case 'gridsOpen':UI.page='editor';UI.edTab='grids';playClick(1.05,0.05);renderTabs();renderPage();setHash('#/editor');break;
+    case 'closeModal':closeModal(id);playClick(0.85,0.04);break;
+    case 'confirmYes':closeModal('confirmModal');playClick(1.1,0.05);if(_cf){const f=_cf;_cf=null;f();}break;
+    case 'addPlayer':if(!EDIT_MODE)break;playClick(1.2,0.05);openForm(null);break;
+    case 'editPlayer':if(!EDIT_MODE)break;playClick(1.1,0.05);closeModal('playerModal');openForm(id);break;
     case 'delPlayer':{if(!EDIT_MODE)break;const p=byId(id);if(!p)break;showConfirm(`Удалить игрока ${p.nick}?`,()=>{S.players=S.players.filter(x=>x.id!==id);S.grids.forEach(gr=>gr.players=gr.players.filter(x=>x!==id));save();closeModal('playerModal');renderAll();toast('🗑 Игрок удалён');});break;}
-    case 'downloadCard':downloadCard(id);break;
-    case 'copyLink':setHash('#/player/'+id);if(navigator.clipboard)navigator.clipboard.writeText(location.href).then(()=>toast('🔗 Ссылка скопирована')).catch(()=>toast('⚠️ Не удалось скопировать ссылку',true));else toast('⚠️ Буфер обмена недоступен',true);break;
+    case 'downloadCard':playClick(1.2,0.05);downloadCard(id);break;
+    case 'copyLink':playClick(1.25,0.05);setHash('#/player/'+id);if(navigator.clipboard)navigator.clipboard.writeText(location.href).then(()=>toast('🔗 Ссылка скопирована')).catch(()=>toast('⚠️ Не удалось скопировать ссылку',true));else toast('⚠️ Буфер обмена недоступен',true);break;
     case 'addMode':{const m={id:uid(),name:'Новый режим',icon:'🎮'};S.modes.push(m);S.nav.push({kind:'mode',ref:m.id});save();setTierVar();renderTabs();renderPage();toast('⚔️ Режим добавлен');break;}
     case 'delMode':{const m=mode(id);showConfirm(`Удалить режим «${m.name}»? Оценки игроков в нём тоже удалятся.`,()=>{S.modes=S.modes.filter(x=>x.id!==id);S.nav=S.nav.filter(n=>!(n.kind==='mode'&&n.ref===id));S.players.forEach(p=>delete p.tiers[id]);if(UI.page===id)UI.page='overall';save();setTierVar();renderAll();toast('🗑 Режим удалён');});break;}
     case 'moveMode':{const i=S.modes.findIndex(m=>m.id===id),j=i+dir;if(j<0||j>=S.modes.length)break;[S.modes[i],S.modes[j]]=[S.modes[j],S.modes[i]];save();renderPage();break;}
@@ -1165,7 +1377,7 @@ function act(a,el){
     case 'delGrid':{const gr=grid(id);showConfirm(`Удалить сетку «${gr.name}»? Игроки останутся в базе.`,()=>{S.grids=S.grids.filter(x=>x.id!==id);save();renderPage();toast('🗑 Сетка удалена');});break;}
     case 'dupGrid':{const i=S.grids.findIndex(x=>x.id===id);const c=clone(S.grids[i]);c.id=uid();c.name=c.name+' (копия)';S.grids.splice(i+1,0,c);save();renderPage();toast('⧉ Сетка продублирована');break;}
     case 'moveGrid':{const i=S.grids.findIndex(x=>x.id===id),j=i+dir;if(j<0||j>=S.grids.length)break;[S.grids[i],S.grids[j]]=[S.grids[j],S.grids[i]];save();renderPage();break;}
-    case 'gridCollapse':UI.collapsed.has(id)?UI.collapsed.delete(id):UI.collapsed.add(id);renderPage();break;
+    case 'gridCollapse':playClick(0.95,0.04);UI.collapsed.has(id)?UI.collapsed.delete(id):UI.collapsed.add(id);renderPage();break;
     case 'gridAdd':{const v=$('#gs-'+g).value;const gr=grid(g);if(v&&!gr.players.includes(v)){gr.players.push(v);save();renderPage();}break;}
     case 'gridDel':grid(g).players.splice(idx,1);save();renderPage();break;
     case 'gridMove':{const gr=grid(g),j=idx+dir;if(j<0||j>=gr.players.length)break;[gr.players[idx],gr.players[j]]=[gr.players[j],gr.players[idx]];save();renderPage();break;}
@@ -1188,14 +1400,14 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('[data-act]');
   if(a){e.preventDefault();act(a.dataset.act,a);return;}
   const r=e.target.closest('[data-player]');
-  if(r){openPlayer(r.dataset.player);return;}
+  if(r){playClick(1.15,0.06);openPlayer(r.dataset.player);return;}
   if(e.target.classList&&e.target.classList.contains('modal'))closeModal(e.target.id);
 });
 $('#soundBtn').addEventListener('click',()=>{
   SOUND_ON=!SOUND_ON;
   localStorage.setItem(SOUND_KEY,SOUND_ON?'1':'0');
   ensureAC();updateSoundBtn();
-  if(SOUND_ON)tick(900,.06,.06);
+  if(SOUND_ON)playClick(1.3,0.07);
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){document.querySelectorAll('.modal.open').forEach(m=>closeModal(m.id));$('#pagesDD').classList.remove('open');}
@@ -1234,7 +1446,7 @@ function openPlayer(id){
     </div>
   </div></div>
   ${p.bio?`<div class="pc-bio">${esc(p.bio)}</div>`:''}
-  <div class="tiers-grid">${S.modes.map(m=>`<div class="tg-cell"><span>${iconHTML(m.icon)}</span>${esc(m.name)}${tb(m.id,p.tiers[m.id])}</div>`).join('')}</div>
+  <div class="tiers-grid">${S.modes.map(m=>`<div class="tg-cell"><span>${iconHTML(m.icon,m.id)}</span>${esc(m.name)}${tb(m.id,p.tiers[m.id])}</div>`).join('')}</div>
   <div class="modal-actions">
     <button class="btn" data-act="downloadCard" data-id="${p.id}">📸 Скачать карточку</button>
     <button class="btn" data-act="copyLink" data-id="${p.id}">🔗 Ссылка</button>
@@ -1251,7 +1463,7 @@ function openForm(id){
   $('#pfCountry').innerHTML=Object.entries(COUNTRIES).map(([c,n])=>`<option value="${c}"${PF.country===c?' selected':''}>${flag(c)} ${c} — ${n}</option>`).join('');
   $('#pfRegion').innerHTML=REGIONS.map(r=>`<option${PF.region===r?' selected':''}>${r}</option>`).join('');
   $('#pfTagInput').value='';pfTags();pfPrev();
-  $('#pfTiers').innerHTML=S.modes.map(m=>field(`${iconHTML(m.icon)} ${esc(m.name)}`,`<select class="inp" data-mode="${m.id}"><option value="">— Unranked</option>${TIERS.map(t=>`<option${PF.tiers[m.id]===t?' selected':''}>${t}</option>`).join('')}</select>`)).join('');
+  $('#pfTiers').innerHTML=S.modes.map(m=>field(`${iconHTML(m.icon,m.id)} ${esc(m.name)}`,`<select class="inp" data-mode="${m.id}"><option value="">— Unranked</option>${TIERS.map(t=>`<option${PF.tiers[m.id]===t?' selected':''}>${t}</option>`).join('')}</select>`)).join('');
   openModal('playerForm');setTimeout(()=>$('#pfNick').focus(),60);
 }
 function pfTags(){$('#pfTags').innerHTML=PF.tags.map((t,i)=>`<span class="chip" style="--c:${tagColor(t)}">${esc(t)}<button data-act="pfDelTag" data-idx="${i}">✕</button></span>`).join('')||'<span class="muted" style="font-size:12px">Тегов пока нет</span>';}
