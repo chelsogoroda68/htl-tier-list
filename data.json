@@ -655,6 +655,21 @@
         "uhc": "LT5",
         "axe": "HT4"
       }
+    },
+    {
+      "id": "caj56i6r",
+      "nick": "Lydellan",
+      "country": "RU",
+      "city": "",
+      "region": "EU",
+      "tags": [],
+      "bio": "",
+      "skin": "",
+      "bg": "",
+      "tiers": {
+        "sword": "LT5",
+        "axe": "LT5"
+      }
     }
   ],
   "grids": [
@@ -692,6 +707,7 @@
         "p6",
         "x9p44kld",
         "p7",
+        "caj56i6r",
         "p8"
       ]
     }
