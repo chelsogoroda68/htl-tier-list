@@ -44,17 +44,20 @@ body[data-mode="edit"] #editBanner{display:block}
 /* ---------- TOPBAR + TABS ---------- */
 #topbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 .tb-in{width:min(1240px,100%);margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:10px}
-.logo{font-family:var(--font-head);font-weight:800;font-size:18px;color:var(--accent);display:flex;gap:9px;align-items:center;cursor:pointer;white-space:nowrap;padding:16px 10px 16px 0}
+.logo{font-family:var(--font-head);font-weight:800;font-size:18px;color:var(--accent);display:flex;gap:9px;align-items:center;cursor:pointer;white-space:nowrap;padding:16px 8px 16px 0;flex:0 0 auto}
 .logo-ico{font-size:19px;transition:.2s}
 .logo:hover .logo-ico{transform:rotate(-12deg) scale(1.15)}
-#tabbar{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
+.tabwrap{position:relative;display:flex;flex:1;min-width:0}
+#tabbar{display:flex;gap:1px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
 #tabbar::-webkit-scrollbar{display:none}
-.tab{display:flex;align-items:center;gap:8px;padding:17px 15px;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:color .18s,border-color .18s}
+.tabwrap.can-scroll::after{content:'';position:absolute;right:0;top:4px;bottom:4px;width:44px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--bg));border-radius:10px}
+.tab{display:flex;align-items:center;gap:7px;padding:17px 10px;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap;transition:color .18s,border-color .18s;flex:0 0 auto}
 .tab .m-ico{opacity:.65;transition:.18s}
 .tab:hover{color:var(--text)}
 .tab:hover .m-ico{opacity:1;transform:translateY(-1px)}
 .tab.active{color:var(--text);border-bottom-color:var(--accent)}
 .tab.active .m-ico{opacity:1}
+.tab-sep{width:1px;height:22px;background:var(--border);margin:0 7px;flex:0 0 auto;align-self:center}
 .m-ico{display:inline-flex;flex:0 0 auto}
 .m-ico svg,.m-ico img{width:18px;height:18px;display:block}
 .m-ico.txt{font-size:16px;line-height:1}
@@ -256,7 +259,7 @@ input[type="range"]{accent-color:var(--accent);width:100%}
 <div id="editBanner">✏️ Режим редактирования — изменения видны только тебе. Готово? Нажми «📥 Скачать data.json» в редакторе и замени файл в репозитории GitHub.</div>
 <header id="topbar"><div class="tb-in">
   <div class="logo" data-act="goto" data-id="top"><span class="logo-ico" id="logoIco">🧡</span><span id="logoText">HTL</span></div>
-  <div id="tabbar"></div>
+  <div class="tabwrap" id="tabwrap"><div id="tabbar"></div></div>
   <div class="tb-right">
     <div class="dd" id="pagesDD">
       <button class="dd-btn" id="ddBtn" data-act="toggleDD">📄<span>Страницы</span><span class="dd-caret">▾</span></button>
@@ -357,7 +360,7 @@ function iconHTML(icon){
   const ic=String(icon||'').trim();
   if(!ic)return `<span class="m-ico txt">🎮</span>`;
   if(ic.startsWith('<'))return `<span class="m-ico">${ic}</span>`;
-  if(ic.startsWith('http'))return `<span class="m-ico"><img src="${esc(ic)}" alt="" onerror="iconFail(this)"> </span>`;
+  if(ic.startsWith('http'))return `<span class="m-ico"><img src="${esc(ic)}" alt="" onerror="iconFail(this)"></span>`;
   return `<span class="m-ico txt">${ic}</span>`;
 }
 window.iconFail=function(img){
@@ -368,7 +371,7 @@ window.iconFail=function(img){
 
 /* ================= ДАННЫЕ ================= */
 const DEFAULTS={
-  settings:{siteName:'HTL',logoEmoji:'🧡',subtitle:'HTL-рейтинг «наших» игроков',footer:'Официальный tier list сайт наших игроков.',overallNote:'ℹ️ Overall — суммарный рейтинг по очкам за тиры во всех режимах. Режимы без оценки (Unranked) не учитываются.',accent:'#f59e0b',bg:'#0a0c11',panel:'#12151d',font:'Inter',headFont:'Unbounded',radius:14,compact:true,showPoints:true,showTags:true,showRegions:true,showTitles:true,customCSS:'',tierColors:{HT1:'#ff4655',LT1:'#ff8a5c',HT2:'#ffb020',LT2:'#ffd166',HT3:'#3ddc84',LT3:'#7ce7a2',HT4:'#4aa3ff',LT4:'#7cc0ff',HT5:'#b07cff',LT5:'#c9a9ff'}},
+  settings:{siteName:'HTL',logoEmoji:'🧡',subtitle:'HTL-рейтинг «наших» игроков',footer:'Официальный tier list сайт наших игроков.',overallNote:'ℹ️ Overall — суммарный рейтинг по очкам за тиры во всех режимах. Режимы без оценки (Unranked) не учитываются.',accent:'#f59e0b',bg:'#0a0c11',panel:'#12151d',font:'Inter',headFont:'Unbounded',radius:14,compact:true,showPoints:true,showTags:true,showRegions:true,showTitles:true,pagesInNav:'dropdown',customCSS:'',tierColors:{HT1:'#ff4655',LT1:'#ff8a5c',HT2:'#ffb020',LT2:'#ffd166',HT3:'#3ddc84',LT3:'#7ce7a2',HT4:'#4aa3ff',LT4:'#7cc0ff',HT5:'#b07cff',LT5:'#c9a9ff'}},
   points:{HT1:100,LT1:80,HT2:60,LT2:45,HT3:35,LT3:25,HT4:18,LT4:12,HT5:8,LT5:4},
   titles:[{id:'t1',name:'Combat Grandmaster',emoji:'👑',color:'#ffd700',min:400},{id:'t2',name:'Combat Master',emoji:'👑',color:'#ff9f43',min:250},{id:'t3',name:'Combat Ace',emoji:'👑',color:'#ff6b6b',min:150},{id:'t4',name:'Combat Specialist',emoji:'👑',color:'#b07cff',min:80},{id:'t5',name:'Combat Cadet',emoji:'👑',color:'#4aa3ff',min:30},{id:'t6',name:'Combat Novice',emoji:'👑',color:'#3ddc84',min:15},{id:'t7',name:'Rookie',emoji:'👑',color:'#8f97ab',min:0}],
   modes:[{id:'vanilla',name:'Vanilla',icon:OFFICIAL.vanilla},{id:'sword',name:'Sword',icon:OFFICIAL.sword},{id:'uhc',name:'UHC',icon:OFFICIAL.uhc},{id:'pot',name:'Pot',icon:OFFICIAL.pot},{id:'smp',name:'SMP',icon:OFFICIAL.smp},{id:'axe',name:'Axe',icon:OFFICIAL.axe},{id:'mace',name:'Mace',icon:OFFICIAL.mace},{id:'cart',name:'Cart',icon:ICON_FB.cart},{id:'spear',name:'Spear Mace',icon:OFFICIAL.spear}],
@@ -491,7 +494,7 @@ function mkBlock(type){const b={id:uid(),type};if(type==='h2')b.text='Загол
 function mkPage(title,icon,subtitle,blocks){return{id:uid(),title,icon,subtitle,updated:Date.now(),blocks};}
 function tplRules(){return mkPage('Правила тир-листа','📜','Как устроен рейтинг и как попасть в сетки',[{id:uid(),type:'h2',text:'🏆 Общие положения'},{id:uid(),type:'p',text:'Этот сайт — внутренний tier list нашего комьюнити. Игроки оцениваются по режимам (китам), а сумма очков определяет место в **Overall** и **звание**.'},{id:uid(),type:'list',ordered:false,items:['Оценку ставит только действующий тестер соответствующего кита.','Оценка — это текущий уровень игрока.','Рейтинг публичный: любой игрок может посмотреть свою карточку и скачать её.','Все спорные ситуации решает руководство сайта / старшие тестеры.']},{id:uid(),type:'h2',text:'⚔️ Как получить оценку'},{id:uid(),type:'list',ordered:true,items:['Договорись с тестером нужного кита.','Согласуй кит, регион и формат (обычно 1х1).','Проведи бой по регламенту.','Тестер выносит вердикт и вносит тир в таблицу.','После внесения тир появится у тебя в карточке и в Overall.']},{id:uid(),type:'note',tone:'warn',text:'Не проси завысить оценку и не дави на тестеров. Попытка повлиять на результат = отказ в оценке.'},{id:uid(),type:'h2',text:'🧮 Шкала очков'},{id:uid(),type:'tiers'},{id:uid(),type:'h2',text:'👑 Звания'},{id:uid(),type:'titles'}]);}
 function tplCalib(){return mkPage('Регламент калибровок и 1х1','🎯','Процедура оценки при вызове / выходе на тестера',[{id:uid(),type:'h2',text:'📌 Что такое калибровка'},{id:uid(),type:'p',text:'Калибровка — первичная оценка нового игрока в ките. Проводится в формате **1х1** с тестером этого кита до вынесения вердикта.'},{id:uid(),type:'h2',text:'🗡️ Формат боя'},{id:uid(),type:'list',ordered:false,items:['Кит выбирается из списка режимов сайта.','Арена — стандартная для кита.','Длительность: до явного преимущества или по решению тестера (обычно 1–4 раунда).','Запись боя (clip) желательна — она решает апелляции.']},{id:uid(),type:'h2',text:'👤 Кто вызывает'},{id:uid(),type:'list',ordered:true,items:['Игрок сам инициирует калибровку: пишет тестеру кита и договаривается о времени.','Тестер вправе отказать без объяснения причин.','Если тестер долго недоступен — калибровку проводит старший тестер кита.']},{id:uid(),type:'note',tone:'info',text:'Игрок без оценки в ките отображается как **Unranked** и не учитывается в Overall по этому режиму.'},{id:uid(),type:'h2',text:'📊 Как тестер ставит тир'},{id:uid(),type:'p',text:'Тестер оценивает: контроль дистанции, тайминги, урон, принятие решений, стабильность. Итог — один тир из шкалы HT1–LT5.'},{id:uid(),type:'tiers'}]);}
-function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['28.11 — splash-анимация при входе, каскадное появление игроков, выровнены шапки таблиц.','27.11 — официальные иконки китов с mctiers, страницы вынесены в отдельное меню.','27.11 — сайт опубликован на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
+function tplChangelog(){return mkPage('Журнал обновлений','📰','Что меняется в тир-листе и на сайте',[{id:uid(),type:'h2',text:'🗓 2026'},{id:uid(),type:'list',ordered:false,items:['28.11 — все вкладки китов теперь влезают в верхний ряд; страницы можно переключать: dropdown / вкладки / скрыть.','28.11 — splash-анимация при входе, каскадное появление игроков.','27.11 — официальные иконки китов с mctiers, сайт на GitHub Pages.']},{id:uid(),type:'note',tone:'ok',text:'Следи за обновлениями — эта страница редактируется так же, как остальные.'}]);}
 function seedPages(){if(S._seeded)return;S._seeded=true;if(!S.pages.length){[tplRules(),tplCalib(),tplChangelog()].forEach(p=>{S.pages.push(p);S.nav.push({kind:'page',ref:p.id});});}save();}
 
 /* ================= ТЕМА ================= */
@@ -508,7 +511,7 @@ function applyTheme(){
 function tierWidth(){const n=S.modes.length;return Math.min(n*50+6*(n-1),520)+'px';}
 function setTierVar(){document.documentElement.style.setProperty('--tw',tierWidth());}
 
-/* ================= ВКЛАДКИ + ДРОПДАУН ================= */
+/* ================= ВКЛАДКИ + СТРАНИЦЫ В МЕНЮ ================= */
 function navMeta(n){
   if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top'};
   if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall'};
@@ -516,16 +519,28 @@ function navMeta(n){
   if(n.kind==='page'){const p=page(n.ref);return p?{icon:p.icon,label:p.title,page:p.id}:null;}
   return null;
 }
+function updateScrollFade(){
+  const w=$('#tabwrap'),t=$('#tabbar');
+  if(!t||!w)return;
+  w.classList.toggle('can-scroll',t.scrollWidth>t.clientWidth+4);
+}
 function renderTabs(){
-  $('#tabbar').innerHTML=S.nav.map(n=>{
-    if(n.kind==='page')return '';
+  const pnav=S.settings.pagesInNav||'dropdown';
+  let html=S.nav.map(n=>{
+    if(n.kind==='page'&&pnav!=='tabs')return '';
     const m=navMeta(n);if(!m||n.hidden)return '';
     return `<button class="tab ${UI.page===m.page?'active':''}" data-act="goto" data-id="${m.page}">${iconHTML(m.icon)}<span>${esc(m.label)}</span></button>`;}).join('');
   const pages=S.nav.filter(n=>n.kind==='page'&&!n.hidden).map(n=>page(n.ref)).filter(Boolean);
-  $('#pagesDD').style.display=pages.length?'':'none';
+  if(pnav==='tabs'&&pages.length){
+    html+=`<span class="tab-sep"></span>`+pages.map(p=>`<button class="tab ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
+  }
+  $('#tabbar').innerHTML=html;
+  const showDD=pnav==='dropdown'&&pages.length>0;
+  $('#pagesDD').style.display=showDD?'':'none';
   $('#ddMenu').innerHTML=pages.map(p=>`<button class="dd-item ${UI.page===p.id?'active':''}" data-act="goto" data-id="${p.id}">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
-  $('#ddBtn').classList.toggle('active',pages.some(p=>p.id===UI.page));
+  $('#ddBtn').classList.toggle('active',showDD&&pages.some(p=>p.id===UI.page));
   $('#editorBtn').classList.toggle('active',UI.page==='editor');
+  requestAnimationFrame(updateScrollFade);
 }
 function updateChrome(){
   const st=S.settings;
@@ -533,6 +548,11 @@ function updateChrome(){
   $('#footer').innerHTML=esc(st.footer)+(EDIT_MODE?'':' <a href="?edit=1" title="Только для админа">✏️</a>');
   document.title=st.siteName+' | Tier List';
 }
+$('#tabbar').addEventListener('wheel',e=>{
+  const t=$('#tabbar');
+  if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&t.scrollWidth>t.clientWidth){e.preventDefault();t.scrollLeft+=e.deltaY;}
+},{passive:false});
+window.addEventListener('resize',updateScrollFade);
 
 /* ================= БЕЙДЖИ / СТРОКИ ================= */
 function tb(modeId,tier,big){
@@ -689,7 +709,8 @@ function edNav(){
       ${n.kind==='page'?`<button class="icon-btn" data-act="editPage" data-id="${n.ref}" title="К редактору блоков">✏️</button><button class="icon-btn danger" data-act="delPage" data-id="${n.ref}">🗑</button>`:''}
     </div>`;}).join('');
   return `<div class="ed-card"><h3>🧭 Меню сайта</h3>
-  <div class="ed-hint">⚔️ Режимы и Overall — вкладки сверху. 📄 Страницы — в выпадающем меню «Страницы» справа. В поле иконки можно вставить эмодзи, ссылку на картинку (<code>https://...svg</code>) или SVG-код. Переключатель скрывает пункт.</div>
+  <div class="ed-hint">Порядок пунктов — перетаскиванием за ⠿ или стрелками. Если вкладок много и не все влезают — их можно скроллить колёсиком мыши (у края появится подсказка-затемнение). Страницы можно вынести в отдельные вкладки или спрятать.</div>
+  <div class="f-grid" style="margin-bottom:14px">${field('Страницы в меню',sel('set:pagesInNav',S.settings.pagesInNav||'dropdown',[['dropdown','📄 Выпадающее меню справа'],['tabs','🔗 Вкладки в общем ряду'],['hidden','🙈 Скрыть (только по ссылке)']]))}</div>
   ${rows}<div class="modal-actions"><button class="btn btn-accent" data-act="addPage">➕ Добавить свою страницу</button></div></div>`;
 }
 function edModes(){
@@ -699,7 +720,7 @@ function edModes(){
     <button class="icon-btn" data-act="moveMode" data-id="${m.id}" data-dir="1">↓</button>
     <button class="icon-btn danger" data-act="delMode" data-id="${m.id}">🗑</button></div>`).join('');
   return `<div class="ed-card"><h3>⚔️ Режимы (киты)</h3>
-  <div class="ed-hint">Иконки уже официальные с mctiers. Если захочешь свои — вставь URL картинки или SVG. Порядок задаёт порядок бейджей в строках и в форме игрока.</div>
+  <div class="ed-hint">Иконки уже официальные с mctiers. Если захочешь свои — вставь URL картинки или SVG. Порядок задаёт порядок бейджей в строках и вкладок сверху.</div>
   ${rows}<div class="modal-actions"><button class="btn btn-accent" data-act="addMode">➕ Добавить режим</button></div></div>`;
 }
 function edTitles(){
@@ -789,7 +810,7 @@ function edPages(){
       <div class="muted" style="font-size:11px;margin-bottom:6px">Блоков: ${p.blocks.length} • обновлено ${fmtDate(p.updated)}</div>
       <button class="btn btn-sm${open?' btn-accent':''}" data-act="toggleBlocks" data-id="${p.id}">${open?'▲ Свернуть редактор':'✏️ Редактировать блоки'}</button>
       ${inner}</div>`;}).join('');
-  return `<div class="ed-hint">Страницы — отдельные вкладки сайта (правила, регламенты, FAQ...), независимые от тир-листа. Они собраны в меню «📄 Страницы» в правом верхнем углу сайта.</div>
+  return `<div class="ed-hint">Страницы — отдельные вкладки сайта (правила, регламенты, FAQ...). Где они отображаются — выбирается в 🧭 Меню → «Страницы в меню».</div>
   ${tplbar}${cards||'<div class="empty">Страниц пока нет — создай первую или возьми шаблон 📄</div>'}`;
 }
 function edData(){
