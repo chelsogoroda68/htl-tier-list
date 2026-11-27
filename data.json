@@ -11,8 +11,6 @@
     "font": "Inter",
     "headFont": "Unbounded",
     "radius": 14,
-    "side": "left",
-    "navStyle": "full",
     "compact": true,
     "showPoints": true,
     "showTags": true,
@@ -30,7 +28,9 @@
       "LT4": "#7cc0ff",
       "HT5": "#b07cff",
       "LT5": "#c9a9ff"
-    }
+    },
+    "side": "left",
+    "navStyle": "full"
   },
   "points": {
     "HT1": 100,
@@ -99,47 +99,47 @@
     {
       "id": "vanilla",
       "name": "Vanilla",
-      "icon": "🌿"
+      "icon": "https://mctiers.net/tier_icons/vanilla.svg"
     },
     {
       "id": "sword",
       "name": "Sword",
-      "icon": "⚔️"
+      "icon": "https://mctiers.net/tier_icons/sword.svg"
     },
     {
       "id": "uhc",
       "name": "UHC",
-      "icon": "🍎"
+      "icon": "https://mctiers.net/tier_icons/uhc.svg"
     },
     {
       "id": "pot",
       "name": "Pot",
-      "icon": "🧪"
+      "icon": "https://mctiers.net/tier_icons/pot.svg"
     },
     {
       "id": "smp",
       "name": "SMP",
-      "icon": "🛡️"
+      "icon": "https://mctiers.net/tier_icons/smp.svg"
     },
     {
       "id": "axe",
       "name": "Axe",
-      "icon": "🪓"
+      "icon": "https://mctiers.net/tier_icons/axe.svg"
     },
     {
       "id": "mace",
       "name": "Mace",
-      "icon": "🔨"
+      "icon": "https://mctiers.net/tier_icons/mace.svg"
     },
     {
       "id": "cart",
       "name": "Cart",
-      "icon": "🛒"
+      "icon": "<svg viewBox=\"0 0 24 24\"><path d=\"M4 8h16l-2 8H6z\" fill=\"#7a5a3a\"/><path d=\"M4 8h16l-1 3H5z\" fill=\"#8b5a3c\"/><rect x=\"8\" y=\"4\" width=\"8\" height=\"4\" fill=\"#4aa3ff\"/><circle cx=\"8\" cy=\"18\" r=\"2\" fill=\"#333\"/><circle cx=\"16\" cy=\"18\" r=\"2\" fill=\"#333\"/></svg>"
     },
     {
       "id": "spear",
       "name": "Spear Mace",
-      "icon": "🔱"
+      "icon": "https://mctiers.net/tier_icons/spear.png"
     }
   ],
   "nav": [
@@ -188,7 +188,8 @@
     },
     {
       "kind": "page",
-      "ref": "l6ikwuqb"
+      "ref": "l6ikwuqb",
+      "hidden": false
     },
     {
       "kind": "page",
@@ -460,7 +461,7 @@
         "Тестер: Mace",
         "Тестер: Spear Mace"
       ],
-      "skin": "",
+      "skin": "data:image/png;base64,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",
       "bg": "",
       "tiers": {
         "vanilla": "HT4",
@@ -616,7 +617,7 @@
     {
       "id": "vyc0bv86",
       "name": "Верхняя сетка",
-      "icon": "",
+      "icon": "🏆",
       "auto": false,
       "autoCount": 3,
       "players": [
@@ -628,7 +629,7 @@
     {
       "id": "0q807yo1",
       "name": "Продвиженцы",
-      "icon": "",
+      "icon": "🏆",
       "auto": false,
       "autoCount": 3,
       "players": [
@@ -638,7 +639,7 @@
     {
       "id": "1uu3cuj8",
       "name": "Нижняя сетка",
-      "icon": "",
+      "icon": "🏆",
       "auto": false,
       "autoCount": 5,
       "players": [
