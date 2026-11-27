@@ -406,9 +406,6 @@ window.iconFail=function(img){
 let SOUND_ON=localStorage.getItem(SOUND_KEY)==='1';
 let AC=null,NOISE_BUF=null;
 
-/* Карта звуков для каждого кита:
-   1) Сначала ищет твой файл в папке sounds/ (например, sounds/vanilla.ogg или sounds/vanilla.mp3)
-   2) Если файла в папке нет — играет резерв (или синтезатор Minecraft, чтобы не было тишины) */
 const KIT_AUDIO_FILES={
   vanilla:['sounds/vanilla.ogg','sounds/vanilla.mp3'],
   sword:  ['sounds/sword.ogg','sounds/sword.mp3'],
@@ -423,7 +420,7 @@ const KIT_AUDIO_FILES={
   top:    ['sounds/top.ogg','sounds/top.mp3'],
   click:  ['sounds/click.ogg','sounds/click.mp3']
 };
-const AUDIO_CACHE={}; // id -> HTMLAudioElement | false
+const AUDIO_CACHE={};
 
 function tryPlayFile(key,vol=0.45){
   const list=KIT_AUDIO_FILES[key];
@@ -437,7 +434,6 @@ function tryPlayFile(key,vol=0.45){
       return true;
     }catch(e){return false;}
   }
-  // Пробуем загрузить первый доступный файл из списка
   let idx=0;
   const tryNext=()=>{
     if(idx>=list.length){AUDIO_CACHE[key]=false;return;}
@@ -454,7 +450,7 @@ function tryPlayFile(key,vol=0.45){
     a.load();
   };
   tryNext();
-  return false; // на самый первый раз, пока грузится, страхуем синтезатором
+  return false;
 }
 
 function ensureAC(){
@@ -470,7 +466,6 @@ function ensureAC(){
   }
 }
 
-/* Мягкий, приятный «кличок» мышки */
 function playClick(pitch=1,vol=0.06){
   if(!SOUND_ON)return;
   if(tryPlayFile('click',vol*4))return;
@@ -507,7 +502,6 @@ function playNoise(t,dur,type,freq,q,vol,endFreq){
   src.start(t);src.stop(t+dur+0.02);
 }
 
-/* Звук конкретного кита: сначала ищет настоящий файл в sounds/, иначе — точная MC-имитация */
 function playKitSound(kitId,isHover=false){
   if(!SOUND_ON)return;
   if(tryPlayFile(kitId,isHover?0.24:0.5))return;
@@ -851,7 +845,7 @@ const DEFAULTS={
   players:[
     {id:'p1',nick:'meshnn',country:'RU',city:'Saint Petersburg',region:'EU',tags:['Тестер: Sword','Тестер: UHC','Тестер: Axe'],bio:'',skin:'',bg:'',tiers:{vanilla:'LT5',sword:'HT1',uhc:'HT1',pot:'HT1',smp:'LT4',axe:'HT1',mace:'LT5',cart:'HT3',spear:'LT5'}},
     {id:'p2',nick:'JustBekon',country:'UA',city:'Kharkiv',region:'EU',tags:['Тестер: Pot','Тестер: Mace','Тестер: Spear Mace'],bio:'',skin:'',bg:'',tiers:{vanilla:'HT4',sword:'LT2',uhc:'LT4',pot:'LT3',smp:'HT3',axe:'LT2',mace:'LT2',cart:'HT3',spear:'LT1'}},
-    {id:'p3',nick:'burgarito',country:'RU',city:'Tyumen',region:'EU',tags:['Тестер: Vanilla','Тестер: SMP','Тестер: Cart'],bio:'',skin:'',bg:'',tiers:{vanilla:'HT4',sword:'HT3',uhc:'HT4',pot:'HT3',smp:'HT4',axe:'HT4',mace:'LT2',cart:'LT2',spear:'LT1'}},
+    {id:'p3',nick:'burgarito',country:'RU',city:'Tyumen',region:'EU',tags:['Тестер: Vanilla','Тестер: SMP','Тестер: Cart'],bio:'',skin:'',bg:'',tiers:{vanilla:'HT4',sword:'HT3',uhc:'HT4',pot:'LT3',smp:'HT4',axe:'HT4',mace:'LT2',cart:'LT2',spear:'LT1'}},
     {id:'p4',nick:'GavrilaQueen',country:'RU',city:'Tambov',region:'EU',tags:['Руководство сайта'],bio:'',skin:'',bg:'',tiers:{sword:'HT2',uhc:'HT4',pot:'HT1',axe:'HT3'}},
     {id:'p5',nick:'EXDEN19',country:'UA',city:'Kharkiv',region:'EU',tags:[],bio:'',skin:'',bg:'',tiers:{sword:'HT4',uhc:'HT5',axe:'LT2'}},
     {id:'p6',nick:'Arbyzekk',country:'RU',city:'Tula',region:'EU',tags:[],bio:'',skin:'',bg:'',tiers:{sword:'LT4',uhc:'HT5',axe:'HT5'}},
@@ -974,10 +968,10 @@ function setTierVar(){document.documentElement.style.setProperty('--tw',tierWidt
 
 /* ================= ВКЛАДКИ + ИНДИКАТОР ================= */
 function navMeta(n){
-  if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top',fb:'overall'};
-  if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall',fb:'overall'};
-  if(n.kind==='mode'){const m=mode(n.ref);return m?{icon:m.icon,label:m.name,page:m.id,fb:m.id}:null;}
-  if(n.kind==='page'){const p=page(n.ref);return p?{icon:p.icon,label:p.title,page:p.id,fb:''}:null;}
+  if(n.kind==='top')return{icon:n.icon||'🏆',label:n.label||'Топ / Сетки',page:'top',fb:'overall',soundKey:'top'};
+  if(n.kind==='overall')return{icon:n.icon||OFFICIAL.overall,label:n.label||'Overall',page:'overall',fb:'overall',soundKey:'overall'};
+  if(n.kind==='mode'){const m=mode(n.ref);return m?{icon:m.icon,label:m.name,page:m.id,fb:m.id,soundKey:m.id}:null;}
+  if(n.kind==='page'){const p=page(n.ref);return p?{icon:p.icon,label:p.title,page:p.id,fb:'',soundKey:'click'}:null;}
   return null;
 }
 function updateScrollFade(){
@@ -987,7 +981,8 @@ function updateScrollFade(){
 }
 function updateIndicator(center){
   const bar=$('#tabbar'),ind=$('#tabInd');
-  const act=bar.querySelector('.tab.active');
+  const act=bar?bar.querySelector('.tab.active'):null;
+  if(!bar||!ind)return;
   if(!act){ind.style.opacity=0;return;}
   ind.style.opacity=1;
   ind.style.left=act.offsetLeft+'px';
@@ -998,4 +993,571 @@ function updateIndicator(center){
   }
 }
 function renderTabs(){
-  const pnav=
+  const pnav=S.settings.pagesInNav||'dropdown';
+  const items=S.nav.map(n=>({n,m:navMeta(n)})).filter(x=>x.m&&(pnav==='tabs'||x.n.kind!=='page'));
+  const main=items.filter(x=>x.n.kind!=='mode'),kit=items.filter(x=>x.n.kind==='mode');
+  const tabBtn=({n,m})=>`<button class="tab${UI.page===m.page?' active':''}" data-act="goto" data-id="${esc(m.page)}" data-sound="${esc(m.soundKey)}">${iconHTML(m.icon,m.fb)}<span>${esc(m.label)}</span></button>`;
+  const bar=$('#tabbar');
+  bar.innerHTML=main.map(tabBtn).join('')+(main.length&&kit.length?'<div class="tab-sep"></div>':'')+kit.map(tabBtn).join('')+'<div class="tab-ind" id="tabInd"></div>';
+  requestAnimationFrame(()=>{updateScrollFade();updateIndicator(false);});
+
+  const dd=$('#pagesDD'),menu=$('#ddMenu'),btn=$('#ddBtn');
+  if(pnav==='hidden'||!S.pages.length){dd.style.display='none';}
+  else{
+    dd.style.display='';
+    menu.innerHTML=S.pages.map(p=>`<button class="dd-item${UI.page===p.id?' active':''}" data-act="goto" data-id="${esc(p.id)}" data-sound="click">${iconHTML(p.icon)}<span>${esc(p.title)}</span></button>`).join('');
+    btn.classList.toggle('active',S.pages.some(p=>p.id===UI.page));
+  }
+  $('#editorBtn').classList.toggle('active',UI.page==='editor');
+}
+addEventListener('resize',()=>{updateScrollFade();updateIndicator(false);});
+
+/* ================= КОМПОНЕНТЫ ИГРОКОВ ================= */
+function tierColor(t){return S.settings.tierColors[t]||'#8f97ab';}
+function tierBadge(m,t,big=false){
+  if(!t)return `<div class="tb empty${big?' big':''}" style="--c:#4a5266" title="${esc(m.name)}: Unranked">${iconHTML(m.icon,m.id)}<span class="tb-lbl">—</span></div>`;
+  const c=tierColor(t);
+  return `<div class="tb${big?' big':''}" style="--c:${c}" title="${esc(m.name)}: ${t}"><span class="tb-lbl">${esc(t)}</span>${iconHTML(m.icon,m.id)}</div>`;
+}
+function regionBadge(p){
+  const c=REGION_COLORS[p.region]||'#8f97ab';
+  return `<span class="rgn" style="background:${hexA(c,.15)};color:${c};border:1px solid ${hexA(c,.38)}" title="${esc(regionText(p))}">${esc(p.region||'—')}</span>`;
+}
+function tagsHTML(p){
+  if(!S.settings.showTags||!p.tags?.length)return '';
+  return p.tags.map(t=>{const c=tagColor(t);return `<span class="tag" style="--c:${c}">${esc(t)}</span>`;}).join('');
+}
+function playerRow(p,rank,modeId=null,delay=0){
+  const pts=points(p),ti=titleFor(pts),st=S.settings,rkCls=rank<=3?' r'+rank:'';
+  const rnk=(rank==null||Number.isNaN(rank))?'—':rank;
+  const subParts=[];
+  if(st.showTitles)subParts.push(`<b style="--c:${ti.color}">${esc(ti.emoji)} ${esc(ti.name)}</b>`);
+  if(st.showPoints)subParts.push(`<span class="pts" data-pts="${pts}">${pts} очк.</span>`);
+  const tiers=modeId
+    ?(()=>{const m=mode(modeId);return m?tierBadge(m,p.tiers?.[m.id],true):'';})()
+    :S.modes.map(m=>tierBadge(m,p.tiers?.[m.id])).join('');
+  return `<div class="row" style="animation-delay:${delay}ms" data-act="openPlayer" data-id="${esc(p.id)}">
+    <div class="col-rank"><div class="rankb${rkCls}">${rnk}</div></div>
+    <img class="ava" src="${esc(skinSrc(p))}" alt="${esc(p.nick)}" loading="lazy" onerror="this.onerror=null;this.src=window.DEFAULT_AVA">
+    <div class="col-info">
+      <div class="p-name"><span>${esc(p.nick)}</span>${tagsHTML(p)}</div>
+      <div class="p-title">${subParts.join(' · ')}</div>
+    </div>
+    ${st.showRegions?`<div class="col-region">${regionBadge(p)}</div>`:''}
+    <div class="col-tiers">${tiers}</div>
+  </div>`;
+}
+function animatePoints(){
+  if(!UI.animatePts)return;
+  UI.animatePts=false;
+  const els=[...document.querySelectorAll('.pts[data-pts]')];
+  if(!els.length||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const start=performance.now(),dur=650;
+  els.forEach(el=>el.textContent='0 очк.');
+  function step(now){
+    const k=Math.min(1,(now-start)/dur),e=1-Math.pow(1-k,3);
+    els.forEach(el=>{el.textContent=Math.round(+el.dataset.pts*e)+' очк.';});
+    if(k<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function tableHead(modeId=null){
+  const st=S.settings;
+  return `<div class="thead">
+    <div class="col-rank">#</div><div class="ava-spacer"></div>
+    <div class="col-info">Игрок</div>
+    ${st.showRegions?'<div class="col-region th-region">Регион</div>':''}
+    <div class="col-tiers th-tiers">${modeId?'Тир':'Режимы'}</div>
+  </div>`;
+}
+function filterBar(){
+  const countries=[...new Set(S.players.map(p=>p.country).filter(Boolean))].sort();
+  return `<div class="toolbar">
+    <div class="search"><span>🔎</span><input id="qInput" value="${esc(UI.search)}" placeholder="Поиск по нику, городу, тегу..."></div>
+    <select class="inp f-sel" id="fRegion"><option value="">Все регионы</option>${REGIONS.map(r=>`<option value="${r}"${UI.region===r?' selected':''}>${r}</option>`).join('')}</select>
+    <select class="inp f-sel" id="fCountry"><option value="">Все страны</option>${countries.map(c=>`<option value="${c}"${UI.country===c?' selected':''}>${flag(c)} ${COUNTRIES[c]||c}</option>`).join('')}</select>
+    <select class="inp f-sel" id="fSort">
+      <option value="points"${UI.sort==='points'?' selected':''}>Сортировка: очки</option>
+      <option value="nick"${UI.sort==='nick'?' selected':''}>Сортировка: ник (А-Я)</option>
+      <option value="best"${UI.sort==='best'?' selected':''}>Сортировка: лучший тир</option>
+    </select>
+    <button class="btn edit-only" data-act="newPlayer">➕ Игрок</button>
+  </div>`;
+}
+function matchFilter(p){
+  const q=UI.search.trim().toLowerCase();
+  if(q&&!p.nick.toLowerCase().includes(q)&&!(p.city||'').toLowerCase().includes(q)&&!(p.tags||[]).some(t=>t.toLowerCase().includes(q)))return false;
+  if(UI.region&&p.region!==UI.region)return false;
+  if(UI.country&&p.country!==UI.country)return false;
+  return true;
+}
+function sortList(arr){
+  const a=[...arr];
+  if(UI.sort==='nick')return a.sort((x,y)=>x.nick.localeCompare(y.nick));
+  if(UI.sort==='best')return a.sort((x,y)=>bestTier(x)-bestTier(y)||points(y)-points(x));
+  return a.sort((x,y)=>points(y)-points(x)||x.nick.localeCompare(y.nick));
+}
+
+/* ================= СТРАНИЦЫ ================= */
+function renderTop(){
+  const all=overallSorted(),rankOf=id=>all.findIndex(p=>p.id===id)+1;
+  const used=new Set();
+  const secs=S.grids.map(g=>{
+    const list=g.auto?all.slice(0,+g.autoCount||3):g.players.map(byId).filter(Boolean);
+    list.forEach(p=>used.add(p.id));
+    const filtered=sortList(list.filter(matchFilter));
+    const col=UI.collapsed.has(g.id);
+    const body=!filtered.length?`<div class="empty">В этой сетке пока никого нет.</div>`
+      :tableHead()+filtered.map((p,i)=>playerRow(p,g.auto?i+1:rankOf(p.id),null,i*35)).join('');
+    return `<section style="margin-bottom:26px">
+      <div class="page-head">
+        <span class="ph-ico">${iconHTML(g.icon)}</span>
+        <div><h1>${esc(g.name)}</h1><div class="ph-sub">Игроков: ${filtered.length}</div></div>
+        <button class="btn btn-sm" style="margin-left:auto" data-act="toggleGrid" data-id="${esc(g.id)}">${col?'▾ Развернуть':'▴ Свернуть'}</button>
+      </div>
+      ${col?'':body}
+    </section>`;
+  }).join('');
+  const rest=sortList(S.players.filter(p=>!used.has(p.id)&&matchFilter(p)));
+  const restHTML=rest.length?`<section style="margin-bottom:26px"><div class="page-head"><span class="ph-ico">📋</span><div><h1>Остальные игроки</h1><div class="ph-sub">${rest.length}</div></div></div>${tableHead()}${rest.map((p,i)=>playerRow(p,rankOf(p.id),null,i*30)).join('')}</section>`:'';
+  return `${filterBar()}${secs||''}${restHTML}${!secs&&!restHTML?'<div class="empty">Ничего не найдено.</div>':''}`;
+}
+function renderOverall(){
+  const list=sortList(overallSorted().filter(matchFilter));
+  return `${filterBar()}${S.settings.overallNote?`<div class="note">${esc(S.settings.overallNote)}</div>`:''}${list.length?tableHead()+list.map((p,i)=>playerRow(p,i+1,null,i*30)).join(''):'<div class="empty">Игроков пока нет.</div>'}`;
+}
+function renderMode(m){
+  const ranked=S.players.filter(p=>p.tiers?.[m.id]&&matchFilter(p)).sort((a,b)=>TIERS.indexOf(a.tiers[m.id])-TIERS.indexOf(b.tiers[m.id])||points(b)-points(a));
+  const unranked=S.players.filter(p=>!p.tiers?.[m.id]&&matchFilter(p));
+  const head=`<div class="page-head">${iconHTML(m.icon,m.id)}<div><h1>${esc(m.name)}</h1><div class="ph-sub">Оценено игроков: ${ranked.length}</div></div></div>`;
+  const ur=!unranked.length?'':`<div style="margin-top:24px"><div class="page-head"><span class="ph-ico">⏳</span><div><h1 style="font-size:18px">Unranked</h1><div class="ph-sub">Без тира в этом режиме (${unranked.length})</div></div></div>${unranked.map(p=>playerRow(p,NaN,m.id)).join('')}</div>`;
+  return `${filterBar()}${head}${ranked.length?tableHead(m.id)+ranked.map((p,i)=>playerRow(p,i+1,m.id,i*30)).join(''):'<div class="empty">В этом режиме пока никому не выставлен тир.</div>'}${ur}`;
+}
+
+/* ================= ПРОИЗВОЛЬНЫЕ СТРАНИЦЫ ================= */
+function fmtText(s){
+  return esc(s)
+    .replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')
+    .replace(/\*([^*\n]+)\*/g,'<em>$1</em>')
+    .replace(/`([^`\n]+)`/g,'<code>$1</code>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\n/g,'<br>');
+}
+function renderTiersTable(){
+  return `<table class="pt-table"><thead><tr><th>Тир</th><th>Очки</th></tr></thead><tbody>${TIERS.map(t=>{const c=tierColor(t);return `<tr><td><span class="tag" style="--c:${c}">${t}</span></td><td><b>${+S.points[t]||0}</b> очк.</td></tr>`;}).join('')}</tbody></table>`;
+}
+function renderTitlesTable(){
+  const sorted=[...S.titles].sort((a,b)=>b.min-a.min);
+  return `<table class="pt-table"><thead><tr><th>Звание</th><th>От скольких очков</th></tr></thead><tbody>${sorted.map(t=>`<tr><td><b style="color:${esc(t.color||'#e9edf5')}">${esc(t.emoji||'👑')} ${esc(t.name)}</b></td><td><b>${+t.min||0}</b> очк.</td></tr>`).join('')}</tbody></table>`;
+}
+function renderBlock(b){
+  switch(b.type){
+    case 'h2':return `<h2>${fmtText(b.text||'')}</h2>`;
+    case 'h3':return `<h3>${fmtText(b.text||'')}</h3>`;
+    case 'p':return `<p>${fmtText(b.text||'')}</p>`;
+    case 'list':{const tag=b.ordered?'ol':'ul';const items=(b.items||[]).filter(x=>String(x||'').trim()).map(x=>`<li>${fmtText(x)}</li>`).join('');return `<${tag}>${items}</${tag}>`;}
+    case 'note':{const tn=NOTE_TONES[b.tone]||NOTE_TONES.info;return `<div class="callout" style="--cc:${tn.c}"><span class="ci">${tn.i}</span><div>${fmtText(b.text||'')}</div></div>`;}
+    case 'quote':return `<blockquote>${fmtText(b.text||'')}</blockquote>`;
+    case 'divider':return `<hr>`;
+    case 'tiers':return renderTiersTable();
+    case 'titles':return renderTitlesTable();
+    case 'html':return b.code||'';
+    default:return '';
+  }
+}
+function renderCustomPage(pg){
+  const edBtn=EDIT_MODE?`<button class="btn btn-sm edit-only" style="margin-left:auto" data-act="editPageInPlace" data-id="${esc(pg.id)}">✏️ Редактировать страницу</button>`:'';
+  return `<div class="page-head"><span class="ph-ico">${iconHTML(pg.icon)}</span><div><h1>${esc(pg.title)}</h1><div class="ph-sub">${pg.subtitle?esc(pg.subtitle)+' · ':''}Обновлено ${fmtDate(pg.updated)}</div></div>${edBtn}</div>
+    <div class="ed-card prose">${(pg.blocks||[]).map(renderBlock).join('')||'<p class="muted">Страница пока пуста.</p>'}</div>`;
+}
+
+/* ================= РЕДАКТОР СТРАНИЦ ================= */
+function openPageEditor(id){
+  const pg=page(id);if(!pg)return;
+  normalizePage(pg);
+  UI.pageEdit={id:pg.id,title:pg.title,icon:pg.icon,subtitle:pg.subtitle||'',blocks:clone(pg.blocks)};
+  UI.page='editor';UI.edTab='pages';renderAll();toast('✏️ Редактируем «'+pg.title+'»');
+}
+function syncPageEditFromDOM(){
+  const pe=UI.pageEdit;if(!pe)return;
+  const t=$('#peTitle'),ic=$('#peIcon'),sub=$('#peSub');
+  if(t)pe.title=t.value;if(ic)pe.icon=ic.value;if(sub)pe.subtitle=sub.value;
+  pe.blocks.forEach(b=>{
+    const el=document.querySelector(`.blk[data-bid="${b.id}"]`);if(!el)return;
+    if(b.type==='h2'||b.type==='h3'||b.type==='p'||b.type==='quote'){const f=el.querySelector('[data-f="text"]');if(f)b.text=f.value;}
+    else if(b.type==='list'){const ord=el.querySelector('[data-f="ordered"]'),f=el.querySelector('[data-f="items"]');if(ord)b.ordered=ord.checked;if(f)b.items=f.value.split('\n');}
+    else if(b.type==='note'){const tn=el.querySelector('[data-f="tone"]'),f=el.querySelector('[data-f="text"]');if(tn)b.tone=tn.value;if(f)b.text=f.value;}
+    else if(b.type==='html'){const f=el.querySelector('[data-f="code"]');if(f)b.code=f.value;}
+  });
+}
+function savePageEdit(){
+  const pe=UI.pageEdit;if(!pe)return;
+  syncPageEditFromDOM();
+  const pg=page(pe.id);if(!pg)return;
+  pg.title=(pe.title||'').trim()||'Без названия';
+  pg.icon=(pe.icon||'').trim()||'📄';
+  pg.subtitle=(pe.subtitle||'').trim();
+  pg.blocks=pe.blocks.map(b=>b.type==='list'?{...b,items:(b.items||[]).map(x=>x.trim()).filter(Boolean)}:b);
+  pg.updated=Date.now();
+  UI.pageEdit=null;save();UI.page=pg.id;renderAll();toast('💾 Страница сохранена');
+}
+function renderPageEditor(){
+  const pe=UI.pageEdit;
+  const blocksHTML=pe.blocks.map((b,i)=>{
+    const top=`<div class="blk-head">
+      <span class="blk-type">${BLOCK_TYPES.find(x=>x[0]===b.type)?.[1]||b.type}</span>
+      <button class="icon-btn" style="margin-left:auto" data-act="peMove" data-idx="${i}" data-dir="-1" title="Выше">↑</button>
+      <button class="icon-btn" data-act="peMove" data-idx="${i}" data-dir="1" title="Ниже">↓</button>
+      <button class="icon-btn danger" data-act="peDel" data-idx="${i}" title="Удалить блок">🗑</button>
+    </div>`;
+    let body='';
+    if(b.type==='h2'||b.type==='h3'||b.type==='quote')body=`<input class="inp" data-f="text" value="${esc(b.text||'')}">`;
+    else if(b.type==='p')body=`<textarea class="inp" rows="3" data-f="text" style="font-family:var(--font)">${esc(b.text||'')}</textarea>`;
+    else if(b.type==='list')body=`<label class="sw-row" style="margin-bottom:8px"><input type="checkbox" class="sw" data-f="ordered"${b.ordered?' checked':''}><span>Нумерованный список (1, 2, 3...)</span></label><textarea class="inp" rows="4" data-f="items" style="font-family:var(--font)">${esc((b.items||[]).join('\n'))}</textarea><div class="blk-hint">Каждый пункт с новой строки.</div>`;
+    else if(b.type==='note')body=`<div style="display:flex;gap:8px;margin-bottom:8px"><select class="inp f-sel" data-f="tone">${Object.entries(NOTE_TONES).map(([k,v])=>`<option value="${k}"${b.tone===k?' selected':''}>${v.i} ${k}</option>`).join('')}</select><input class="inp" data-f="text" value="${esc(b.text||'')}"></div>`;
+    else if(b.type==='divider')body=`<div class="blk-hint">Горизонтальная разделительная линия.</div>`;
+    else if(b.type==='tiers')body=`<div class="blk-hint">Автоматически подставит актуальную таблицу очков из настроек.</div>`;
+    else if(b.type==='titles')body=`<div class="blk-hint">Автоматически подставит актуальную таблицу званий из настроек.</div>`;
+    else if(b.type==='html')body=`<textarea class="inp" rows="4" data-f="code">${esc(b.code||'')}</textarea>`;
+    return `<div class="blk" data-bid="${b.id}">${top}${body}</div>`;
+  }).join('');
+  const addButtons=BLOCK_TYPES.map(([t,lbl])=>`<button class="btn btn-sm" data-act="peAdd" data-btype="${t}">+ ${lbl}</button>`).join('');
+  return `<div class="ed-card">
+    <h3>✏️ Редактор страницы</h3>
+    <div class="f-grid">
+      <div class="field"><label>Название</label><input class="inp" id="peTitle" value="${esc(pe.title)}"></div>
+      <div class="field"><label>Иконка</label><input class="inp" id="peIcon" value="${esc(pe.icon)}"></div>
+      <div class="field"><label>Подзаголовок</label><input class="inp" id="peSub" value="${esc(pe.subtitle)}"></div>
+    </div>
+    <div class="fmt-help">Разметка в тексте: <code>**жирный**</code> · <code>*курсив*</code> · <code>\`код\`</code> · <code>[текст](https://...)</code></div>
+    <div style="margin-top:14px">${blocksHTML||'<div class="empty">Блоков нет — добавь первый кнопкой ниже.</div>'}</div>
+    <div class="addbar">${addButtons}</div>
+    <div class="modal-actions">
+      <button class="btn btn-accent" data-act="peSave">💾 Сохранить страницу</button>
+      <button class="btn" data-act="peCancel">Отмена</button>
+    </div>
+  </div>`;
+}
+
+/* ================= АДМИН-ПАНЕЛЬ ================= */
+function renderEditor(){
+  if(!EDIT_MODE)return `<div class="empty">Режим редактирования выключен. Открой сайт с <code>?edit</code> в конце ссылки, чтобы редактировать.</div>`;
+  if(UI.edTab==='pages'&&UI.pageEdit)return renderPageEditor();
+  const st=S.settings,t=UI.edTab;
+  const tabs=[['theme','🎨 Внешний вид'],['modes','⚔️ Режимы'],['nav','🧭 Меню'],['pages','📄 Страницы'],['grids','🏆 Сетки'],['players','👥 Игроки'],['points','🧮 Очки и звания'],['data','💾 Сохранение']];
+  const bar=`<div class="ed-tabs">${tabs.map(([k,l])=>`<button class="ed-tab${t===k?' active':''}" data-act="edTab" data-tab="${k}">${l}</button>`).join('')}</div>`;
+  let body='';
+  if(t==='theme'){
+    body=`<div class="ed-card"><h3>🎨 Бренд, цвета и шрифты</h3>
+      <div class="f-grid">
+        <div class="field"><label>Название сайта</label><input class="inp" data-s="siteName" value="${esc(st.siteName)}"></div>
+        <div class="field"><label>Эмодзи-логотип</label><input class="inp" data-s="logoEmoji" value="${esc(st.logoEmoji)}"></div>
+        <div class="field"><label>Подзаголовок</label><input class="inp" data-s="subtitle" value="${esc(st.subtitle)}"></div>
+        <div class="field"><label>Текст в подвале</label><input class="inp" data-s="footer" value="${esc(st.footer)}"></div>
+        <div class="field"><label>Шрифт текста</label><select class="inp" data-s="font">${FONTS.map(f=>`<option${st.font===f?' selected':''}>${f}</option>`).join('')}</select></div>
+        <div class="field"><label>Шрифт заголовков</label><select class="inp" data-s="headFont">${FONTS.map(f=>`<option${st.headFont===f?' selected':''}>${f}</option>`).join('')}</select></div>
+        <div class="field"><label>Акцентный цвет</label><input type="color" data-s="accent" value="${st.accent}"></div>
+        <div class="field"><label>Фон страницы</label><input type="color" data-s="bg" value="${st.bg}"></div>
+        <div class="field"><label>Фон карточек</label><input type="color" data-s="panel" value="${st.panel}"></div>
+        <div class="field"><label>Скругление: <span id="radVal">${st.radius}</span>px</label><input type="range" min="0" max="26" data-s="radius" value="${st.radius}"></div>
+      </div>
+      <div class="switches">
+        <label class="sw-row"><input type="checkbox" class="sw" data-s="compact"${st.compact?' checked':''}><span>Компактные карточки</span></label>
+        <label class="sw-row"><input type="checkbox" class="sw" data-s="showPoints"${st.showPoints?' checked':''}><span>Показывать очки</span></label>
+        <label class="sw-row"><input type="checkbox" class="sw" data-s="showTags"${st.showTags?' checked':''}><span>Показывать теги</span></label>
+        <label class="sw-row"><input type="checkbox" class="sw" data-s="showRegions"${st.showRegions?' checked':''}><span>Показывать регионы</span></label>
+        <label class="sw-row"><input type="checkbox" class="sw" data-s="showTitles"${st.showTitles?' checked':''}><span>Показывать звания</span></label>
+      </div>
+      <div class="field" style="margin-top:16px"><label>Цвета тиров</label><div class="tier-colors">${TIERS.map(k=>`<div class="tc"><span class="tag" style="--c:${tierColor(k)}">${k}</span><input type="color" data-tc="${k}" value="${tierColor(k)}"></div>`).join('')}</div></div>
+      <div class="field" style="margin-top:16px"><label>Свой CSS (для продвинутых)</label><textarea class="inp" data-s="customCSS" placeholder=".row { ... }">${esc(st.customCSS||'')}</textarea></div>
+    </div>`;
+  }else if(t==='modes'){
+    body=`<div class="ed-card"><h3>⚔️ Режимы (киты)</h3><div class="ed-hint">По умолчанию подставляются официальные иконки с mctiers.net (с авто-резервом). Можно вставить свой URL, SVG или эмодзи.</div>
+      ${S.modes.map((m,i)=>`<div class="ed-row" draggable="true" data-drag="modes" data-idx="${i}">
+        <span class="drag">⋮⋮</span><span class="icoprev">${iconHTML(m.icon,m.id)}</span>
+        <input class="inp grow" data-m="name" data-idx="${i}" value="${esc(m.name)}" placeholder="Название режима">
+        <input class="inp icon-inp" data-m="icon" data-idx="${i}" value="${esc(m.icon)}" placeholder="URL / SVG / эмодзи">
+        <button class="icon-btn danger" data-act="delMode" data-idx="${i}">🗑</button>
+      </div>`).join('')}
+      <button class="btn btn-accent" data-act="addMode">➕ Добавить режим</button>
+    </div>`;
+  }else if(t==='nav'){
+    const pnav=st.pagesInNav||'dropdown';
+    body=`<div class="ed-card"><h3>🧭 Навигация</h3>
+      <div class="field" style="margin-bottom:14px"><label>Как показывать пользовательские страницы</label>
+        <select class="inp f-sel" data-s="pagesInNav">
+          <option value="dropdown"${pnav==='dropdown'?' selected':''}>В выпадающем меню «Страницы»</option>
+          <option value="tabs"${pnav==='tabs'?' selected':''}>Отдельными вкладками в шапке</option>
+          <option value="hidden"${pnav==='hidden'?' selected':''}>Скрыть из меню (доступны по ссылке)</option>
+        </select>
+      </div>
+      ${S.nav.map((n,i)=>{const m=navMeta(n);if(!m)return '';return `<div class="ed-row" draggable="true" data-drag="nav" data-idx="${i}">
+        <span class="drag">⋮⋮</span>${iconHTML(m.icon,m.fb)}<strong style="min-width:95px">${esc(m.label)}</strong>
+        <input class="inp grow" data-n="label" data-idx="${i}" value="${esc(n.label||'')}" placeholder="Своё название (необязательно)">
+        <input class="inp icon-inp" data-n="icon" data-idx="${i}" value="${esc(n.icon||'')}" placeholder="Своя иконка">
+        ${n.kind==='page'?`<button class="icon-btn danger" data-act="delNav" data-idx="${i}">✕</button>`:''}
+      </div>`;}).join('')}
+    </div>`;
+  }else if(t==='pages'){
+    body=`<div class="ed-card"><h3>📄 Страницы</h3>
+      <div class="tplbar">
+        <button class="btn btn-sm" data-act="tplPage" data-tpl="rules">📜 + Правила</button>
+        <button class="btn btn-sm" data-act="tplPage" data-tpl="calib">🎯 + Регламент 1х1</button>
+        <button class="btn btn-sm" data-act="tplPage" data-tpl="changelog">📰 + Журнал</button>
+        <button class="btn btn-sm btn-accent" data-act="newPage">➕ Пустая страница</button>
+      </div>
+      ${S.pages.length?S.pages.map(p=>`<div class="ed-row">
+        <span class="icoprev">${iconHTML(p.icon)}</span>
+        <div class="grow"><strong>${esc(p.title)}</strong><div class="blk-hint">${esc(p.subtitle||'')} · ${fmtDate(p.updated)}</div></div>
+        <button class="btn btn-sm" data-act="openPageEdit" data-id="${esc(p.id)}">✏️ Изменить</button>
+        <button class="btn btn-sm" data-act="goto" data-id="${esc(p.id)}">👁</button>
+        <button class="icon-btn danger" data-act="delPage" data-id="${esc(p.id)}">🗑</button>
+      </div>`).join(''):'<div class="empty">Страниц пока нет. Выбери шаблон выше или создай пустую.</div>'}
+    </div>`;
+  }else if(t==='grids'){
+    body=`<div class="ed-card"><h3>🏆 Сетки на главной</h3>
+      ${S.grids.map((g,gi)=>`<div class="ed-row" style="flex-direction:column;align-items:stretch">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="drag" draggable="true" data-drag="grids" data-idx="${gi}">⋮⋮</span>
+          <input class="inp icon-inp" data-g="icon" data-gi="${gi}" value="${esc(g.icon)}">
+          <input class="inp grow" data-g="name" data-gi="${gi}" value="${esc(g.name)}">
+          <label class="sw-row"><input type="checkbox" class="sw" data-g="auto" data-gi="${gi}"${g.auto?' checked':''}><span>Авто-топ</span></label>
+          ${g.auto?`<input type="number" class="inp num-inp" min="1" max="50" data-g="autoCount" data-gi="${gi}" value="${g.autoCount}">`:''}
+          <button class="icon-btn danger" data-act="delGrid" data-gi="${gi}">🗑</button>
+        </div>
+        ${g.auto?`<div class="blk-hint" style="margin-top:6px">Автоматически берёт топ-${g.autoCount} игроков по очкам Overall.</div>`
+          :`<div class="chips" style="margin-top:8px">${g.players.map(pid=>{const pl=byId(pid);return pl?`<span class="chip" style="--c:var(--accent)">${esc(pl.nick)}<button data-act="rmGridPlayer" data-gi="${gi}" data-pid="${esc(pid)}">✕</button></span>`:'';}).join('')}</div>
+            <div class="grid-add"><select class="inp" id="addGridSel_${gi}"><option value="">+ Выбрать игрока...</option>${S.players.map(p=>`<option value="${p.id}">${esc(p.nick)} (${points(p)} очк.)</option>`).join('')}</select><button class="btn btn-sm" data-act="addGridPlayer" data-gi="${gi}">Добавить</button></div>`}
+      </div>`).join('')}
+      <button class="btn btn-accent" data-act="addGrid">➕ Добавить сетку</button>
+    </div>`;
+  }else if(t==='players'){
+    body=`<div class="ed-card"><h3>👥 Игроки (${S.players.length})</h3>
+      <div class="toolbar"><button class="btn btn-accent" data-act="newPlayer">➕ Новый игрок</button></div>
+      ${S.players.map(p=>`<div class="ed-row">
+        <img class="ava" style="width:34px;height:34px" src="${esc(skinSrc(p))}" alt="" onerror="this.onerror=null;this.src=window.DEFAULT_AVA">
+        <div class="grow"><strong>${esc(p.nick)}</strong> <span class="muted">· ${points(p)} очк. · ${esc(titleFor(points(p)).name)}</span></div>
+        <button class="btn btn-sm" data-act="editPlayer" data-id="${esc(p.id)}">✏️</button>
+        <button class="icon-btn danger" data-act="delPlayer" data-id="${esc(p.id)}">🗑</button>
+      </div>`).join('')}
+    </div>`;
+  }else if(t==='points'){
+    body=`<div class="ed-card"><h3>🧮 Очки за тиры</h3><div class="f-grid">${TIERS.map(k=>`<div class="field"><label><span class="tag" style="--c:${tierColor(k)}">${k}</span></label><input type="number" class="inp" data-pt="${k}" value="${+S.points[k]||0}"></div>`).join('')}</div></div>
+    <div class="ed-card"><h3>👑 Звания по очкам</h3>
+      ${S.titles.map((tl,i)=>`<div class="ed-row">
+        <input class="inp num-inp" data-tl="emoji" data-idx="${i}" value="${esc(tl.emoji||'👑')}">
+        <input class="inp grow" data-tl="name" data-idx="${i}" value="${esc(tl.name)}">
+        <input type="color" data-tl="color" data-idx="${i}" value="${tl.color||'#8f97ab'}">
+        <input type="number" class="inp num-inp" data-tl="min" data-idx="${i}" value="${+tl.min||0}" placeholder="Мин. очки">
+        <button class="icon-btn danger" data-act="delTitle" data-idx="${i}">🗑</button>
+      </div>`).join('')}
+      <button class="btn btn-accent" data-act="addTitle">➕ Добавить звание</button>
+    </div>`;
+  }else if(t==='data'){
+    body=`<div class="ed-card"><h3>💾 Сохранение и перенос на GitHub</h3>
+      <div class="ed-hint">1. Нажми <b>«📥 Скачать data.json»</b>.<br>2. В репозитории на GitHub открой файл <code>data.json</code> → нажми карандаш (Edit) → вставь скачанное (или загрузи файл) → <b>Commit changes</b>. Через минуту он обновится у всех.</div>
+      <div class="toolbar">
+        <button class="btn btn-accent" data-act="exportJSON">📥 Скачать data.json</button>
+        <button class="btn" data-act="importJSON">📤 Загрузить JSON</button>
+        <button class="btn btn-danger" data-act="resetDemo">🔄 Сбросить до примера</button>
+      </div>
+      <div class="stats">
+        <div class="stat">Игроков: <b>${S.players.length}</b></div>
+        <div class="stat">Режимов: <b>${S.modes.length}</b></div>
+        <div class="stat">Страниц: <b>${S.pages.length}</b></div>
+        <div class="stat">Сеток: <b>${S.grids.length}</b></div>
+      </div>
+    </div>`;
+  }
+  return bar+body;
+}
+
+/* ================= МОДАЛКА ИГРОКА ================= */
+function openPlayerModal(id){
+  const p=byId(id);if(!p)return;
+  const all=overallSorted(),rk=all.findIndex(x=>x.id===p.id)+1,pts=points(p),ti=titleFor(pts),st=S.settings;
+  const headStyle=p.bg?`style="background-image:url('${esc(p.bg)}')"`:'';
+  const loc=regionText(p);
+  const locHTML=st.showRegions&&(p.country||p.city||p.region)?`<div class="pc-loc">${regionBadge(p)}${loc?`<span class="pc-loc-t">${flag(p.country)} ${esc(loc)}</span>`:''}</div>`:'';
+  const bioHTML=p.bio?`<div class="pc-bio">${esc(p.bio)}</div>`:'';
+  const cells=S.modes.map(m=>{const t=p.tiers?.[m.id];return `<div class="tg-cell" data-act="gotoModeFromCard" data-id="${esc(m.id)}" data-sound="${esc(m.id)}">${iconHTML(m.icon,m.id)}<span>${esc(m.name)}</span>${tierBadge(m,t)}</div>`;}).join('');
+  const ed=EDIT_MODE?`<div class="modal-actions edit-only"><button class="btn btn-accent" data-act="editPlayer" data-id="${esc(p.id)}">✏️ Редактировать</button><button class="btn btn-danger" data-act="delPlayer" data-id="${esc(p.id)}">🗑 Удалить</button></div>`:'';
+  $('#pmBody').innerHTML=`<div class="pc-head"${headStyle}><div class="pc-in">
+    <img class="pc-ava" src="${esc(skinSrc(p))}" alt="${esc(p.nick)}" onerror="this.onerror=null;this.src=window.DEFAULT_AVA">
+    <div>
+      <div class="pc-name"><span>${esc(p.nick)}</span><span class="tag" style="--c:var(--accent)">#${rk} Overall</span></div>
+      <div class="pc-tags">${tagsHTML(p)}</div>
+      <div class="pc-title">${st.showTitles?`<b style="--c:${ti.color}">${esc(ti.emoji)} ${esc(ti.name)}</b>`:''}${st.showPoints?`<span class="muted">${st.showTitles?' · ':''}${pts} очков</span>`:''}</div>
+      ${locHTML}
+    </div>
+  </div></div>${bioHTML}<div class="tiers-grid">${cells}</div>${ed}`;
+  setHash('#/player/'+encodeURIComponent(p.id));
+  openModal('playerModal');
+}
+
+/* ================= ФОРМА ИГРОКА ================= */
+function fillSelects(p){
+  $('#pfCountry').innerHTML='<option value="">— не указана —</option>'+Object.entries(COUNTRIES).map(([k,v])=>`<option value="${k}"${p.country===k?' selected':''}>${flag(k)} ${v}</option>`).join('');
+  $('#pfRegion').innerHTML=REGIONS.map(r=>`<option value="${r}"${p.region===r?' selected':''}>${r}</option>`).join('');
+}
+function renderPFTags(){
+  $('#pfTags').innerHTML=(PF.tags||[]).map((t,i)=>`<span class="chip" style="--c:${tagColor(t)}">${esc(t)}<button data-act="pfDelTag" data-idx="${i}">✕</button></span>`).join('');
+}
+function renderPFTiers(){
+  $('#pfTiers').innerHTML=S.modes.map(m=>`<div class="field"><label style="display:flex;align-items:center;gap:6px">${iconHTML(m.icon,m.id)} ${esc(m.name)}</label><select class="inp" data-pft="${m.id}"><option value="">Unranked</option>${TIERS.map(t=>`<option value="${t}"${PF.tiers?.[m.id]===t?' selected':''}>${t} (${+S.points[t]||0})</option>`).join('')}</select></div>`).join('');
+}
+function openPlayerForm(id=null){
+  const ex=id?byId(id):null;
+  PF=ex?clone(ex):{id:uid(),nick:'',country:'RU',city:'',region:'EU',tags:[],bio:'',skin:'',bg:'',tiers:{}};
+  $('#pfTitle').textContent=ex?'Редактировать: '+ex.nick:'Новый игрок';
+  $('#pfNick').value=PF.nick;$('#pfCity').value=PF.city||'';$('#pfBio').value=PF.bio||'';$('#pfTagInput').value='';
+  $('#pfSkinPrev').src=PF.skin||DEFAULT_AVA;$('#pfBgPrev').src=PF.bg||DEFAULT_AVA;
+  fillSelects(PF);renderPFTags();renderPFTiers();openModal('playerForm');
+}
+function pickImg(cb){const inp=$('#pfSkinFile');inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{if(r.result.length>900000)toast('⚠️ Файл большой — может не влезть в хранилище',true);cb(r.result);};r.readAsDataURL(f);inp.value='';};inp.click();}
+function pickBgImg(cb){const inp=$('#pfBgFile');inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(f);inp.value='';};inp.click();}
+function savePlayerForm(){
+  const nick=$('#pfNick').value.trim();if(!nick)return toast('Введи ник игрока',true);
+  PF.nick=nick;PF.country=$('#pfCountry').value;PF.city=$('#pfCity').value.trim();PF.region=$('#pfRegion').value;PF.bio=$('#pfBio').value.trim();
+  PF.tiers={};document.querySelectorAll('[data-pft]').forEach(sel=>{if(sel.value)PF.tiers[sel.dataset.pft]=sel.value;});
+  const i=S.players.findIndex(x=>x.id===PF.id);if(i>=0)S.players[i]=PF;else S.players.push(PF);
+  save();closeModal('playerForm');if($('#playerModal').classList.contains('open'))openPlayerModal(PF.id);renderAll();toast('💾 Сохранено');
+}
+
+/* ================= РЕНДЕР И РОУТИНГ ================= */
+function renderAll(){
+  applyTheme();
+  $('#logoIco').textContent=S.settings.logoEmoji;$('#logoText').textContent=S.settings.siteName;
+  document.title=`${S.settings.siteName} | ${S.settings.subtitle}`;
+  $('#footer').innerHTML=`${esc(S.settings.footer)}${EDIT_MODE?'':' · <a href="?edit">Режим редактора</a>'}`;
+  renderTabs();
+  const c=$('#content');
+  if(UI.page==='top')c.innerHTML=renderTop();
+  else if(UI.page==='overall')c.innerHTML=renderOverall();
+  else if(UI.page==='editor')c.innerHTML=renderEditor();
+  else if(page(UI.page))c.innerHTML=renderCustomPage(page(UI.page));
+  else if(mode(UI.page))c.innerHTML=renderMode(mode(UI.page));
+  else{UI.page='top';c.innerHTML=renderTop();renderTabs();}
+  animatePoints();
+}
+function goto(id){
+  if(id==='editor'&&!EDIT_MODE)return;
+  if(id!==UI.page){UI.animatePts=true;UI.pageEdit=null;}
+  UI.page=id;$('#pagesDD').classList.remove('open');
+  setHash('#/'+id);renderAll();
+  requestAnimationFrame(()=>updateIndicator(true));
+}
+function setHash(h){if(location.hash!==h)history.replaceState(null,'',h);}
+function applyHash(){
+  const h=location.hash.replace(/^#\/?/,'');if(!h)return;
+  if(h.startsWith('player/')){const p=byId(decodeURIComponent(h.slice(7)));if(p)openPlayerModal(p.id);return;}
+  if(h==='editor'&&!EDIT_MODE)return;
+  if(h==='top'||h==='overall'||h==='editor'||mode(h)||page(h)){UI.page=h;renderAll();}
+}
+addEventListener('hashchange',applyHash);
+
+/* ================= СОБЫТИЯ ================= */
+document.addEventListener('click',e=>{
+  const dd=$('#pagesDD');if(dd&&!dd.contains(e.target))dd.classList.remove('open');
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act,id=el.dataset.id;
+  if(a==='goto'){
+    if(el.dataset.sound)playKitSound(el.dataset.sound,false);
+    else playClick(1,0.06);
+    goto(id);
+  }
+  else if(a==='gotoModeFromCard'){
+    if(el.dataset.sound)playKitSound(el.dataset.sound,false);
+    closeModal('playerModal');
+    goto(id);
+  }
+  else if(a==='toggleDD'){playClick(1.1,0.05);dd.classList.toggle('open');}
+  else if(a==='closeModal'){playClick(0.9,0.05);closeModal(id);}
+  else if(a==='openPlayer'){playClick(1.05,0.06);openPlayerModal(id);}
+  else if(a==='toggleGrid'){playClick(1,0.05);UI.collapsed.has(id)?UI.collapsed.delete(id):UI.collapsed.add(id);renderAll();}
+  else if(a==='confirmYes'){if(_cf)_cf();_cf=null;closeModal('confirmModal');}
+  else if(!EDIT_MODE)return;
+  else if(a==='edTab'){UI.pageEdit=null;UI.edTab=el.dataset.tab;renderAll();}
+  else if(a==='editPageInPlace'||a==='openPageEdit')openPageEditor(id);
+  else if(a==='peAdd'){syncPageEditFromDOM();UI.pageEdit.blocks.push(mkBlock(el.dataset.btype));renderAll();}
+  else if(a==='peDel'){syncPageEditFromDOM();UI.pageEdit.blocks.splice(+el.dataset.idx,1);renderAll();}
+  else if(a==='peMove'){syncPageEditFromDOM();const bs=UI.pageEdit.blocks,i=+el.dataset.idx,j=i+ +el.dataset.dir;if(j>=0&&j<bs.length){[bs[i],bs[j]]=[bs[j],bs[i]];renderAll();}}
+  else if(a==='peSave')savePageEdit();
+  else if(a==='peCancel'){UI.pageEdit=null;renderAll();}
+  else if(a==='tplPage'){const map={rules:tplRules,calib:tplCalib,changelog:tplChangelog};const pg=(map[el.dataset.tpl]||tplRules)();S.pages.push(pg);S.nav.push({kind:'page',ref:pg.id});save();renderAll();toast('📄 Страница добавлена');}
+  else if(a==='newPage'){const pg=mkPage('Новая страница','📄','Описание',[mkBlock('h2'),mkBlock('p')]);S.pages.push(pg);S.nav.push({kind:'page',ref:pg.id});save();openPageEditor(pg.id);}
+  else if(a==='delPage')showConfirm('Удалить страницу?',()=>{S.pages=S.pages.filter(p=>p.id!==id);S.nav=S.nav.filter(n=>!(n.kind==='page'&&n.ref===id));if(UI.page===id)UI.page='top';save();renderAll();toast('🗑 Удалено');});
+  else if(a==='delNav'){S.nav.splice(+el.dataset.idx,1);save();renderAll();}
+  else if(a==='addMode'){const mid='m_'+uid();S.modes.push({id:mid,name:'Новый режим',icon:'⚔️'});S.nav.push({kind:'mode',ref:mid});save();renderAll();}
+  else if(a==='delMode'){const m=S.modes[+el.dataset.idx];if(!m)return;showConfirm(`Удалить режим «${m.name}»?`,()=>{S.modes.splice(+el.dataset.idx,1);S.nav=S.nav.filter(n=>!(n.kind==='mode'&&n.ref===m.id));save();renderAll();});}
+  else if(a==='addGrid'){S.grids.push({id:uid(),name:'Новая сетка',icon:'🏅',auto:false,autoCount:3,players:[]});save();renderAll();}
+  else if(a==='delGrid')showConfirm('Удалить эту сетку?',()=>{S.grids.splice(+el.dataset.gi,1);save();renderAll();});
+  else if(a==='addGridPlayer'){const gi=+el.dataset.gi,pid=$('#addGridSel_'+gi).value;if(!pid)return;const g=S.grids[gi];if(!g.players.includes(pid))g.players.push(pid);save();renderAll();}
+  else if(a==='rmGridPlayer'){S.grids[+el.dataset.gi].players=S.grids[+el.dataset.gi].players.filter(x=>x!==el.dataset.pid);save();renderAll();}
+  else if(a==='newPlayer')openPlayerForm();
+  else if(a==='editPlayer')openPlayerForm(id);
+  else if(a==='delPlayer'){const p=byId(id);if(!p)return;showConfirm(`Удалить игрока ${p.nick}?`,()=>{S.players=S.players.filter(x=>x.id!==id);S.grids.forEach(g=>g.players=g.players.filter(x=>x!==id));save();closeModal('playerModal');renderAll();toast('🗑 Удалён');});}
+  else if(a==='pfAddTag'){const inp=$('#pfTagInput'),v=inp.value.trim();if(!v)return;PF.tags.push(v);inp.value='';renderPFTags();}
+  else if(a==='pfDelTag'){PF.tags.splice(+el.dataset.idx,1);renderPFTags();}
+  else if(a==='pfSkinPick')pickImg(u=>{PF.skin=u;$('#pfSkinPrev').src=u;});
+  else if(a==='pfSkinClear'){PF.skin='';$('#pfSkinPrev').src=DEFAULT_AVA;}
+  else if(a==='pfBgPick')pickBgImg(u=>{PF.bg=u;$('#pfBgPrev').src=u;});
+  else if(a==='pfBgClear'){PF.bg='';$('#pfBgPrev').src=DEFAULT_AVA;}
+  else if(a==='pfSave')savePlayerForm();
+  else if(a==='addTitle'){S.titles.push({id:uid(),name:'Новое звание',emoji:'👑',color:'#e9edf5',min:0});save();renderAll();}
+  else if(a==='delTitle'){S.titles.splice(+el.dataset.idx,1);save();renderAll();}
+  else if(a==='exportJSON'){const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a2=document.createElement('a');a2.href=url;a2.download='data.json';a2.click();URL.revokeObjectURL(url);toast('📥 Скачан data.json');}
+  else if(a==='importJSON')$('#importFile').click();
+  else if(a==='resetDemo')showConfirm('Сбросить все данные к примеру по умолчанию?',()=>{localStorage.removeItem(KEY);localStorage.removeItem(DRAFT_KEY);S=clone(DEFAULTS);S._seeded=false;seedPages();save();renderAll();toast('🔄 Сброшено');});
+});
+
+/* Звук при наведении на вкладку кита или карточку игрока */
+document.addEventListener('mouseover',e=>{
+  if(!SOUND_ON)return;
+  const tab=e.target.closest('.tab[data-sound]');
+  if(tab&&!tab.contains(e.relatedTarget)){
+    playKitSound(tab.dataset.sound,true);
+  }
+});
+
+$('#soundBtn').addEventListener('click',()=>{
+  SOUND_ON=!SOUND_ON;
+  localStorage.setItem(SOUND_KEY,SOUND_ON?'1':'0');
+  updateSoundBtn();
+  if(SOUND_ON){ensureAC();playLevelUp();toast('🔊 Звуки включены');}
+  else toast('🔇 Звуки выключены');
+});
+
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.id==='qInput'){UI.search=el.value;const pos=el.selectionStart;renderAll();const n=$('#qInput');if(n){n.focus();n.setSelectionRange(pos,pos);}}
+  else if(el.dataset.s==='radius')$('#radVal').textContent=el.value;
+});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.id==='fRegion'){UI.region=el.value;renderAll();}
+  else if(el.id==='fCountry'){UI.country=el.value;renderAll();}
+  else if(el.id==='fSort'){UI.sort=el.value;renderAll();}
+  else if(!EDIT_MODE)return;
+  else if(el.dataset.s){const k=el.dataset.s;S.settings[k]=el.type==='checkbox'?el.checked:(el.type==='range'?+el.value:el.value);save();renderAll();}
+  else if(el.dataset.tc){S.settings.tierColors[el.dataset.tc]=el.value;save();renderAll();}
+  else if(el.dataset.m){S.modes[+el.dataset.idx][el.dataset.m]=el.value;save();renderTabs();}
+  else if(el.dataset.n){S.nav[+el.dataset.idx][el.dataset.n]=el.value.trim();save();renderTabs();}
+  else if(el.dataset.g){const g=S.grids[+el.dataset.gi],k=el.dataset.g;g[k]=el.type==='checkbox'?el.checked:(el.type==='number'?Math.max(1,+el.value||1):el.value);save();renderAll();}
+  else if(el.dataset.pt){S.points[el.dataset.pt]=+el.value||0;save();}
+  else if(el.dataset.tl){const k=el.dataset.tl;S.titles[+el.dataset.idx][k]=k==='min'?+el.value||0:el.value;save();}
+});
+$('#pfTagInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.querySelector('[data-act="pfAddTag"]').click();}});
+$('#importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{S=normalize(JSON.parse(r.result));save();renderAll();toast('📤 Импортировано');}catch{toast('Ошибка в JSON',true);}};r.readAsText(f);e.target.value='';});
+
+let dragSrc=null;
+document.addEventListener('dragstart',e=>{const r=e.target.closest('[data-drag]');if(!r||!EDIT_MODE)return;dragSrc={kind:r.dataset.drag,idx:+r.dataset.idx};e.dataTransfer.effectAllowed='move';});
+document.addEventListener('dragover',e=>{if(dragSrc&&e.target.closest('[data-drag="'+dragSrc.kind+'"]'))e.preventDefault();});
+document.addEventListener('drop',e=>{const r=e.target.closest('[data-drag]');if(!r||!dragSrc||!EDIT_MODE)return;const k=r.dataset.drag;if(dragSrc.kind!==k)return;const to=+r.dataset.idx,arr=S[k];if(dragSrc.idx===to)return;const [item]=arr.splice(dragSrc.idx,1);arr.splice(to,0,item);dragSrc=null;save();renderAll();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')['playerModal','playerForm','confirmModal'].forEach(closeModal);});
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
+
+boot();
+</script>
+</body>
+</html>
