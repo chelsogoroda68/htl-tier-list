@@ -488,7 +488,7 @@
         "smp": "LT4",
         "axe": "HT1",
         "mace": "LT5",
-        "cart": "HT3",
+        "cart": "HT2",
         "spear": "LT5"
       },
       "bio": ""
@@ -534,7 +534,7 @@
       "tiers": {
         "vanilla": "HT4",
         "sword": "HT3",
-        "uhc": "HT4",
+        "uhc": "HT3",
         "pot": "HT3",
         "smp": "HT4",
         "axe": "HT4",
